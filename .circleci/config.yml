@@ -40,4 +40,4 @@ jobs:
       # run tests!
       - run: mvn -f base integration-test
 
-      - run: mvn -f base --batch-mode -DdryRun=true release:prepare
+      - run: mvn -f base --batch-mode -DscmCommentPrefix="[maven-release-plugin][ci skip] " release:prepare
