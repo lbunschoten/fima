@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: fima-transaction-service
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: fima-transaction-service
+          image: "fima-transaction-service:1.0"
+          ports:
+            - name: http
+              containerPort: 9997
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: fima-transaction-service
+spec:
+  selector:
+    app: fima
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 9997
+      targetPort: http
