@@ -1,0 +1,30 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: fima-web-frontend
+spec:
+  selector:
+    app: fima-web-frontend
+    tier: frontend
+  ports:
+    - protocol: "TCP"
+      port: 8890
+      targetPort: 8890
+  type: LoadBalancer
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: fima-web-frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fima-web-frontend
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: fima-web-frontend
+          image: "fima-web-frontend:1.0"
