@@ -180,7 +180,19 @@
                 <artifactId>maven-release-plugin</artifactId>
             </plugin>
         </plugins>
-
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>MavenLocal</id>
+            <name>Local file system</name>
+            <url>file:///~/.m2/repository</url>
+        </repository>
+        <snapshotRepository>
+            <id>MavenLocalSnapshot</id>
+            <name>Local file system</name>
+            <url>file:///~/.m2/repository</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
