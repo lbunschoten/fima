@@ -16,6 +16,12 @@
     <version>17.12.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <scm>
+        <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
+        <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
