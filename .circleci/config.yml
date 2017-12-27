@@ -19,6 +19,8 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
+      GIT_AUTHOR_NAME: lbunschoten
+      GIT_AUTHOR_EMAIL: lbunschoten@circleci
 
     steps:
       - checkout
