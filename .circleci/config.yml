@@ -41,7 +41,7 @@ jobs:
       - run: mvn -f base integration-test
 
       - run:
-        command: mvn -f base --batch-mode -DscmCommentPrefix="[maven-release-plugin][ci skip] " release:prepare
-        environment:
-          GIT_AUTHOR_NAME: lbunschoten
-          GIT_AUTHOR_EMAIL: lbunschoten@circleci
+          command: mvn -f base --batch-mode -DscmCommentPrefix="[maven-release-plugin][ci skip] " release:prepare
+          environment:
+              GIT_AUTHOR_NAME: lbunschoten
+              GIT_AUTHOR_EMAIL: lbunschoten@circleci
