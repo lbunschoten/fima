@@ -11,6 +11,7 @@
 
     <scm>
         <connection>scm:git:ssh://git@github.com:lbunschoten/fima.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:lbunschoten/fima.git</developerConnection>
     </scm>
 
     <properties>
