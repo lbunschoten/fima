@@ -17,3 +17,7 @@ project/plugins/project/
 .worksheet
 .idea
 *.iml
+
+.DS_Store
+node_modules/
+npm-debug.log
