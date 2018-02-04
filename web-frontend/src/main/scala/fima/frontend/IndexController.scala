@@ -5,13 +5,11 @@ import com.twitter.finatra.http.Controller
 
 class IndexController extends Controller {
 
-  get("/") { _: Request =>
-    response.ok.view("index.mustache", Map(
-      "transactions" -> Seq(Transaction("a"), Transaction("b"))
-    ))
+  get("/index.html") { _: Request =>
+    response.ok.file("index.html")
   }
 
-  get("/assets/:*") { request: Request =>
+  get("/:*") { request: Request =>
     response.ok.file(request.params("*"))
   }
 

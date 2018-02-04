@@ -1,7 +1,15 @@
-FROM frolvlad/alpine-oraclejdk8:full
+FROM node:alpine
 
-EXPOSE 8890
+WORKDIR /usr/src/app
 
-COPY ./target/fima-web-frontend-17.12.1-SNAPSHOT-jar-with-dependencies.jar fima.jar
+COPY package*.json ./
+COPY build ./build
+COPY config ./config
 
-ENTRYPOINT ["java", "-cp", "fima.jar", "fima.frontend.WebFrontend"]
+RUN npm install
+
+RUN npm run build
+
+EXPOSE 8080
+
+CMD ["npm", "start"]
