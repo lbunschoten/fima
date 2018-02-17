@@ -6,15 +6,15 @@ import fima.transactionservice.thriftscala.{Transaction, TransactionService$Fina
 
 class TransactionController(transactionService: TransactionService$FinagleClient) extends Controller {
 
-  get("/transaction/:id") { request: GetTransactionRequest =>
+  get("/api/transaction/:id") { request: GetTransactionRequest =>
     transactionService.getTransaction(request.id)
   }
 
-  put("/transaction") { request: PutTransactionRequest =>
+  put("/api/transaction") { request: PutTransactionRequest =>
     transactionService.insertTransaction(Transaction(0))
   }
 
-  delete("/transaction/:id") { request: DeleteTransactionRequest =>
+  delete("/api/transaction/:id") { request: DeleteTransactionRequest =>
     transactionService.deleteTransaction(request.id)
   }
 

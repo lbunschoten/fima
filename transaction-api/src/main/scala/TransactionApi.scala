@@ -33,7 +33,6 @@ object TransactionApi extends HttpServer {
       .failFast(false)
       .build()
 
-
   override protected def configureHttp(router: HttpRouter): Unit = {
     router
       .filter[LoggingMDCFilter[Request, Response]]
