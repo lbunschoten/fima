@@ -181,11 +181,39 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>releases</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <serverId>fima-releases</serverId>
+                            <nexusUrl>http://${env.NEXUS_HOST}:8081/</nexusUrl>
+                            <skipStaging>true</skipStaging>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <distributionManagement>
         <repository>
-            <id>MavenLocal</id>
-            <name>Local file system</name>
-            <url>file://${user.home}/.m2/repository</url>
+            <id>fima-releases</id>
+            <url>http://${env.NEXUS_HOST}:8081/repository/fima-releases</url>
         </repository>
         <snapshotRepository>
             <id>MavenLocalSnapshot</id>
