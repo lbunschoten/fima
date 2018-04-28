@@ -10,8 +10,8 @@
     <scm>
         <connection>scm:git:ssh://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-      <tag>fima-base-18.04.2</tag>
-  </scm>
+        <tag>fima-base-18.04.2</tag>
+    </scm>
 
     <properties>
         <scala.version>2.12.4</scala.version>
