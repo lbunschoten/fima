@@ -2,26 +2,49 @@ package fima.transaction
 
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.QueryParam
-import fima.transactionservice.thriftscala.{Transaction, TransactionService$FinagleClient}
+import fima.services.transaction
+import fima.services.transaction.TransactionServiceGrpc.TransactionServiceBlockingStub
+import fima.services.transactionstatistics.TransactionStatisticsServiceGrpc.TransactionStatisticsServiceBlockingStub
+import fima.services.transactionstatistics.{TransactionStatisticsResponse, TransactionsStatisticsRequest}
 
-class TransactionController(transactionService: TransactionService$FinagleClient) extends Controller {
+class TransactionController(transactionService: TransactionServiceBlockingStub,
+                            transactionStatisticsService: TransactionStatisticsServiceBlockingStub) extends Controller {
 
   get("/api/transaction/:id") { request: GetTransactionRequest =>
-    transactionService.getTransaction(request.id)
+    val request = transaction.GetTransactionRequest.newBuilder().setId(1).build()
+    transactionService.getTransaction(request)
+  }
+
+  get("/api/transaction/recent") { request: RecentTransactionRequest =>
+    val request = transaction.GetRecentTransactionsRequest.newBuilder().setLimit(5).build()
+    transactionService.getRecentTransactions(request)
+  }
+
+  get("/api/transaction/statistics") { request: TransactionStatisticsRequest =>
+    val a: TransactionStatisticsResponse = transactionStatisticsService.getStatistics(TransactionsStatisticsRequest.newBuilder().setName("abc").build())
+    StatisticsResponse(a.getTransactions)
   }
 
   put("/api/transaction") { request: PutTransactionRequest =>
-    transactionService.insertTransaction(Transaction(0))
+    val request = transaction.InsertTransactionRequest.newBuilder().build()
+    transactionService.insertTransaction(request)
   }
 
   delete("/api/transaction/:id") { request: DeleteTransactionRequest =>
-    transactionService.deleteTransaction(request.id)
+    val request = transaction.DeleteTransactionRequest.newBuilder().build()
+    transactionService.deleteTransaction(request)
   }
 
 }
 
 case class GetTransactionRequest(@QueryParam id: Int)
 
+case class TransactionStatisticsRequest()
+
+case class RecentTransactionRequest(@QueryParam limit: Int)
+
 case class PutTransactionRequest(@QueryParam description: String)
 
 case class DeleteTransactionRequest(@QueryParam id: Int)
+
+case class StatisticsResponse(transactions: Int)

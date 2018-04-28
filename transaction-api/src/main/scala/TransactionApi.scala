@@ -1,14 +1,13 @@
-import java.net.InetSocketAddress
-
-import com.twitter.finagle.builder.ClientBuilder
 import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finagle.thrift.RichClientParam
-import com.twitter.finagle.{Thrift, thrift}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
+import fima.services.transaction.TransactionServiceGrpc
+import fima.services.transaction.TransactionServiceGrpc.TransactionServiceBlockingStub
+import fima.services.transactionstatistics.TransactionStatisticsServiceGrpc
+import fima.services.transactionstatistics.TransactionStatisticsServiceGrpc.TransactionStatisticsServiceBlockingStub
 import fima.transaction.TransactionController
-import fima.transactionservice.thriftscala.TransactionService$FinagleClient
+import io.grpc.ManagedChannelBuilder
 
 object TransactionApi extends HttpServer {
 
@@ -18,27 +17,25 @@ object TransactionApi extends HttpServer {
   private val transactionServiceHost = flag(name = "transaction.service.host", default = "localhost", help = "Host for transaction-service")
   private val transactionServicePort = flag(name = "transaction.service.port", default = 9997, help = "Host for transaction-service")
 
-  def transactionService: TransactionService$FinagleClient = new TransactionService$FinagleClient(
-    thriftClientBuilder(transactionServiceHost(), transactionServicePort()), RichClientParam(
-      protocolFactory = thrift.Protocols.binaryFactory(),
-      "transactionService"
-    )
-  )
+  private val transactionStatisticsServiceHost = flag(name = "transaction-statistics.service.host", default = "localhost", help = "Host for transaction-statistics-service")
+  private val transactionStatisticsServicePort = flag(name = "transaction-statistics.service.port", default = 15001, help = "Host for transaction-statistics-service")
 
-  private def thriftClientBuilder(host: String, port: Int) =
-    ClientBuilder()
-      .hosts(Seq(new InetSocketAddress(host, port)))
-      .stack(Thrift.client)
-      .hostConnectionLimit(1)
-      .failFast(false)
-      .build()
+  def transactionService: TransactionServiceBlockingStub = {
+    val channel = ManagedChannelBuilder.forAddress(transactionServiceHost(), transactionServicePort()).usePlaintext(true).build()
+    TransactionServiceGrpc.newBlockingStub(channel)
+  }
+
+  def transactionStatisticsService: TransactionStatisticsServiceBlockingStub = {
+    val channel = ManagedChannelBuilder.forAddress(transactionStatisticsServiceHost(), transactionStatisticsServicePort()).usePlaintext(true).build()
+    TransactionStatisticsServiceGrpc.newBlockingStub(channel)
+  }
 
   override protected def configureHttp(router: HttpRouter): Unit = {
     router
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter[CommonFilters]
-      .add(new TransactionController(transactionService))
+      .add(new TransactionController(transactionService, transactionStatisticsService))
   }
 
 }
