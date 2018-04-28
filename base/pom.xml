@@ -33,6 +33,11 @@
 
     <repositories>
         <repository>
+            <id>fima-releases</id>
+            <name>fima-releases</name>
+            <url>http://${env.NEXUS_HOST}:8081/repository/fima-releases</url>
+        </repository>
+        <repository>
             <id>twitter-repo</id>
             <name>twitter-repo</name>
             <url>https://maven.twttr.com</url>
