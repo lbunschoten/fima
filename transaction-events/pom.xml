@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>fima-transaction-events-contract</artifactId>
-    <version>17.12.3-SNAPSHOT</version>
+    <version>18.12.4</version>
     <packaging>jar</packaging>
 
     <scm>
