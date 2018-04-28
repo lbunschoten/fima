@@ -10,7 +10,6 @@
     <scm>
         <connection>scm:git:ssh://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>fima-base-18.04.2</tag>
     </scm>
 
     <properties>
@@ -30,27 +29,6 @@
         <java-lang.encoding>UTF-8</java-lang.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>fima-releases</id>
-            <name>fima-releases</name>
-            <url>http://${env.NEXUS_HOST}:8081/repository/fima-releases</url>
-        </repository>
-        <repository>
-            <id>twitter-repo</id>
-            <name>twitter-repo</name>
-            <url>https://maven.twttr.com</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>twitter-repo</id>
-            <name>twitter-repo</name>
-            <url>https://maven.twttr.com</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencyManagement>
         <dependencies>
