@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package domain;
+
+option java_multiple_files = true;
+option java_package = "fima.domain.transaction";
+option java_outer_classname = "TransactionServiceProtos";
+
+message Date {
+    int32 day = 1;
+    int32 month = 2;
+    int32 year = 3;
+}
+
+enum TransactionType {
+    WIRE_TRANSFER = 0; // Acceptgiro (AM)
+    DIRECT_DEBIT = 1; // Incasso (IC)
+    PAYMENT_TERMINAL = 2; // Betaalautomaat (BA)
+    TRANSFER = 3; // Overschrijving (OV)
+    ONLINE_TRANSFER = 4; // Online overschrijving (GT)
+    ATM = 5; // Geldautomaat (GM)
+    TRANSER_COLLECTION = 6; // Verzamelbetaling (VZ)
+    OTHER = 99; // Diversen (DV)
+}
+
+message Transaction {
+    int32 id = 1;
+    Date date = 2;
+    TransactionType type = 3;
+    string name = 4;
+    string description = 5;
+    string to_account = 6;
+    string from_account = 7;
+    float amount = 8;
+}
+
+message RawTransaction {
+    int32 date = 1;
+    string name = 2;
+    string from_account = 3;
+    string to_account = 4;
+    string type = 5;
+    float amount = 6;
+    string details = 7;
+}
