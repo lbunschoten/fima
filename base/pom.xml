@@ -4,13 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fima</groupId>
     <artifactId>fima-base</artifactId>
-    <version>18.04.6-SNAPSHOT</version>
+    <version>18.04.6</version>
     <packaging>pom</packaging>
 
     <scm>
         <connection>scm:git:ssh://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-    </scm>
+      <tag>fima-base-18.04.6</tag>
+  </scm>
 
     <properties>
         <scala.version>2.12.4</scala.version>
