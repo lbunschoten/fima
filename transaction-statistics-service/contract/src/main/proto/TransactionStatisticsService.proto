@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package services;
+
+option java_multiple_files = true;
+option java_package = "fima.services.transactionstatistics";
+option java_outer_classname = "TransactionStatisticsServiceProtos";
+
+service TransactionStatisticsService {
+    rpc getStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
+}
+
+message TransactionsStatisticsRequest {
+    string name = 1;
+}
+
+message TransactionStatisticsResponse {
+    int32 month = 1;
+    int32 year = 2;
+    int32 transactions = 3;
+}
