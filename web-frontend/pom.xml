@@ -35,8 +35,16 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- optional: you don't really need execution ids, but it looks nice in your build log. -->
-                        <id>install rebuild node-sass</id>
+                        <id>install dependencies</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>rebuild node-sass</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -45,8 +53,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- optional: you don't really need execution ids, but it looks nice in your build log. -->
-                        <id>install npm dependencies</id>
+                        <id>build</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
