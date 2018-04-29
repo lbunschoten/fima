@@ -16,7 +16,7 @@
     <version>18.02.1-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.2.40</kotlin.version>
+        <kotlin.version>1.2.41</kotlin.version>
         <grpc.version>1.10.0</grpc.version>
         <mysql-connector.version>6.0.6</mysql-connector.version>
         <kafka.version>0.10.0.1</kafka.version>
