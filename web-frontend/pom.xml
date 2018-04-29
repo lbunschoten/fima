@@ -8,50 +8,55 @@
     <parent>
         <artifactId>fima-base</artifactId>
         <groupId>fima</groupId>
-        <version>17.12.4</version>
+        <version>18.04.6</version>
         <relativePath/>
     </parent>
 
     <artifactId>fima-web-frontend</artifactId>
     <version>17.12.1-SNAPSHOT</version>
 
-    <dependencies>
-        <!-- Scala dependencies -->
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-        </dependency>
-
-        <!-- fima dependencies -->
-
-        <dependency>
-            <groupId>fima</groupId>
-            <artifactId>fima-transaction-service-thrift</artifactId>
-            <version>17.12.1</version>
-        </dependency>
-
-        <!-- Third party dependencies -->
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>finatra-http_${scala.compat.version}</artifactId>
-        </dependency>
-
-    </dependencies>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <!-- optional: you don't really need execution ids, but it looks nice in your build log. -->
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v8.11.1</nodeVersion>
+                            <nodeDownloadRoot>${env.NODE_DOWNLOAD_ROOT}</nodeDownloadRoot>
+                            <npmDownloadRoot>${env.NPM_DOWNLOAD_ROOT}</npmDownloadRoot>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- optional: you don't really need execution ids, but it looks nice in your build log. -->
+                        <id>install rebuild node-sass</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>rebuild node-sass --force</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- optional: you don't really need execution ids, but it looks nice in your build log. -->
+                        <id>install npm dependencies</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

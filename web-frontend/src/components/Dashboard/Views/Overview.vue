@@ -80,10 +80,10 @@
          * Chart data used to render stats, charts. Should be replaced with server data
          */
         mounted() {
-            fetch('/api/transaction/1')
+            fetch('/api/transaction/statistics')
                 .then(response => response.json())
-                .then(transaction => {
-                    this.statsCards[2].value = transaction.id;
+                .then(statistics => {
+                    this.statsCards[2].value = statistics.transactions;
                 });
         },
         data() {
