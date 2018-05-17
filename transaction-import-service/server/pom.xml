@@ -127,7 +127,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>${env.NEXUS_HOST}:8081/repository/fima-docker/${project.artifactId}</repository>
+                    <repository>${project.artifactId}</repository>
                     <tag>${project.version}</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
