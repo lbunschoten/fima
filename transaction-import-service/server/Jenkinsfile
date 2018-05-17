@@ -14,13 +14,17 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn -DskipTests clean package'
+                dir('transaction-import-service/server') {
+                    sh 'mvn -DskipTests clean package'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                dir('transaction-import-service/server') {
+                    sh 'mvn test'
+                }
             }
         }
     }
