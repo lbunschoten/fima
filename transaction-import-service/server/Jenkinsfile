@@ -31,7 +31,7 @@ pipeline {
 
         stage('Push docker image') {
             steps {
-                docker.withRegistry(${env.DOCKER_REGISTRY}) {
+                docker.withRegistry(env.DOCKER_REGISTRY) {
 
                     def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
 
