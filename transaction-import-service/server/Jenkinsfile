@@ -31,11 +31,13 @@ pipeline {
 
         stage('Push docker image') {
             steps {
-                docker.withRegistry(env.DOCKER_REGISTRY) {
+                script {
+                    docker.withRegistry(env.DOCKER_REGISTRY) {
 
-                    def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
+                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
 
-                    customImage.push()
+                        customImage.push()
+                    }
                 }
             }
         }
