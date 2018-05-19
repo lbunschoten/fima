@@ -34,7 +34,7 @@ pipeline {
                 script {
                     docker.withRegistry(env.DOCKER_REGISTRY) {
 
-                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}", '-f transaction-import-service/server/Dockerfile .')
+                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}", '-f Dockerfile ./transaction-import-service/server')
 
                         customImage.push()
                     }
