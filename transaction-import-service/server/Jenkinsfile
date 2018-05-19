@@ -32,11 +32,13 @@ pipeline {
         stage('Push docker image') {
             steps {
                 script {
-                    docker.withRegistry(env.DOCKER_REGISTRY) {
+                    dir('transaction-import-service/server') {
+                        docker.withRegistry(env.DOCKER_REGISTRY) {
 
-                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
+                            def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
 
-                        customImage.push()
+                            customImage.push()
+                        }
                     }
                 }
             }
