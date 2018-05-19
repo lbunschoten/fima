@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
+                cleanWs()
                 checkout scm
             }
         }
@@ -24,6 +25,20 @@ pipeline {
             steps {
                 dir('transaction-import-service/server') {
                     sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Push docker image') {
+            steps {
+                script {
+                    echo env.DOCKER_REGISTRY
+
+                    docker.withRegistry(env.DOCKER_REGISTRY, 'nexus-docker-registry') {
+                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}", './transaction-import-service/server')
+
+                        customImage.push()
+                    }
                 }
             }
         }
