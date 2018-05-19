@@ -16,7 +16,6 @@
     <version>18.03.1-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.2.41</kotlin.version>
         <grpc.version>1.10.0</grpc.version>
         <kafka.version>0.10.0.1</kafka.version>
     </properties>
@@ -26,7 +25,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
 
         <dependency>
@@ -74,7 +72,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
 
