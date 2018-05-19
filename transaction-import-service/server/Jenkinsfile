@@ -34,7 +34,7 @@ pipeline {
                 script {
                     echo env.DOCKER_REGISTRY
 
-                    docker.withRegistry("http://${env.DOCKER_REGISTRY}", 'nexus-docker-registry') {
+                    docker.withRegistry("${env.DOCKER_REGISTRY}", 'nexus-docker-registry') {
                         def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}", './transaction-import-service/server')
 
                         customImage.push()
