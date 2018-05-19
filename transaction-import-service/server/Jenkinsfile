@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        dockerfile {
-            dir 'transaction-import-service/server'
-        }
-    }
+    agent any
 
     tools {
         maven 'Maven 3.3.9'
