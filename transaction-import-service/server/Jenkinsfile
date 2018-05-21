@@ -42,8 +42,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "sed -i.bak 's/\$BUILD_ID/${env.BUILD_ID}/g' transaction-import-service/server/manifest.yaml"
-                    sh "kubectl apply -f transaction-import-service/server/manifest.yaml"
+                    dir('transaction-import-service/server') {
+                        sh "sed -i.bak 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
+                        sh "kubectl apply -f manifest.yaml"
+                    }
                 }
             }
         }
