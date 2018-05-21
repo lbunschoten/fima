@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: transaction-import-service
-          image: "192.168.178.52:8123/transaction-import-service:40"
+          image: "192.168.178.52:8123/transaction-import-service:$BUILD_ID"
           ports:
             - name: http
               containerPort: 9997

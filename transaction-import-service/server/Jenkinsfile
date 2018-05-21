@@ -32,13 +32,17 @@ pipeline {
         stage('Push docker image') {
             steps {
                 script {
-                    echo env.DOCKER_REGISTRY
-
                     docker.withRegistry(env.DOCKER_REGISTRY, 'nexus-docker-registry') {
-                        def customImage = docker.build("${env.JOB_NAME}:${env.BUILD_ID}", './transaction-import-service/server')
-
-                        customImage.push()
+                        docker.build("${env.JOB_NAME}:${env.BUILD_ID}", './transaction-import-service/server').push()
                     }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    sh "cat transaction-import-service/server/manifest.yaml | sed 's/\$BUILD_ID/${env.BUILD_ID}/g' | kubectl apply -f -"
                 }
             }
         }
