@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "sed 's/\$BUILD_ID/${env.BUILD_ID}/g' transaction-import-service/server/manifest.yaml"
+                    sh "sed -i.bak 's/\$BUILD_ID/${env.BUILD_ID}/g' transaction-import-service/server/manifest.yaml"
                     sh "kubectl apply -f transaction-import-service/server/manifest.yaml"
                 }
             }
