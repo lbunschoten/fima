@@ -4,4 +4,4 @@ COPY ./target/fima-transaction-import-service-server-18.03.1-SNAPSHOT-jar-with-d
 
 EXPOSE 9997
 
-ENTRYPOINT ["java", "-cp", "fima.jar", "fima.transactionservice.TransactionServiceServer"]
+ENTRYPOINT ["java", "-cp", "fima.jar", "fima.services.transactionimport.MainKt"]

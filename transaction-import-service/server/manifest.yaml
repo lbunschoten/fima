@@ -1,0 +1,34 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: transaction-import-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: transaction-import-service
+          image: "192.168.178.52:8123/transaction-import-service:40"
+          ports:
+            - name: http
+              containerPort: 9997
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: transaction-import-service
+spec:
+  selector:
+    app: fima
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 9997
+      targetPort: http
