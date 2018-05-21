@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "transaction-import-service/server/manifest.yaml | sed 's/\$BUILD_ID/${env.BUILD_ID}/g"
+                    sh "cat transaction-import-service/server/manifest.yaml | sed 's/\$BUILD_ID/${env.BUILD_ID}/g"
                     sh "cat transaction-import-service/server/manifest.yaml | sed 's/\$BUILD_ID/${env.BUILD_ID}/g' | kubectl apply -f -"
                 }
             }
