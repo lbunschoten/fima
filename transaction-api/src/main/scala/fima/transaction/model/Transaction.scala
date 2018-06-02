@@ -33,7 +33,7 @@ case class Transaction(id: Int,
 
 object Transaction {
 
-  def fromProto(t: ProtoTransaction): Unit = {
+  def fromProto(t: ProtoTransaction): Transaction = {
     Transaction(
       t.getId,
       LocalDate.of(t.getDate.getYear, t.getDate.getMonth, t.getDate.getDay),
