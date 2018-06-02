@@ -37,8 +37,7 @@ spec:
   selector:
     app: fima
     tier: backend
-    matchLabels:
-      name: transaction-service
+    name: transaction-service
   ports:
     - protocol: TCP
       port: 9997
