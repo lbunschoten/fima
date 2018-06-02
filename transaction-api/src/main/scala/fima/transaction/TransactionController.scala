@@ -12,7 +12,11 @@ class TransactionController(transactionService: TransactionServiceBlockingStub,
 
   get("/api/transaction/:id") { request: GetTransactionRequest =>
     val request = transaction.GetTransactionRequest.newBuilder().setId(1).build()
-    transactionService.getTransaction(request)
+    val r = transactionService.getTransaction(request)
+
+    println(s"DEBUG: ${r.getTransaction.getId}")
+
+    r
   }
 
   get("/api/transaction/recent") { request: RecentTransactionRequest =>
