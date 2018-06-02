@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
         props
     }(), "fima-added-transactions").listen(transactionAddedEventProcessor)
 
-    val server = ServerBuilder.forPort(15001).addService(TransactionStatisticsServiceImpl(statisticsRepository)).build()
+    val server = ServerBuilder.forPort(9997).addService(TransactionStatisticsServiceImpl(statisticsRepository)).build()
     server.start()
     println("Transaction statistics service started")
 

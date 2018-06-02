@@ -18,7 +18,7 @@ object TransactionApi extends HttpServer {
   private val transactionServicePort = flag(name = "transaction.service.port", default = 9997, help = "Host for transaction-service")
 
   private val transactionStatisticsServiceHost = flag(name = "transaction-statistics.service.host", default = "localhost", help = "Host for transaction-statistics-service")
-  private val transactionStatisticsServicePort = flag(name = "transaction-statistics.service.port", default = 15001, help = "Host for transaction-statistics-service")
+  private val transactionStatisticsServicePort = flag(name = "transaction-statistics.service.port", default = 9997, help = "Host for transaction-statistics-service")
 
   def transactionService: TransactionServiceBlockingStub = {
     val channel = ManagedChannelBuilder.forAddress(transactionServiceHost(), transactionServicePort()).usePlaintext(true).build()
