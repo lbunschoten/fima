@@ -15,7 +15,7 @@ import java.util.*
 fun main(args: Array<String>) {
     val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-    Database.connect("jdbc:mysql://$dbHost:3306/transaction-statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
+    Database.connect("jdbc:mysql://$dbHost:3306/transaction_statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
     val statisticsRepository = StatisticsRepository()
     val transactionAddedEventProcessor = ProcessTransactionAddedEvent(statisticsRepository)
