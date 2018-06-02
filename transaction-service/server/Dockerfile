@@ -4,6 +4,4 @@ COPY ./target/fima-transaction-service-server-18.03.1-SNAPSHOT-jar-with-dependen
 
 EXPOSE 9997
 
-CMD echo $DB_HOST
-
 ENTRYPOINT ["java", "-cp", "fima.jar", "fima.services.transaction.MainKt"]
