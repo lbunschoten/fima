@@ -36,7 +36,7 @@ object Transaction {
   def fromProto(t: ProtoTransaction): Unit = {
     Transaction(
       t.getId,
-      LocalDate.of(t.getDate.getYear, t.getDate.getMonth, t.getDate.getDay),
+      LocalDate.of(t.getDate.getYear, t.getDate.getMonth + 1, t.getDate.getDay),
       TransactionType.fromProto(t.getType),
       t.getName,
       t.getDescription,
