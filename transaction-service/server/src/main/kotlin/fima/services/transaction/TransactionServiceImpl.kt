@@ -12,6 +12,7 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
                              private val toTransactionConverter: RawTransactionToTransactionConverter) : TransactionServiceGrpc.TransactionServiceImplBase() {
 
     override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
+        println("DEBUG: Get transaction")
         val response = GetTransactionResponse
                 .newBuilder()
                 .setTransaction(Transaction.newBuilder().setId(1))
