@@ -15,7 +15,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir("${env.JOB_NAME}/server") {
+                dir("${env.JOB_NAME}") {
                     sh 'mvn -DskipTests clean package'
                 }
             }
@@ -23,7 +23,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir("${env.JOB_NAME}/server") {
+                dir("${env.JOB_NAME}") {
                     sh 'mvn test'
                 }
             }
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry(env.DOCKER_REGISTRY, 'nexus-docker-registry') {
-                        docker.build("${env.JOB_NAME}:${env.BUILD_ID}", "./${env.JOB_NAME}/server").push()
+                        docker.build("${env.JOB_NAME}:${env.BUILD_ID}", "./${env.JOB_NAME}").push()
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    dir("${env.JOB_NAME}/server") {
+                    dir("${env.JOB_NAME}") {
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
                         sh "sed -i 's/\$NEXUS_HOST/${env.NEXUS_HOST}/g' manifest.yaml"
                         sh "kubectl apply -f manifest.yaml"
