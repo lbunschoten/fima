@@ -13,8 +13,9 @@ import java.util.*
 
 
 fun main(args: Array<String>) {
-    // TODO: Make configurabler
-    Database.connect("jdbc:mysql://localhost:3306/fima", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = "root123")
+    val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
+    val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
+    Database.connect("jdbc:mysql://$dbHost:3306/transaction-statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
     val statisticsRepository = StatisticsRepository()
     val transactionAddedEventProcessor = ProcessTransactionAddedEvent(statisticsRepository)
