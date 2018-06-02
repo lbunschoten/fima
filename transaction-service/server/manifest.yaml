@@ -19,11 +19,11 @@ spec:
               containerPort: 9997
           env:
             - name: DB_HOST
-              value: fima-transaction-service-mysql
+              value: fima-mysql-db
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-transaction-service-pass
+                  name: fima-mysql-db-pass
                   key: password
       imagePullSecrets:
         - name: regcred
