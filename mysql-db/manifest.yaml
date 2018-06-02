@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-volume-claim
+  name: mysql-db-volume-claim
   labels:
     app: fima
 spec:
@@ -62,4 +62,4 @@ spec:
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
-          claimName: mysql-db-claim
+          claimName: mysql-db-volume-claim
