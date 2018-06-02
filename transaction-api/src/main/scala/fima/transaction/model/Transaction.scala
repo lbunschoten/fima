@@ -34,7 +34,7 @@ object Transaction {
   def fromProto(t: ProtoTransaction): Transaction = {
     Transaction(
       t.getId,
-      s"${t.getDate.getDay}-${t.getDate.getMonth}-${t.getDate.getYear}",
+      s"${"%02d".format(t.getDate.getDay)}-${"%02d".format(t.getDate.getMonth)}-${t.getDate.getYear}",
       TransactionType.fromProto(t.getType),
       t.getName,
       t.getDescription,

@@ -1,7 +1,5 @@
 package fima.services.transaction
 
-import fima.domain.transaction.Date
-import fima.domain.transaction.Transaction
 import fima.events.transaction.TransactionAddedEvent
 import fima.services.transaction.conversion.RawTransactionToTransactionConverter
 import fima.services.transaction.events.TransactionEventProducer
@@ -12,41 +10,41 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
                              private val transactionEventProducer: TransactionEventProducer,
                              private val toTransactionConverter: RawTransactionToTransactionConverter) : TransactionServiceGrpc.TransactionServiceImplBase() {
 
-    override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
-        val response = GetTransactionResponse
-                .newBuilder()
-                .setTransaction(Transaction.newBuilder().setId(1).setDate(Date.newBuilder().setMonth(2018).setMonth(6).setDay(2)))
-                .build()
+  override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
+    val response = GetTransactionResponse
+      .newBuilder()
+      .setTransaction(transactionsRepository.getById(request.id).toProto())
+      .build()
 
-        responseObserver.onNext(response)
-        responseObserver.onCompleted()
-    }
+    responseObserver.onNext(response)
+    responseObserver.onCompleted()
+  }
 
-    override fun getRecentTransactions(request: GetRecentTransactionsRequest, responseObserver: StreamObserver<GetRecentTransactionResponse>) {
-        val response = GetRecentTransactionResponse
-                .newBuilder()
-                .addTransactions(Transaction.newBuilder().setId(1))
-                .build()
+  override fun getRecentTransactions(request: GetRecentTransactionsRequest, responseObserver: StreamObserver<GetRecentTransactionResponse>) {
+    val response = GetRecentTransactionResponse
+      .newBuilder()
+      .addAllTransactions(transactionsRepository.getRecent().map { it.toProto() })
+      .build()
 
-        responseObserver.onNext(response)
-        responseObserver.onCompleted()
-    }
+    responseObserver.onNext(response)
+    responseObserver.onCompleted()
+  }
 
-    override fun insertTransaction(request: InsertTransactionRequest, responseObserver: StreamObserver<InsertTransactionResponse>) {
-        val transaction = toTransactionConverter(request.transaction)
+  override fun insertTransaction(request: InsertTransactionRequest, responseObserver: StreamObserver<InsertTransactionResponse>) {
+    val transaction = toTransactionConverter(request.transaction)
 
-        transactionsRepository.insertTransaction(transaction)
+    transactionsRepository.insertTransaction(transaction)
 
-        transactionEventProducer.produce(
-                TransactionAddedEvent
-                        .newBuilder()
-                        .setTransaction(transaction)
-                        .build()
-        )
+    transactionEventProducer.produce(
+      TransactionAddedEvent
+        .newBuilder()
+        .setTransaction(transaction)
+        .build()
+    )
 
-        val response = InsertTransactionResponse.newBuilder().build()
+    val response = InsertTransactionResponse.newBuilder().build()
 
-        responseObserver.onNext(response)
-        responseObserver.onCompleted()
-    }
+    responseObserver.onNext(response)
+    responseObserver.onCompleted()
+  }
 }
