@@ -1,5 +1,6 @@
 package fima.services.transaction
 
+import fima.domain.transaction.Date
 import fima.domain.transaction.Transaction
 import fima.events.transaction.TransactionAddedEvent
 import fima.services.transaction.conversion.RawTransactionToTransactionConverter
@@ -14,7 +15,7 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
     override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
         val response = GetTransactionResponse
                 .newBuilder()
-                .setTransaction(Transaction.newBuilder().setId(1))
+                .setTransaction(Transaction.newBuilder().setId(1).setDate(Date.newBuilder().setMonth(2018).setMonth(6).setDay(2)))
                 .build()
 
         responseObserver.onNext(response)
