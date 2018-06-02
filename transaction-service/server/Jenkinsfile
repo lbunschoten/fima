@@ -45,7 +45,7 @@ pipeline {
                     dir("${env.JOB_NAME}/server") {
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
                         sh "sed -i 's/\$NEXUS_HOST/${env.NEXUS_HOST}/g' manifest.yaml"
-                        sh "kubectl apply -f manifest.yaml"
+                        sh "kubectl apply -f manifest.yaml --v=9"
                     }
                 }
             }
