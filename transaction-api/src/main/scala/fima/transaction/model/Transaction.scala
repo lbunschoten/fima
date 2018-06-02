@@ -2,8 +2,6 @@ package fima.transaction.model
 
 import fima.domain.transaction.{Transaction => ProtoTransaction, TransactionType => ProtoTransactionType}
 
-import java.time.LocalDate
-
 sealed trait TransactionType
 
 case object WireTransfer extends TransactionType
@@ -23,7 +21,7 @@ case object TransferCollection extends TransactionType
 case object Other extends TransactionType
 
 case class Transaction(id: Int,
-                       date: LocalDate,
+                       date: String,
                        `type`: TransactionType,
                        name: String,
                        description: String,
@@ -36,7 +34,7 @@ object Transaction {
   def fromProto(t: ProtoTransaction): Transaction = {
     Transaction(
       t.getId,
-      LocalDate.of(t.getDate.getYear, t.getDate.getMonth, t.getDate.getDay),
+      s"${t.getDate.getDay}-${t.getDate.getMonth}-${t.getDate.getYear}",
       TransactionType.fromProto(t.getType),
       t.getName,
       t.getDescription,
@@ -59,7 +57,7 @@ object TransactionType {
       case ProtoTransactionType.ONLINE_TRANSFER => OnlineTransfer
       case ProtoTransactionType.ATM => ATM
       case ProtoTransactionType.TRANSER_COLLECTION => TransferCollection
-      case ProtoTransactionType.OTHER => Other
+      case _ => Other
     }
   }
 
