@@ -36,7 +36,7 @@ object Transaction {
   def fromProto(t: ProtoTransaction): Unit = {
     Transaction(
       t.getId,
-      new LocalDate(t.getDate.getYear, t.getDate.getMonth, t.getDate.getDay),
+      LocalDate.of(t.getDate.getYear, t.getDate.getMonth, t.getDate.getDay),
       TransactionType.fromProto(t.getType),
       t.getName,
       t.getDescription,
@@ -64,32 +64,3 @@ object TransactionType {
   }
 
 }
-/*
-message Date {
-    int32 day = 1;
-    int32 month = 2;
-    int32 year = 3;
-}
-
-enum TransactionType {
-    WIRE_TRANSFER = 0; // Acceptgiro (AM)
-    DIRECT_DEBIT = 1; // Incasso (IC)
-    PAYMENT_TERMINAL = 2; // Betaalautomaat (BA)
-    TRANSFER = 3; // Overschrijving (OV)
-    ONLINE_TRANSFER = 4; // Online overschrijving (GT)
-    ATM = 5; // Geldautomaat (GM)
-    TRANSER_COLLECTION = 6; // Verzamelbetaling (VZ)
-    OTHER = 99; // Diversen (DV)
-}
-
-message Transaction {
-    int32 id = 1;
-    Date date = 2;
-    TransactionType type = 3;
-    string name = 4;
-    string description = 5;
-    string to_account = 6;
-    string from_account = 7;
-    float amount = 8;
-}
- */
