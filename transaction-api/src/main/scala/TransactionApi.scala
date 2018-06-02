@@ -12,7 +12,7 @@ import io.grpc.ManagedChannelBuilder
 object TransactionApi extends HttpServer {
 
   override protected def disableAdminHttpServer = true
-  override val defaultFinatraHttpPort = ":8891"
+  override val defaultFinatraHttpPort = ":80"
 
   private val transactionServiceHost = flag(name = "transaction.service.host", default = "localhost", help = "Host for transaction-service")
   private val transactionServicePort = flag(name = "transaction.service.port", default = 9997, help = "Host for transaction-service")
