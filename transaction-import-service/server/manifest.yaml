@@ -10,6 +10,7 @@ spec:
         app: fima
         tier: backend
         track: stable
+        name: transaction-import-service
     spec:
       containers:
         - name: transaction-import-service
@@ -28,6 +29,7 @@ spec:
   selector:
     app: fima
     tier: backend
+    name: transaction-import-service
   ports:
     - protocol: TCP
       port: 9997

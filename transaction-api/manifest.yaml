@@ -10,6 +10,7 @@ spec:
         app: fima
         tier: frontend
         track: stable
+        name: transaction-api
     spec:
       containers:
         - name: transaction-api
@@ -28,6 +29,7 @@ spec:
   selector:
     app: fima
     tier: frontend
+    name: transaction-api
   ports:
     - protocol: TCP
       port: 80
