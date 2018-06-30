@@ -13,7 +13,7 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
   override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
     val response = GetTransactionResponse
       .newBuilder()
-      .setTransaction(transactionsRepository.getById(request.id).toProto())
+      .setTransaction(transactionsRepository.getById(request.id)?.let(TransactionsRepository.TransactionDao::toProto))
       .build()
 
     responseObserver.onNext(response)

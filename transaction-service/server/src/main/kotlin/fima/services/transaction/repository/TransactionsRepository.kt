@@ -25,9 +25,9 @@ class TransactionsRepository {
     }
   }
 
-  fun getById(id: Int): TransactionDao {
+  fun getById(id: Int): TransactionDao? {
     return dbtransaction {
-      TransactionDao[id]
+      TransactionDao.findById(id)
     }
   }
 
