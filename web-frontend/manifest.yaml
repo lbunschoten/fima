@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: web-frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: frontend
+        track: stable
+        name: web-frontend
+    spec:
+      containers:
+        - name: web-frontend
+          image: "$NEXUS_HOST:8123/web-frontend:$BUILD_ID"
+          ports:
+            - name: http
+              containerPort: 80
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: web-frontend
+spec:
+  selector:
+    app: fima
+    tier: frontend
+    name: web-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http

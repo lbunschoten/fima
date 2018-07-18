@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: transaction-api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: frontend
+        track: stable
+        name: transaction-api
+    spec:
+      containers:
+        - name: transaction-api
+          image: "$NEXUS_HOST:8123/transaction-api:$BUILD_ID"
+          ports:
+            - name: http
+              containerPort: 80
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: transaction-api
+spec:
+  selector:
+    app: fima
+    tier: frontend
+    name: transaction-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http

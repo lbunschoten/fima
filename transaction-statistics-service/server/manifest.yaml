@@ -1,0 +1,44 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: transaction-statistics-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: backend
+        track: stable
+        name: transaction-statistics-service
+    spec:
+      containers:
+        - name: transaction-statistics-service
+          image: "$NEXUS_HOST:8123/transaction-statistics-service:$BUILD_ID"
+          ports:
+            - name: http
+              containerPort: 9997
+          env:
+            - name: DB_HOST
+              value: fima-mysql-db
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fima-mysql-db-pass
+                  key: password
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: transaction-statistics-service
+spec:
+  selector:
+    app: fima
+    tier: backend
+    name: transaction-statistics-service
+  ports:
+    - protocol: TCP
+      port: 9997
+      targetPort: http
