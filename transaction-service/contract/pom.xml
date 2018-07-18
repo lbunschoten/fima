@@ -6,7 +6,7 @@
     <parent>
         <groupId>fima</groupId>
         <artifactId>fima-base</artifactId>
-        <version>18.04.6</version>
+        <version>18.07.1</version>
         <relativePath />
     </parent>
 
