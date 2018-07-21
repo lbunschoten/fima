@@ -11,13 +11,13 @@
     </parent>
 
     <artifactId>fima-transaction-statistics-service-contract</artifactId>
-    <version>18.04.2-SNAPSHOT</version>
+    <version>18.07.1</version>
     <packaging>jar</packaging>
 
     <scm>
         <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>fima-transaction-statistics-service-contract-18.07.1</tag>
     </scm>
 
     <dependencies>
