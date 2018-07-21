@@ -9,6 +9,7 @@
 
     <modules>
         <module>base</module>
+        <module>base-grpc</module>
         <module>base-kotlin</module>
         <module>transaction-api</module>
         <module>transaction-domain</module>
