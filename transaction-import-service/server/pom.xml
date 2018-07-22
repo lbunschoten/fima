@@ -8,7 +8,7 @@
     <parent>
         <groupId>fima</groupId>
         <artifactId>fima-base-kotlin</artifactId>
-        <version>18.05.2</version>
+        <version>18.07.2</version>
         <relativePath/>
     </parent>
 
@@ -16,14 +16,14 @@
     <version>18.03.1-SNAPSHOT</version>
 
     <properties>
-        <grpc.version>1.10.0</grpc.version>
+        <grpc.version>1.13.2</grpc.version>
         <kafka.version>0.10.0.1</kafka.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
 
         <dependency>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>0.10.0.0</version>
+            <version>${kafka.version}</version>
         </dependency>
 
         <dependency>

@@ -8,7 +8,7 @@
     <parent>
         <groupId>fima</groupId>
         <artifactId>fima-base-kotlin</artifactId>
-        <version>18.05.2</version>
+        <version>18.07.2</version>
         <relativePath/>
     </parent>
 
@@ -16,8 +16,7 @@
     <version>18.03.1-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.2.41</kotlin.version>
-        <grpc.version>1.10.0</grpc.version>
+        <grpc.version>1.13.2</grpc.version>
         <mysql-connector.version>6.0.6</mysql-connector.version>
         <kafka.version>0.10.0.1</kafka.version>
     </properties>
@@ -26,8 +25,7 @@
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
+            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
 
         <dependency>
@@ -57,25 +55,24 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>0.10.0.0</version>
+            <version>${kafka.version}</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-statistics-service-contract</artifactId>
-            <version>18.04.1</version>
+            <version>18.07.1</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-events-contract</artifactId>
-            <version>18.04.1</version>
+            <version>18.07.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
 

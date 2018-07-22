@@ -14,7 +14,7 @@
     <version>17.12.1-SNAPSHOT</version>
 
     <properties>
-        <grpc.version>1.10.0</grpc.version>
+        <grpc.version>1.13.2</grpc.version>
     </properties>
 
     <dependencies>
@@ -75,13 +75,13 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-service-contract</artifactId>
-            <version>18.04.1</version>
+            <version>18.07.1</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-statistics-service-contract</artifactId>
-            <version>18.04.1</version>
+            <version>18.07.1</version>
         </dependency>
 
     </dependencies>
