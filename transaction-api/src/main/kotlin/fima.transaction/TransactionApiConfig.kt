@@ -17,9 +17,11 @@ open class TransactionApiConfig {
 
     @Bean
     open fun getTransactionService(): TransactionServiceGrpc.TransactionServiceBlockingStub {
+        println(transactionServiceHost)
+        println(transactionServicePort)
         val channel = ManagedChannelBuilder
                 .forAddress(transactionServiceHost, transactionServicePort)
-                .usePlaintext(true)
+                .usePlaintext()
                 .build()
         return TransactionServiceGrpc.newBlockingStub(channel)
     }
