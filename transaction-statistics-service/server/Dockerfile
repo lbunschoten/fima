@@ -1,4 +1,4 @@
-FROM frolvlad/alpine-oraclejdk8:full
+FROM openjdk:10.0.2-jre-slim
 
 COPY ./target/fima-transaction-statistics-service-server-18.03.1-SNAPSHOT-jar-with-dependencies.jar fima.jar
 
