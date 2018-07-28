@@ -1,7 +1,7 @@
-FROM frolvlad/alpine-oraclejdk8:full
+FROM openjdk:10.0.2-jre-slim
 
 EXPOSE 80
 
-COPY ./target/fima-transaction-api-17.12.1-SNAPSHOT-jar-with-dependencies.jar fima.jar
+COPY ./target/fima-transaction-api-17.12.1-SNAPSHOT.jar fima.jar
 
-ENTRYPOINT ["java", "-cp", "fima.jar", "TransactionApi", "-transaction.service.host=transaction-service", "-transaction-statistics.service.host=transaction-statistics-service"]
+ENTRYPOINT ["java", "-jar", "fima.jar", "-transaction.service.host=transaction-service", "-transaction-statistics.service.host=transaction-statistics-service"]
