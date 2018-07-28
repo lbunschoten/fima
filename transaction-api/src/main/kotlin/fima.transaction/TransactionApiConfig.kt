@@ -2,32 +2,23 @@ package fima.transaction
 
 import fima.services.transaction.TransactionServiceGrpc
 import io.grpc.ManagedChannelBuilder
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 open class TransactionApiConfig {
 
-    @ConfigurationProperties(prefix = "transaction.service")
-    class TransactionServiceProperties {
-        private var host: String = "localhost"
-        private var port: Int = 9997
+    @Value("\${transaction.service.host:localhost}")
+    private var transactionServiceHost: String = "localhost"
 
-        fun getHost(): String {
-            return host
-        }
-
-        fun getPort(): Int {
-            return port
-        }
-    }
+    @Value("\${transaction.service.port:9997}")
+    private var transactionServicePort: Int = 9997
 
     @Bean
     open fun getTransactionService(): TransactionServiceGrpc.TransactionServiceBlockingStub {
-        val transactionServiceProperties = TransactionServiceProperties()
         val channel = ManagedChannelBuilder
-                .forAddress(transactionServiceProperties.getHost(), transactionServiceProperties.getPort())
+                .forAddress(transactionServiceHost, transactionServicePort)
                 .usePlaintext(true)
                 .build()
         return TransactionServiceGrpc.newBlockingStub(channel)

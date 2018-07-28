@@ -4,4 +4,4 @@ EXPOSE 80
 
 COPY ./target/fima-transaction-api-17.12.1-SNAPSHOT.jar fima.jar
 
-ENTRYPOINT ["java", "-jar", "fima.jar", "-transaction.service.host=transaction-service", "-transaction-statistics.service.host=transaction-statistics-service", "--server.port=80"]
+ENTRYPOINT ["java", "-jar", "fima.jar", "--transaction.service.host=transaction-service", "--server.port=80"]
