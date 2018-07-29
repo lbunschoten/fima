@@ -1,15 +1,4 @@
-FROM node:alpine
+FROM httpd:2.4-alpine
 
-WORKDIR /usr/src/app
+COPY dist /usr/local/apache2/htdocs/
 
-COPY package*.json ./
-COPY build ./build
-COPY config ./config
-
-RUN npm install
-
-RUN npm run build
-
-EXPOSE 8080
-
-CMD ["npm", "start"]
