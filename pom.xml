@@ -19,6 +19,7 @@
         <module>base-grpc</module>
         <module>base-kotlin</module>
         <module>mysql-db</module>
+        <module>traefik</module>
         <module>transaction-api</module>
         <module>transaction-domain</module>
         <module>transaction-events</module>
