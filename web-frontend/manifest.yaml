@@ -33,7 +33,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8085
-      targetPort: http
+      targetPort: 80
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
