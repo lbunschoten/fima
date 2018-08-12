@@ -17,7 +17,7 @@ spec:
           image: "$NEXUS_HOST:8123/web-frontend:$BUILD_ID"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8085
       imagePullSecrets:
         - name: regcred
 ---
@@ -32,7 +32,7 @@ spec:
     name: web-frontend
   ports:
     - protocol: TCP
-      port: 80
+      port: 8085
       targetPort: http
 ---
 apiVersion: extensions/v1beta1
