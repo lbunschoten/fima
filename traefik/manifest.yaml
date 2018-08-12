@@ -66,7 +66,7 @@ spec:
   selector:
     k8s-app: traefik-ingress-lb
   ports:
-  - port: 30001
+  - port: 80
     targetPort: 8080
 ---
 apiVersion: extensions/v1beta1
@@ -83,4 +83,4 @@ spec:
       paths:
       - backend:
           serviceName: traefik-web-ui
-          servicePort: 30001
+          servicePort: 80
