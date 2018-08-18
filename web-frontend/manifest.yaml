@@ -32,13 +32,13 @@ spec:
     name: web-frontend
   ports:
     - protocol: TCP
-      port: 8085
-      targetPort: 80
+      port: 80
+      targetPort: 8080
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: fima-traefik-ingress
+  name: web-fronted
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.frontend.rule.type: PathPrefixStrip
@@ -50,4 +50,4 @@ spec:
       - path: /
         backend:
           serviceName: web-frontend
-          servicePort: http
+          servicePort: 80
