@@ -41,7 +41,6 @@ metadata:
   name: transaction-api
   annotations:
     kubernetes.io/ingress.class: traefik
-    traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
   - host: fima.dev
