@@ -15,14 +15,14 @@ class TransactionController @Autowired constructor(
         private val transactionStatisticsService: TransactionStatisticsServiceGrpc.TransactionStatisticsServiceBlockingStub
 ) {
 
-    @GetMapping("/api/transaction/{id}")
+    @GetMapping("/{id}")
     fun getTransaction(@PathVariable("id") transactionId: Int): fima.transaction.transaction.Transaction {
         val request = GetTransactionRequest.newBuilder().setId(transactionId).build()
 
         return transactionService.getTransaction(request).transaction.simple()
     }
 
-    @GetMapping("/api/transaction/statistics")
+    @GetMapping("/statistics")
     fun getStatistics(): TransactionStatistics {
         return transactionStatisticsService.getStatistics(TransactionsStatisticsRequest.newBuilder().build()).simple()
     }
