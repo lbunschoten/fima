@@ -33,6 +33,10 @@ fun fima.domain.transaction.Transaction.simple(): Transaction {
     return Transaction(this.id, SimpleDateFormat("dd-MM-yyyy").format(transactionDate), this.type.simple(), this.name, this.description, this.toAccount, this.fromAccount, this.amount)
 }
 
+fun fima.services.transactionstatistics.TransactionStatisticsResponse.simple(): TransactionStatistics {
+    return TransactionStatistics(this.month, this.year, this.transactions)
+}
+
 data class Transaction(val id: Int,
                        val date: String,
                        val type: TransactionType,
@@ -41,3 +45,7 @@ data class Transaction(val id: Int,
                        val toAccount: String,
                        val fromAccount: String,
                        val amount: Float)
+
+data class TransactionStatistics(val month: Int,
+                                 val year: Int,
+                                 val transaction: Int)
