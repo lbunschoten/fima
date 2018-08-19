@@ -3,18 +3,20 @@ package fima.transaction.transaction
 import fima.services.transaction.GetRecentTransactionsRequest
 import fima.services.transaction.GetTransactionRequest
 import fima.services.transaction.TransactionServiceGrpc
+import fima.services.transactionimport.ImportTransactionsRequest
+import fima.services.transactionimport.TransactionImportServiceGrpc
 import fima.services.transactionstatistics.TransactionStatisticsServiceGrpc
 import fima.services.transactionstatistics.TransactionsStatisticsRequest
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.nio.charset.Charset
 
 @RestController
 class TransactionController @Autowired constructor(
         private val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub,
-        private val transactionStatisticsService: TransactionStatisticsServiceGrpc.TransactionStatisticsServiceBlockingStub
+        private val transactionStatisticsService: TransactionStatisticsServiceGrpc.TransactionStatisticsServiceBlockingStub,
+        private val transactionImportService: TransactionImportServiceGrpc.TransactionImportServiceBlockingStub
 ) {
 
     @GetMapping("/{id}")
@@ -34,6 +36,12 @@ class TransactionController @Autowired constructor(
     @GetMapping("/statistics")
     fun getStatistics(): TransactionStatistics {
         return transactionStatisticsService.getStatistics(TransactionsStatisticsRequest.newBuilder().build()).simple()
+    }
+
+    @PutMapping("/import")
+    fun importTransactions(@RequestParam("transactions") transactions: MultipartFile) {
+        val request = ImportTransactionsRequest.newBuilder().setTransactions(String(transactions.bytes, Charset.forName("UTF-8"))).build();
+        transactionImportService.importTransactions(request)
     }
 
 }
