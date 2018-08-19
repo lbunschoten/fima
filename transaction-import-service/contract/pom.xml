@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fima</groupId>
+        <artifactId>fima-base-grpc</artifactId>
+        <version>18.07.2</version>
+        <relativePath />
+    </parent>
+
+    <artifactId>fima-transaction-import-service-contract</artifactId>
+    <version>18.08.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <scm>
+        <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
+        <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+
+        <!-- Required because of the following bug: https://github.com/grpc/grpc-java/issues/3633 -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
