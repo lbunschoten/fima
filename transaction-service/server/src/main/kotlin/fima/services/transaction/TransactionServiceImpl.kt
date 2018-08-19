@@ -46,8 +46,8 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
         responseObserver.onCompleted()
     }
 
-    override fun insertTransaction(request: InsertTransactionRequest, responseObserver: StreamObserver<InsertTransactionResponse>) {
-        val transaction = toTransactionConverter(request.transaction)
+    override fun insertTransaction(request: InsertTransactionRequest?, responseObserver: StreamObserver<InsertTransactionResponse>?) {
+        val transaction = toTransactionConverter(request!!.transaction)
 
         transactionsRepository.insertTransaction(transaction)
 
@@ -60,7 +60,29 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
 
         val response = InsertTransactionResponse.newBuilder().build()
 
-        responseObserver.onNext(response)
+        responseObserver!!.onNext(response)
         responseObserver.onCompleted()
     }
+
+    override fun deleteTransaction(request: DeleteTransactionRequest?, responseObserver: StreamObserver<DeleteTransactionResponse>?) {
+        super.deleteTransaction(request, responseObserver)
+    }
+
+    //    override fun insertTransaction(request: InsertTransactionRequest, responseObserver: StreamObserver<InsertTransactionResponse>) {
+//        val transaction = toTransactionConverter(request.transaction)
+//
+//        transactionsRepository.insertTransaction(transaction)
+//
+//        transactionEventProducer.produce(
+//                TransactionAddedEvent
+//                        .newBuilder()
+//                        .setTransaction(transaction)
+//                        .build()
+//        )
+//
+//        val response = InsertTransactionResponse.newBuilder().build()
+//
+//        responseObserver.onNext(response)
+//        responseObserver.onCompleted()
+//    }
 }
