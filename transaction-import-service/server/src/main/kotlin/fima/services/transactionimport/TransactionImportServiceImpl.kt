@@ -5,14 +5,14 @@ import com.opencsv.bean.CsvToBeanBuilder
 import fima.domain.transaction.RawTransaction
 import fima.services.transaction.InsertTransactionRequest
 import fima.services.transaction.TransactionServiceGrpc
-import java.nio.file.Files.newBufferedReader
-import java.nio.file.Paths
+import io.grpc.stub.StreamObserver
+import java.io.StringReader
 
-class TransactionImportServiceImpl(transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub) {
+class TransactionImportServiceImpl(private val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub) : TransactionImportServiceGrpc.TransactionImportServiceImplBase() {
 
-    init {
-        newBufferedReader(Paths.get("/Users/lbunschoten/Downloads/transactions.csv")).use {
-            val csvReader = CsvToBeanBuilder<Transaction>(it)
+    override fun importTransactions(request: ImportTransactionsRequest, responseObserver: StreamObserver<ImportTransactionsResponse>) {
+        StringReader(request.transactions).use { reader ->
+            val csvReader = CsvToBeanBuilder<Transaction>(reader)
                     .withSeparator(',')
                     .withQuoteChar('\"')
                     .withType(Transaction::class.java)
@@ -47,8 +47,10 @@ class TransactionImportServiceImpl(transactionService: TransactionServiceGrpc.Tr
                 )
             }
         }
-    }
 
+        responseObserver.onNext(ImportTransactionsResponse.newBuilder().build())
+        responseObserver.onCompleted()
+    }
 }
 
 data class Transaction(

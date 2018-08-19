@@ -1,7 +1,7 @@
 package fima.transaction.transaction
 
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 enum class TransactionType {
     WireTransfer,
@@ -28,9 +28,12 @@ fun fima.domain.transaction.TransactionType.simple(): TransactionType {
 }
 
 fun fima.domain.transaction.Transaction.simple(): Transaction {
-    val transactionDate = Calendar.getInstance().set(this.date.year, this.date.month, this.date.day)
+    val transactionDate = LocalDate.of(this.date.year, this.date.month, this.date.day).format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+    return Transaction(this.id, transactionDate, this.type.simple(), this.name, this.description, this.toAccount, this.fromAccount, this.amount)
+}
 
-    return Transaction(this.id, SimpleDateFormat("dd-MM-yyyy").format(transactionDate), this.type.simple(), this.name, this.description, this.toAccount, this.fromAccount, this.amount)
+fun fima.services.transactionstatistics.TransactionStatisticsResponse.simple(): TransactionStatistics {
+    return TransactionStatistics(this.month, this.year, this.transactions)
 }
 
 data class Transaction(val id: Int,
@@ -41,3 +44,7 @@ data class Transaction(val id: Int,
                        val toAccount: String,
                        val fromAccount: String,
                        val amount: Float)
+
+data class TransactionStatistics(val month: Int,
+                                 val year: Int,
+                                 val transactions: Int)

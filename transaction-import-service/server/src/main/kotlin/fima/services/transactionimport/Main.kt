@@ -2,18 +2,31 @@ package fima.services.transactionimport
 
 import fima.services.transaction.TransactionServiceGrpc
 import io.grpc.ManagedChannelBuilder
+import io.grpc.ServerBuilder
 
 
 fun main(args: Array<String>) {
+    val transactionServiceHost = "transaction-service"
+    val transactionServicePort = 9997
+
     val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub = {
-        val channel = ManagedChannelBuilder.forAddress("localhost", 9997).usePlaintext(true).build()
+        val channel = ManagedChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build()
         TransactionServiceGrpc.newBlockingStub(channel)
     }()
 
-    TransactionImportServiceImpl(transactionService)
+    val server = ServerBuilder
+            .forPort(9997)
+            .addService(TransactionImportServiceImpl(
+                    transactionService = transactionService
+            ))
+            .build()
+
+    server.start()
+    println("Transaction import service started")
 
     Runtime.getRuntime().addShutdownHook(Thread { println("Ups, JVM shutdown") })
+    server.awaitTermination()
 
-    println("Transaction statistics service stopped")
+    println("Transaction import service stopped")
 }
 

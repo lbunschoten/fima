@@ -34,3 +34,19 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: http
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: transaction-api
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: fima.dev
+    http:
+      paths:
+      - path: /api/transaction
+        backend:
+          serviceName: transaction-api
+          servicePort: 80
