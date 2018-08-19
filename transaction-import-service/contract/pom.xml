@@ -11,13 +11,13 @@
     </parent>
 
     <artifactId>fima-transaction-import-service-contract</artifactId>
-    <version>18.08.2</version>
+    <version>18.08.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
         <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>fima-transaction-import-service-contract-18.08.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
