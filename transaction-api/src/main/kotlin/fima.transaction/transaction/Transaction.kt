@@ -47,4 +47,4 @@ data class Transaction(val id: Int,
 
 data class TransactionStatistics(val month: Int,
                                  val year: Int,
-                                 val transaction: Int)
+                                 val transactions: Int)
