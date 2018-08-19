@@ -7,7 +7,7 @@ option java_package = "fima.services.transactionimport";
 option java_outer_classname = "TransactionImportServiceProtos";
 
 message ImportTransactionsRequest {
-    int32 id = 1;
+    string transactions = 1;
 }
 
 message ImportTransactionsResponse {
