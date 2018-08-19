@@ -16,7 +16,7 @@ open class TransactionApiConfig {
     @Value("\${transaction.service.port:9997}")
     private var transactionServicePort: Int = 9997
 
-    @Value("\${transaction.statistics.host:localhost}")
+    @Value("\${transaction.statistics.service.host:localhost}")
     private var transactionStatisticsServiceHost: String = "localhost"
 
     @Value("\${transaction.statistics.service.port:9997}")
