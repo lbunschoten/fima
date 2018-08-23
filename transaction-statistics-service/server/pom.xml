@@ -8,7 +8,7 @@
     <parent>
         <groupId>fima</groupId>
         <artifactId>fima-base-kotlin</artifactId>
-        <version>18.07.2</version>
+        <version>18.08.1</version>
         <relativePath/>
     </parent>
 
@@ -76,6 +76,20 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.kotlintest</groupId>
+            <artifactId>kotlintest-runner-junit5</artifactId>
+            <version>3.1.7</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
+            <version>1.8.6</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -88,6 +102,25 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Spec*</include>
+                    </includes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.2.0</version>
+                    </dependency>
+                </dependencies>
+
             </plugin>
         </plugins>
     </build>

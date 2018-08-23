@@ -1,9 +1,6 @@
 package fima.services.transactionstatistics.repository
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -13,7 +10,7 @@ class StatisticsRepository {
         transaction {
             logger.addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create(MonthlyTransactionStatistics)
+            SchemaUtils.create(MonthlyTransactionStatisticsTable)
         }
     }
 
@@ -21,41 +18,51 @@ class StatisticsRepository {
         transaction {
             val statistics = getStatistics(month, year)
             statistics?.let {
-                MonthlyTransactionStatistics.update({ MonthlyTransactionStatistics.month eq month and (MonthlyTransactionStatistics.year eq year) }) {
-                    it[MonthlyTransactionStatistics.month] = month
-                    it[MonthlyTransactionStatistics.year] = year
+                MonthlyTransactionStatisticsTable.update({ MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year) }) {
+                    it[MonthlyTransactionStatisticsTable.month] = month
+                    it[MonthlyTransactionStatisticsTable.year] = year
                     it[numTransactions] = statistics.numTransactions + 1
                 }
             } ?: {
-                MonthlyTransactionStatistics.insert {
-                    it[MonthlyTransactionStatistics.month] = month
-                    it[MonthlyTransactionStatistics.year] = year
+                MonthlyTransactionStatisticsTable.insert {
+                    it[MonthlyTransactionStatisticsTable.month] = month
+                    it[MonthlyTransactionStatisticsTable.year] = year
                     it[numTransactions] = 1
                 }
             }()
         }
     }
 
-    fun getStatistics(month: Int, year: Int): MonthlyTransactionStatisticsDao? {
+    fun getStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
         return transaction {
             MonthlyTransactionStatisticsDao.find {
-                MonthlyTransactionStatistics.month eq month and (MonthlyTransactionStatistics.year eq year)
-            }.firstOrNull()
+                MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year)
+            }.firstOrNull()?.simple()
         }
     }
 
-    object MonthlyTransactionStatistics : IntIdTable() {
+    object MonthlyTransactionStatisticsTable : IntIdTable() {
         val month = integer("month").index()
         val year = integer("year").index()
         val numTransactions = integer("numTransactions")
     }
 
     class MonthlyTransactionStatisticsDao(id: EntityID<Int>) : IntEntity(id) {
-        companion object : IntEntityClass<MonthlyTransactionStatisticsDao>(MonthlyTransactionStatistics)
+        companion object : IntEntityClass<MonthlyTransactionStatisticsDao>(MonthlyTransactionStatisticsTable)
 
-        val month by MonthlyTransactionStatistics.month
-        val year by MonthlyTransactionStatistics.year
-        val numTransactions by MonthlyTransactionStatistics.numTransactions
+        val month by MonthlyTransactionStatisticsTable.month
+        val year by MonthlyTransactionStatisticsTable.year
+        val numTransactions by MonthlyTransactionStatisticsTable.numTransactions
+
+        fun simple(): MonthlyTransactionStatistics {
+            return MonthlyTransactionStatistics(month, year, numTransactions)
+        }
     }
+
+    data class MonthlyTransactionStatistics(
+      val month: Int,
+      val year: Int,
+      val numTransactions: Int
+    )
 
 }
