@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fima</groupId>
     <artifactId>fima-base-kotlin</artifactId>
-    <version>18.08.2</version>
+    <version>18.08.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
         <connection>scm:git:ssh://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>fima-base-kotlin-18.08.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
