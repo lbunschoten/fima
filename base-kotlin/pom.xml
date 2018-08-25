@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fima</groupId>
     <artifactId>fima-base-kotlin</artifactId>
-    <version>18.08.2-SNAPSHOT</version>
+    <version>18.08.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
