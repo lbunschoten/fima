@@ -51,12 +51,12 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
 
         transactionsRepository.insertTransaction(transaction)
 
-//        transactionEventProducer.produce(
-//                TransactionAddedEvent
-//                        .newBuilder()
-//                        .setTransaction(transaction)
-//                        .build()
-//        )
+        transactionEventProducer.produce(
+                TransactionAddedEvent
+                        .newBuilder()
+                        .setTransaction(transaction)
+                        .build()
+        )
 
         val response = InsertTransactionResponse.newBuilder().build()
 
@@ -64,7 +64,7 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
         responseObserver.onCompleted()
     }
 
-    override fun deleteTransaction(request: DeleteTransactionRequest?, responseObserver: StreamObserver<DeleteTransactionResponse>?) {
+    override fun deleteTransaction(request: DeleteTransactionRequest, responseObserver: StreamObserver<DeleteTransactionResponse>) {
         super.deleteTransaction(request, responseObserver)
     }
 
