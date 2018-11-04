@@ -14,18 +14,21 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
+    val dbPort: String = System.getenv("DB_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-    Database.connect("jdbc:mysql://$dbHost:3306/transaction_statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
+    val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "localhost"
+    val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
+    Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction_statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
     val statisticsRepository = StatisticsRepository()
     val transactionAddedEventProcessor = ProcessTransactionAddedEvent(statisticsRepository)
     EventListener<TransactionAddedEvent>({
         val props = Properties()
-        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
+        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "$kafkaHost:$kafkaPort"
         props[ConsumerConfig.GROUP_ID_CONFIG] = "fima-transaction-statistics-transaction-added-consumer"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = LongDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = TransactionAddedEventDeserializer::class.java.name
-        props[ConsumerConfig.AUTO_OFFSET_RESET_DOC] = "latest"
+        props[ConsumerConfig.AUTO_OFFSET_RESET_DOC] = "earliest"
         props
     }(), "fima-added-transactions").listen(transactionAddedEventProcessor)
 
