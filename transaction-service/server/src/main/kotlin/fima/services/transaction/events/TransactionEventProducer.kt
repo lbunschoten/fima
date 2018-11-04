@@ -15,7 +15,7 @@ class TransactionEventProducer : KafkaProducer<Long, TransactionAddedEvent>(prod
 
   companion object {
     fun producerProperties(): Properties {
-      val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "localhost"
+      val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
       val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
 
       val producerProps = Properties()

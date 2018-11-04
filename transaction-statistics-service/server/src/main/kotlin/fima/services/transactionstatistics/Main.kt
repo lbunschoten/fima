@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
     val dbPort: String = System.getenv("DB_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-    val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "localhost"
+    val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
     val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
     Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction_statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
