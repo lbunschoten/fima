@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
         props[ConsumerConfig.GROUP_ID_CONFIG] = "fima-transaction-statistics-transaction-added-consumer"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = LongDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = TransactionAddedEventDeserializer::class.java.name
-        props[ConsumerConfig.AUTO_OFFSET_RESET_DOC] = "earliest"
+        props[ConsumerConfig.AUTO_OFFSET_RESET_DOC] = "latest"
         props
     }(), "fima-added-transactions").listen(transactionAddedEventProcessor)
 
