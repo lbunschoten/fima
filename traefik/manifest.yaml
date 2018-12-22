@@ -79,14 +79,3 @@ spec:
       - backend:
           serviceName: traefik-web-ui
           servicePort: 80
-  - host: traefik-ui.minikube
-    http:
-      paths:
-      - backend:
-          serviceName: traefik-web-ui
-          servicePort: 30001
-  - http:
-      paths:
-      - backend:
-          serviceName: traefik-web-ui
-          servicePort: 80
