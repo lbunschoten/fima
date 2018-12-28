@@ -16,7 +16,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir("${env.JOB_NAME}") {
-                    sh 'npm install:clean'
+                    sh 'npm run install:clean'
                 }
             }
         }
