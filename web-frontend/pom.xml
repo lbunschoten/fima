@@ -29,7 +29,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v8.11.1</nodeVersion>
+                            <nodeVersion>v10.15.0</nodeVersion>
                             <nodeDownloadRoot>${env.NODE_DOWNLOAD_ROOT}</nodeDownloadRoot>
                             <npmDownloadRoot>${env.NPM_DOWNLOAD_ROOT}</npmDownloadRoot>
                         </configuration>

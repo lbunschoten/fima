@@ -40,7 +40,7 @@ class TransactionController @Autowired constructor(
 
     @PutMapping("/import")
     fun importTransactions(@RequestParam("transactions") transactions: MultipartFile) {
-        val request = ImportTransactionsRequest.newBuilder().setTransactions(String(transactions.bytes, Charset.forName("UTF-8"))).build();
+        val request = ImportTransactionsRequest.newBuilder().setTransactions(String(transactions.bytes, Charset.forName("UTF-8"))).build()
         transactionImportService.importTransactions(request)
     }
 
