@@ -118,16 +118,12 @@ black-dashboard-react
     ├── layouts
     │   ├── Admin
     │   │   └── Admin.jsx
-    │   └── RTL
-    │       └── RTL.jsx
     ├── variables
     │   └── charts.jsx
     └── views
         ├── Dashboard.jsx
         ├── Icons.jsx
-        ├── Map.jsx
         ├── Notifications.jsx
-        ├── Rtl.jsx
         ├── TableList.jsx
         ├── Typography.jsx
         └── UserProfile.jsx

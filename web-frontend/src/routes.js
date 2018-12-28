@@ -1,6 +1,5 @@
 import Dashboard from "views/Dashboard.jsx";
 import Icons from "views/Icons.jsx";
-import Map from "views/Map.jsx";
 import Notifications from "views/Notifications.jsx";
 import TableList from "views/TableList.jsx";
 import Typography from "views/Typography.jsx";
@@ -19,13 +18,6 @@ var routes = [
     name: "Icons",
     icon: "tim-icons icon-atom",
     component: Icons,
-    layout: "/admin"
-  },
-  {
-    path: "/map",
-    name: "Map",
-    icon: "tim-icons icon-pin",
-    component: Map,
     layout: "/admin"
   },
   {
