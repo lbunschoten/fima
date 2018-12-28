@@ -110,10 +110,6 @@ black-dashboard-react
     │       │   │   └── vendor
     │       └── black-dashboard.scss
     ├── components
-    │   ├── FixedPlugin
-    │   │   └── FixedPlugin.jsx
-    │   ├── Footer
-    │   │   └── Footer.jsx
     │   ├── Navbars
     │   │   ├── AdminNavbar.jsx
     │   │   └── RTLNavbar.jsx

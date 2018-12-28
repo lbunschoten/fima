@@ -42,10 +42,10 @@ class Sidebar extends React.Component {
     let logoImg = null;
     let logoText = null;
     if (logo !== undefined) {
-      if (logo.outterLink !== undefined) {
+      if (logo.outerLink !== undefined) {
         logoImg = (
           <a
-            href={logo.outterLink}
+            href={logo.outerLink}
             className="simple-text logo-mini"
             target="_blank"
             onClick={this.props.toggleSidebar}
@@ -57,7 +57,7 @@ class Sidebar extends React.Component {
         );
         logoText = (
           <a
-            href={logo.outterLink}
+            href={logo.outerLink}
             className="simple-text logo-normal"
             target="_blank"
             onClick={this.props.toggleSidebar}
@@ -102,10 +102,7 @@ class Sidebar extends React.Component {
               if (prop.redirect) return null;
               return (
                 <li
-                  className={
-                    this.activeRoute(prop.path) +
-                    (prop.pro ? " active-pro" : "")
-                  }
+                  className={this.activeRoute(prop.path)}
                   key={key}
                 >
                   <NavLink
@@ -139,9 +136,9 @@ Sidebar.propTypes = {
     // innerLink is for links that will direct the user within the app
     // it will be rendered as <Link to="...">...</Link> tag
     innerLink: PropTypes.string,
-    // outterLink is for links that will direct the user outside the app
+    // outerLink is for links that will direct the user outside the app
     // it will be rendered as simple <a href="...">...</a> tag
-    outterLink: PropTypes.string,
+    outerLink: PropTypes.string,
     // the text of the logo
     text: PropTypes.node,
     // the image src of the logo
