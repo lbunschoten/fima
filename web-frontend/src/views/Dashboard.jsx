@@ -37,8 +37,66 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      bigChartData: "data1"
+      bigChartData: "data1",
+      data1: chartExample1.data1,
+      data2: chartExample1.data2,
+      data3: chartExample1.data3
     };
+  }
+  componentDidMount() {
+    fetch("http://api.fima.dev/transaction/statistics")
+        .then(res => res.json())
+        .then(result => {
+            console.log(result);
+            this.setState({
+                    data1: canvas => {
+                        let ctx = canvas.getContext("2d");
+
+                        let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+                        gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
+                        gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
+                        gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
+
+                        return {
+                            labels: [
+                                "JAN",
+                                "FEB",
+                                "MAR",
+                                "APR",
+                                "MAY",
+                                "JUN",
+                                "JUL",
+                                "AUG",
+                                "SEP",
+                                "OCT",
+                                "NOV",
+                                "DEC"
+                            ],
+                            datasets: [
+                                {
+                                    label: "My First dataset",
+                                    fill: true,
+                                    backgroundColor: gradientStroke,
+                                    borderColor: "#1f8ef1",
+                                    borderWidth: 2,
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    pointBackgroundColor: "#1f8ef1",
+                                    pointBorderColor: "rgba(255,255,255,0)",
+                                    pointHoverBackgroundColor: "#1f8ef1",
+                                    pointBorderWidth: 20,
+                                    pointHoverRadius: 4,
+                                    pointHoverBorderWidth: 15,
+                                    pointRadius: 4,
+                                    data: [0, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100]
+                                }
+                            ]
+                        };
+                    }
+                }
+            );
+        });
   }
   setBgChartData = name => {
     this.setState({
@@ -137,7 +195,7 @@ class Dashboard extends React.Component {
                 <CardBody>
                   <div className="chart-area">
                     <Line
-                      data={chartExample1[this.state.bigChartData]}
+                      data={this.state[this.state.bigChartData]}
                       options={chartExample1.options}
                     />
                   </div>
