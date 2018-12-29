@@ -1,24 +1,17 @@
 import React from "react";
 // react plugin for creating notifications over the dashboard
 import NotificationAlert from "react-notification-alert";
-
 // reactstrap components
-import {
-  Alert,
-  UncontrolledAlert,
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  Row,
-  Col
-} from "reactstrap";
+import {Alert, Button, Card, CardBody, CardHeader, CardTitle, Col, Row, UncontrolledAlert} from "reactstrap";
 
 class Notifications extends React.Component {
+  constructor(props) {
+    super(props);
+    this.notificationAlertRef = React.createRef();
+  }
   notify = place => {
-    var color = Math.floor(Math.random() * 5 + 1);
-    var type;
+    let color = Math.floor(Math.random() * 5 + 1);
+    let type;
     switch (color) {
       case 1:
         type = "primary";
@@ -38,29 +31,27 @@ class Notifications extends React.Component {
       default:
         break;
     }
-    var options = {};
-    options = {
+    this.notificationAlertRef.current.notificationAlert({
       place: place,
       message: (
-        <div>
           <div>
-            Welcome to <b>Black Dashboard React</b> - a beautiful freebie for
-            every web developer.
+            <div>
+              Welcome to <b>Black Dashboard React</b> - a beautiful freebie for
+              every web developer.
+            </div>
           </div>
-        </div>
       ),
       type: type,
       icon: "tim-icons icon-bell-55",
       autoDismiss: 7
-    };
-    this.refs.notificationAlert.notificationAlert(options);
+    });
   };
   render() {
     return (
       <>
         <div className="content">
           <div className="react-notification-alert-container">
-            <NotificationAlert ref="notificationAlert" />
+            <NotificationAlert ref={this.notificationAlertRef} />
           </div>
           <Row>
             <Col md="6">

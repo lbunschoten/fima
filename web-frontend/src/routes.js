@@ -5,7 +5,7 @@ import TableList from "views/TableList.jsx";
 import Typography from "views/Typography.jsx";
 import UserProfile from "views/UserProfile.jsx";
 
-var routes = [
+let routes = [
   {
     path: "/dashboard",
     name: "Dashboard",

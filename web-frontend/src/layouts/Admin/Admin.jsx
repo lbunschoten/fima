@@ -4,29 +4,26 @@ import { Route, Switch } from "react-router-dom";
 import PerfectScrollbar from "perfect-scrollbar";
 
 // core components
-import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
-import Sidebar from "components/Sidebar/Sidebar.jsx";
+import AdminNavbar from "../../components/Navbars/AdminNavbar.jsx";
+import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 
-import routes from "routes.js";
+import routes from "../../routes.js";
 
-import logo from "assets/img/react-logo.png";
-
-var ps;
+let ps;
 
 class Admin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      backgroundColor: "blue",
-      sidebarOpened:
-        document.documentElement.className.indexOf("nav-open") !== -1
+      sidebarOpened: document.documentElement.className.indexOf("nav-open") !== -1
     };
+    this.mainPanelRef = React.createRef();
   }
   componentDidMount() {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
       document.documentElement.classList.remove("perfect-scrollbar-off");
-      ps = new PerfectScrollbar(this.refs.mainPanel, { suppressScrollX: true });
+      ps = new PerfectScrollbar(this.mainPanelRef.current, { suppressScrollX: true });
       let tables = document.querySelectorAll(".table-responsive");
       for (let i = 0; i < tables.length; i++) {
         ps = new PerfectScrollbar(tables[i]);
@@ -40,8 +37,8 @@ class Admin extends React.Component {
       document.documentElement.classList.remove("perfect-scrollbar-on");
     }
   }
-  componentDidUpdate(e) {
-    if (e.history.action === "PUSH") {
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.history.action === "PUSH") {
       if (navigator.platform.indexOf("Win") > -1) {
         let tables = document.querySelectorAll(".table-responsive");
         for (let i = 0; i < tables.length; i++) {
@@ -50,7 +47,7 @@ class Admin extends React.Component {
       }
       document.documentElement.scrollTop = 0;
       document.scrollingElement.scrollTop = 0;
-      this.refs.mainPanel.scrollTop = 0;
+      this.mainPanelRef.current.scrollTop = 0;
     }
   }
   // this function opens and closes the sidebar on small devices
@@ -73,10 +70,10 @@ class Admin extends React.Component {
       }
     });
   };
-  getBrandText = path => {
+  brandText = path => {
     for (let i = 0; i < routes.length; i++) {
       if (
-        this.props.location.pathname.indexOf(
+        path.indexOf(
           routes[i].layout + routes[i].path
         ) !== -1
       ) {
@@ -92,25 +89,18 @@ class Admin extends React.Component {
           <Sidebar
             {...this.props}
             routes={routes}
-            bgColor={this.state.backgroundColor}
-            logo={{
-              outerLink: "https://fima.dev/",
-              text: "Fima",
-              imgSrc: logo
-            }}
             toggleSidebar={this.toggleSidebar}
           />
           <div
             className="main-panel"
-            ref="mainPanel"
-            data={this.state.backgroundColor}
+            ref={this.mainPanelRef}
           >
             <AdminNavbar
               {...this.props}
-              brandText={this.getBrandText(this.props.location.pathname)}
+              brandText={this.brandText(this.props.location.pathname)}
               toggleSidebar={this.toggleSidebar}
               sidebarOpened={this.state.sidebarOpened}
-            />
+          />
             <Switch>{this.getRoutes(routes)}</Switch>
           </div>
         </div>
