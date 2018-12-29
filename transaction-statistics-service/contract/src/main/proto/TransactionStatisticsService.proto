@@ -7,15 +7,27 @@ option java_package = "fima.services.transactionstatistics";
 option java_outer_classname = "TransactionStatisticsServiceProtos";
 
 service TransactionStatisticsService {
-    rpc getStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
+
+    rpc getMonthlyStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
+
+}
+
+message MonthInYear {
+    int32 month = 2;
+    int32 year = 3;
+}
+
+message MonthlyStatistics {
+    int32 month = 1;
+    int32 year = 2;
+    int32 transaction = 3;
 }
 
 message TransactionsStatisticsRequest {
-    string name = 1;
+    MonthInYear startDate = 1;
+    MonthInYear endDate = 2;
 }
 
 message TransactionStatisticsResponse {
-    int32 month = 1;
-    int32 year = 2;
-    int32 transactions = 3;
+    map<int32, MonthlyStatistics> monthlyStatistics = 1;
 }
