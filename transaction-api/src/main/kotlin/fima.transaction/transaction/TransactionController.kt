@@ -35,10 +35,13 @@ class TransactionController @Autowired constructor(
     }
 
     @GetMapping("/statistics")
-    fun getStatistics(): TransactionStatistics {
+    fun getStatistics(): List<TransactionStatistics> {
         val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2018)
         val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2018)
-        return transactionStatisticsService.getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build()).simple()
+        return transactionStatisticsService
+          .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
+          .monthlyStatisticsList
+          .map { it.simple() }
     }
 
     @PutMapping("/import")

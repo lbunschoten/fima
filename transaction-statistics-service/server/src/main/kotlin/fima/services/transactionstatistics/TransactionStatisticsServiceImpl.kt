@@ -8,19 +8,17 @@ class TransactionStatisticsServiceImpl(private val statisticsRepository: Statist
   override fun getMonthlyStatistics(request: TransactionsStatisticsRequest, responseObserver: StreamObserver<TransactionStatisticsResponse>) {
     val responseBuilder = TransactionStatisticsResponse
       .newBuilder()
-
-    statisticsRepository
-      .getMonthlyStatistics(request.startDate.month, request.startDate.year, request.endDate.month, request.endDate.year)
-      .mapIndexed { index, monthlyTransactionStatistics ->
-        val s = MonthlyStatistics
-          .newBuilder()
-          .setMonth(monthlyTransactionStatistics.month)
-          .setYear(monthlyTransactionStatistics.year)
-          .setTransaction(monthlyTransactionStatistics.numTransactions)
-          .build()
-
-        responseBuilder.putMonthlyStatistics(index, s)
-      }
+      .addAllMonthlyStatistics(statisticsRepository
+        .getMonthlyStatistics(request.startDate.month, request.startDate.year, request.endDate.month, request.endDate.year)
+        .map {
+          MonthlyStatistics
+            .newBuilder()
+            .setMonth(it.month)
+            .setYear(it.year)
+            .setTransaction(it.numTransactions)
+            .build()
+        }
+      )
 
     responseObserver.onNext(responseBuilder.build())
     responseObserver.onCompleted()
