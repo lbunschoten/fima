@@ -46,7 +46,7 @@ spec:
   - host: fima.dev
     http:
       paths:
-      - path: /*
+      - path: /
         backend:
           serviceName: web-frontend
           servicePort: 80
