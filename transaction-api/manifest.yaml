@@ -46,7 +46,6 @@ spec:
   - host: api.fima.dev
     http:
       paths:
-      - path: /transaction
-        backend:
+      - backend:
           serviceName: transaction-api
           servicePort: 80
