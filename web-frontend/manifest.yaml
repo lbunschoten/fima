@@ -47,5 +47,5 @@ spec:
     http:
       paths:
       - backend:
-        serviceName: web-frontend
-        servicePort: 80
+          serviceName: web-frontend
+          servicePort: 80
