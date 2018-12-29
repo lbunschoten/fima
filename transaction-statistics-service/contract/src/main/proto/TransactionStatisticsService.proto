@@ -29,5 +29,5 @@ message TransactionsStatisticsRequest {
 }
 
 message TransactionStatisticsResponse {
-    map<int32, MonthlyStatistics> monthlyStatistics = 1;
+    repeated MonthlyStatistics monthlyStatistics = 1;
 }
