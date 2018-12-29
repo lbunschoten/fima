@@ -1,6 +1,9 @@
 package fima.services.transactionstatistics.repository
 
-import org.jetbrains.exposed.dao.*
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -38,6 +41,19 @@ class StatisticsRepository {
             MonthlyTransactionStatisticsDao.find {
                 MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year)
             }.firstOrNull()?.simple()
+        }
+    }
+
+    fun getMonthlyStatistics(startMonth: Int, startYear: Int, endMonth: Int, endYear: Int): List<MonthlyTransactionStatistics> {
+        return transaction { MonthlyTransactionStatisticsDao.find {
+            (
+                (MonthlyTransactionStatisticsTable.month greaterEq startMonth and (MonthlyTransactionStatisticsTable.year greaterEq startYear)) or
+                (MonthlyTransactionStatisticsTable.year greater startYear)
+            ) and (
+              (MonthlyTransactionStatisticsTable.month lessEq endMonth and (MonthlyTransactionStatisticsTable.year lessEq  endYear)) or
+              (MonthlyTransactionStatisticsTable.year less endYear)
+            )
+          }.toList().map { it.simple() }
         }
     }
 

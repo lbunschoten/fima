@@ -5,6 +5,7 @@ import fima.services.transaction.GetTransactionRequest
 import fima.services.transaction.TransactionServiceGrpc
 import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpc
+import fima.services.transactionstatistics.MonthInYear
 import fima.services.transactionstatistics.TransactionStatisticsServiceGrpc
 import fima.services.transactionstatistics.TransactionsStatisticsRequest
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +36,9 @@ class TransactionController @Autowired constructor(
 
     @GetMapping("/statistics")
     fun getStatistics(): TransactionStatistics {
-        return transactionStatisticsService.getStatistics(TransactionsStatisticsRequest.newBuilder().build()).simple()
+        val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2018)
+        val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2018)
+        return transactionStatisticsService.getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build()).simple()
     }
 
     @PutMapping("/import")
