@@ -6,6 +6,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.math.BigDecimal
 
 class StatisticsRepository {
 
@@ -17,20 +18,22 @@ class StatisticsRepository {
     }
   }
 
-  fun insertTransaction(month: Int, year: Int) {
+  fun insertTransaction(month: Int, year: Int, amount: Double) {
     transaction {
       val statistics = getStatistics(month, year)
       statistics?.let {
         MonthlyTransactionStatisticsTable.update({ MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year) }) {
           it[MonthlyTransactionStatisticsTable.month] = month
           it[MonthlyTransactionStatisticsTable.year] = year
-          it[numTransactions] = statistics.numTransactions + 1
+          it[MonthlyTransactionStatisticsTable.numTransactions] = statistics.numTransactions + 1
+          it[MonthlyTransactionStatisticsTable.sum] = statistics.sum.add(BigDecimal(amount))
         }
       } ?: {
         MonthlyTransactionStatisticsTable.insert {
           it[MonthlyTransactionStatisticsTable.month] = month
           it[MonthlyTransactionStatisticsTable.year] = year
-          it[numTransactions] = 1
+          it[MonthlyTransactionStatisticsTable.numTransactions] = 1
+          it[MonthlyTransactionStatisticsTable.sum] = BigDecimal(amount)
         }
       }()
     }
@@ -66,6 +69,7 @@ class StatisticsRepository {
     val month = integer("month").index()
     val year = integer("year").index()
     val numTransactions = integer("numTransactions")
+    val sum = decimal("sum", 9, 2)
   }
 
   class MonthlyTransactionStatisticsDao(id: EntityID<Int>) : IntEntity(id) {
@@ -74,16 +78,18 @@ class StatisticsRepository {
     val month by MonthlyTransactionStatisticsTable.month
     val year by MonthlyTransactionStatisticsTable.year
     val numTransactions by MonthlyTransactionStatisticsTable.numTransactions
+    val sum by MonthlyTransactionStatisticsTable.sum
 
     fun simple(): MonthlyTransactionStatistics {
-      return MonthlyTransactionStatistics(month, year, numTransactions)
+      return MonthlyTransactionStatistics(month, year, numTransactions, sum)
     }
   }
 
   data class MonthlyTransactionStatistics(
     val month: Int,
     val year: Int,
-    val numTransactions: Int
+    val numTransactions: Int,
+    val sum: BigDecimal
   )
 
 }

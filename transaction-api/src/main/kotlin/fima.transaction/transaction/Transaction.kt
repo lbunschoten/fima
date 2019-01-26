@@ -33,7 +33,7 @@ fun fima.domain.transaction.Transaction.simple(): Transaction {
 }
 
 fun fima.services.transactionstatistics.MonthlyStatistics.simple(): TransactionStatistics {
-    return TransactionStatistics(this.month, this.year, this.transaction)
+    return TransactionStatistics(this.month, this.year, this.transaction, this.sum)
 }
 
 data class Transaction(val id: Int,
@@ -47,4 +47,5 @@ data class Transaction(val id: Int,
 
 data class TransactionStatistics(val month: Int,
                                  val year: Int,
-                                 val transactions: Int)
+                                 val transactions: Int,
+                                 val sum: Float)

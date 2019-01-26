@@ -26,6 +26,11 @@ spec:
                 secretKeyRef:
                   name: fima-mysql-db-pass
                   key: password
+            - name: PERSONAL_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: fima-personal-account
+                  key: accountnumber
       imagePullSecrets:
         - name: regcred
 ---

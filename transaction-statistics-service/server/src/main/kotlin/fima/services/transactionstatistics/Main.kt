@@ -18,10 +18,12 @@ fun main(args: Array<String>) {
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
     val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
     val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
+    val personalAccount: String = System.getenv("PERSONAL_ACCOUNT")
+
     Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction_statistics?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
     val statisticsRepository = StatisticsRepository()
-    val transactionAddedEventProcessor = ProcessTransactionAddedEvent(statisticsRepository)
+    val transactionAddedEventProcessor = ProcessTransactionAddedEvent(statisticsRepository, personalAccount)
     EventListener<TransactionAddedEvent>({
         val props = Properties()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "$kafkaHost:$kafkaPort"

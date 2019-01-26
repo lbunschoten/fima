@@ -15,11 +15,12 @@ class ProcessTransactionAddedEventSpec : StringSpec() {
 
   init {
     val repository = mockk<StatisticsRepository>(relaxed = true)
-    val event = ProcessTransactionAddedEvent(repository)
+    val personalAccount = "MyAccount"
+    val event = ProcessTransactionAddedEvent(repository, personalAccount)
 
     "it should insert a transaction to the statistics repository" {
       event.invoke(ConsumerRecord("topic", 1, 0, 1L, transactionAddedEvent()))
-      verify { repository.insertTransaction(1, 2018) }
+      verify { repository.insertTransaction(1, 2018, 200.toDouble()) }
     }
   }
 
@@ -29,6 +30,8 @@ class ProcessTransactionAddedEventSpec : StringSpec() {
       .setTransaction(
         Transaction
           .newBuilder()
+          .setFromAccount("SomeElsesAccount")
+          .setAmount(200.toFloat())
           .setDate(
             Date
               .newBuilder()

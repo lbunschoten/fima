@@ -40,7 +40,12 @@ class Dashboard extends React.Component {
       bigChartData: "data1",
       data1: chartExample1.data1,
       data2: chartExample1.data2,
-      data3: chartExample1.data3
+      data3: chartExample1.data3,
+      transactions: [{
+        id: 1
+      }, {
+        id: 2
+      }]
     };
   }
 
@@ -97,6 +102,15 @@ class Dashboard extends React.Component {
           }
         );
       });
+
+    console.log("MOUNTING 2");
+    fetch("http://api.fima.dev/transaction/recent?offset=0&limit=10") // FIXME: Don't use hardcoded domain name
+      .then(res => res.json())
+      .then(results => {
+        this.setState({
+          transactions: results
+        });
+      });
   }
 
   setBgChartData = name => {
@@ -140,7 +154,7 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Accounts
+                            Transactions
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-single-02" />
@@ -534,61 +548,27 @@ class Dashboard extends React.Component {
             <Col lg="6" md="12">
               <Card>
                 <CardHeader>
-                  <CardTitle tag="h4">Simple Table</CardTitle>
+                  <CardTitle tag="h4">Recent transactions</CardTitle>
                 </CardHeader>
                 <CardBody>
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>
-                        <th>Name</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th className="text-center">Salary</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th className="text-center">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Dakota Rice</td>
-                        <td>Niger</td>
-                        <td>Oud-Turnhout</td>
-                        <td className="text-center">$36,738</td>
-                      </tr>
-                      <tr>
-                        <td>Minerva Hooper</td>
-                        <td>Curaçao</td>
-                        <td>Sinaai-Waas</td>
-                        <td className="text-center">$23,789</td>
-                      </tr>
-                      <tr>
-                        <td>Sage Rodriguez</td>
-                        <td>Netherlands</td>
-                        <td>Baileux</td>
-                        <td className="text-center">$56,142</td>
-                      </tr>
-                      <tr>
-                        <td>Philip Chaney</td>
-                        <td>Korea, South</td>
-                        <td>Overland Park</td>
-                        <td className="text-center">$38,735</td>
-                      </tr>
-                      <tr>
-                        <td>Doris Greene</td>
-                        <td>Malawi</td>
-                        <td>Feldkirchen in Kärnten</td>
-                        <td className="text-center">$63,542</td>
-                      </tr>
-                      <tr>
-                        <td>Mason Porter</td>
-                        <td>Chile</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$78,615</td>
-                      </tr>
-                      <tr>
-                        <td>Jon Porter</td>
-                        <td>Portugal</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$98,615</td>
-                      </tr>
+                      {
+                        this.state.transactions.map(t => (
+                          <tr>
+                            <td>{t.date}</td>
+                            <td>{t.name}</td>
+                            <td className="text-center">&euro;{parseFloat(t.amount).toFixed(2)}</td>
+                          </tr>
+                        ))
+                      }
                     </tbody>
                   </Table>
                 </CardBody>
