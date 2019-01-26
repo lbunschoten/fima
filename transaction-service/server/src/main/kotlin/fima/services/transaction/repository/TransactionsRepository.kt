@@ -31,9 +31,12 @@ class TransactionsRepository {
     }
   }
 
-  fun getRecent(): List<TransactionDao> {
+  fun getRecent(offset: Int, limit: Int): List<TransactionDao> {
     return dbtransaction {
-      TransactionDao.all().sortedByDescending { Transactions.date }
+      TransactionDao
+        .all()
+        .limit(limit, offset)
+        .sortedByDescending { Transactions.date }
     }
   }
 

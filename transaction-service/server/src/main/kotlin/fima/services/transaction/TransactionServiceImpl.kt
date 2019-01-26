@@ -39,7 +39,7 @@ class TransactionServiceImpl(private val transactionsRepository: TransactionsRep
     override fun getRecentTransactions(request: GetRecentTransactionsRequest, responseObserver: StreamObserver<GetRecentTransactionResponse>) {
         val response = GetRecentTransactionResponse
                 .newBuilder()
-                .addAllTransactions(transactionsRepository.getRecent().map { it.toProto() })
+                .addAllTransactions(transactionsRepository.getRecent(request.offset, request.limit).map { it.toProto() })
                 .build()
 
         responseObserver.onNext(response)
