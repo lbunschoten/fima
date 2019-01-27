@@ -32,20 +32,20 @@ spec:
                   name: fima-bank-accounts
                   key: checkingAccountNumber
             - name: CHECKING_ACCOUNT_INITIAL_BALANCE
-             valueFrom:
-               secretKeyRef:
-                 name: fima-bank-accounts
-                 key: checkingAccountInitialBalance
+              valueFrom:
+                secretKeyRef:
+                  name: fima-bank-accounts
+                  key: checkingAccountInitialBalance
             - name: SAVINGS_ACCOUNT_NUMBER
               valueFrom:
                 secretKeyRef:
                   name: fima-bank-accounts
                   key: savingsAccountNumber
             - name: SAVINGS_ACCOUNT_INITIAL_BALANCE
-            valueFrom:
-              secretKeyRef:
-                name: fima-bank-accounts
-                key: savingsAccountInitialBalance
+              valueFrom:
+                secretKeyRef:
+                  name: fima-bank-accounts
+                  key: savingsAccountInitialBalance
       imagePullSecrets:
         - name: regcred
 ---
