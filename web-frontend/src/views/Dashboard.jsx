@@ -41,11 +41,7 @@ class Dashboard extends React.Component {
       data1: chartExample1.data1,
       data2: chartExample1.data2,
       data3: chartExample1.data3,
-      transactions: [{
-        id: 1
-      }, {
-        id: 2
-      }]
+      transactions: []
     };
   }
 
@@ -80,7 +76,7 @@ class Dashboard extends React.Component {
                 ],
                 datasets: [
                   {
-                    label: "My First dataset",
+                    label: "# of transactions",
                     fill: true,
                     backgroundColor: gradientStroke,
                     borderColor: "#1f8ef1",
@@ -98,12 +94,101 @@ class Dashboard extends React.Component {
                   }
                 ]
               };
+            },
+            data2: canvas => {
+              let ctx = canvas.getContext("2d");
+
+              let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+              gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
+              gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
+              gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
+
+              return {
+                labels: [
+                  "JAN",
+                  "FEB",
+                  "MAR",
+                  "APR",
+                  "MAY",
+                  "JUN",
+                  "JUL",
+                  "AUG",
+                  "SEP",
+                  "OCT",
+                  "NOV",
+                  "DEC"
+                ],
+                datasets: [
+                  {
+                    label: "Sum of all transactions",
+                    fill: true,
+                    backgroundColor: gradientStroke,
+                    borderColor: "#1f8ef1",
+                    borderWidth: 2,
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    pointBackgroundColor: "#1f8ef1",
+                    pointBorderColor: "rgba(255,255,255,0)",
+                    pointHoverBackgroundColor: "#1f8ef1",
+                    pointBorderWidth: 20,
+                    pointHoverRadius: 4,
+                    pointHoverBorderWidth: 15,
+                    pointRadius: 4,
+                    data: results.map(r => r.sum)
+                  }
+                ]
+              };
+            },
+            data3: canvas => {
+              let ctx = canvas.getContext("2d");
+
+              let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+              gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
+              gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
+              gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
+
+              return {
+                labels: [
+                  "JAN",
+                  "FEB",
+                  "MAR",
+                  "APR",
+                  "MAY",
+                  "JUN",
+                  "JUL",
+                  "AUG",
+                  "SEP",
+                  "OCT",
+                  "NOV",
+                  "DEC"
+                ],
+                datasets: [
+                  {
+                    label: "Balance",
+                    fill: true,
+                    backgroundColor: gradientStroke,
+                    borderColor: "#1f8ef1",
+                    borderWidth: 2,
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    pointBackgroundColor: "#1f8ef1",
+                    pointBorderColor: "rgba(255,255,255,0)",
+                    pointHoverBackgroundColor: "#1f8ef1",
+                    pointBorderWidth: 20,
+                    pointHoverRadius: 4,
+                    pointHoverBorderWidth: 15,
+                    pointRadius: 4,
+                    data: results.map(r => r.balance)
+                  }
+                ]
+              };
             }
           }
         );
       });
 
-    console.log("MOUNTING 2");
     fetch("http://api.fima.dev/transaction/recent?offset=0&limit=10") // FIXME: Don't use hardcoded domain name
       .then(res => res.json())
       .then(results => {
@@ -129,8 +214,8 @@ class Dashboard extends React.Component {
                 <CardHeader>
                   <Row>
                     <Col className="text-left" sm="6">
-                      <h5 className="card-category">Total Shipments</h5>
-                      <CardTitle tag="h2">Performance</CardTitle>
+                      <h5 className="card-category">Transactions</h5>
+                      <CardTitle tag="h2">Account status</CardTitle>
                     </Col>
                     <Col sm="6">
                       <ButtonGroup
@@ -176,7 +261,7 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Purchases
+                            Sum
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-gift-2" />
@@ -198,7 +283,7 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Sessions
+                            Balance
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-tap-02" />
