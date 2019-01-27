@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.math.BigDecimal
 
-class StatisticsRepository {
+class StatisticsRepository(private val initialBalance: Double) {
 
   init {
     transaction {
@@ -27,24 +27,35 @@ class StatisticsRepository {
           it[MonthlyTransactionStatisticsTable.year] = year
           it[MonthlyTransactionStatisticsTable.numTransactions] = statistics.numTransactions + 1
           it[MonthlyTransactionStatisticsTable.sum] = statistics.sum.add(BigDecimal(amount))
+          it[MonthlyTransactionStatisticsTable.balance] = statistics.balance.add(BigDecimal(amount))
         }
       } ?: {
+        val previousMonthStatistics = getPreviousMonthStatistics(month, year)
+
         MonthlyTransactionStatisticsTable.insert {
           it[MonthlyTransactionStatisticsTable.month] = month
           it[MonthlyTransactionStatisticsTable.year] = year
           it[MonthlyTransactionStatisticsTable.numTransactions] = 1
           it[MonthlyTransactionStatisticsTable.sum] = BigDecimal(amount)
+          it[MonthlyTransactionStatisticsTable.balance] = (previousMonthStatistics?.balance ?: BigDecimal(initialBalance)).add(BigDecimal(amount))
         }
       }()
     }
   }
 
-  fun getStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
+  private fun getStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
     return transaction {
       MonthlyTransactionStatisticsDao.find {
         MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year)
       }.firstOrNull()?.simple()
     }
+  }
+
+  private fun getPreviousMonthStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
+    return {
+      if (month == 1) getStatistics(12, year - 1)
+      else getStatistics(month - 1, year)
+    }()
   }
 
   fun getMonthlyStatistics(startMonth: Int, startYear: Int, endMonth: Int, endYear: Int): List<MonthlyTransactionStatistics> {
@@ -70,6 +81,7 @@ class StatisticsRepository {
     val year = integer("year").index()
     val numTransactions = integer("numTransactions")
     val sum = decimal("sum", 9, 2)
+    val balance = decimal("balance", 9, 2)
   }
 
   class MonthlyTransactionStatisticsDao(id: EntityID<Int>) : IntEntity(id) {
@@ -79,9 +91,10 @@ class StatisticsRepository {
     val year by MonthlyTransactionStatisticsTable.year
     val numTransactions by MonthlyTransactionStatisticsTable.numTransactions
     val sum by MonthlyTransactionStatisticsTable.sum
+    val balance by MonthlyTransactionStatisticsTable.balance
 
     fun simple(): MonthlyTransactionStatistics {
-      return MonthlyTransactionStatistics(month, year, numTransactions, sum)
+      return MonthlyTransactionStatistics(month, year, numTransactions, sum, balance)
     }
   }
 
@@ -89,7 +102,8 @@ class StatisticsRepository {
     val month: Int,
     val year: Int,
     val numTransactions: Int,
-    val sum: BigDecimal
+    val sum: BigDecimal,
+    val balance: BigDecimal
   )
 
 }

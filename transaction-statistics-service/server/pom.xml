@@ -61,7 +61,7 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-statistics-service-contract</artifactId>
-            <version>19.04.1</version>
+            <version>19.04.2</version>
         </dependency>
 
         <dependency>

@@ -17,6 +17,7 @@ class TransactionStatisticsServiceImpl(private val statisticsRepository: Statist
             .setYear(it.year)
             .setTransaction(it.numTransactions)
             .setSum(it.sum.toFloat())
+            .setBalance(it.balance.toFloat())
             .build()
         }
       )
