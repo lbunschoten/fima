@@ -10,6 +10,7 @@ import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.math.BigDecimal
@@ -35,10 +36,12 @@ class TransactionsRepository {
     return dbtransaction {
       logger.addLogger(StdOutSqlLogger)
 
-      TransactionDao
-        .all()
-        .limit(limit, offset)
-        .sortedByDescending { Transactions.date }
+      TransactionDao.wrapRows(
+        Transactions
+          .selectAll()
+          .limit(limit, offset)
+          .orderBy(Transactions.date to false)
+      ).toList()
     }
   }
 
