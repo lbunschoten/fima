@@ -22,6 +22,7 @@ message MonthlyStatistics {
     int32 year = 2;
     int32 transaction = 3;
     float sum = 4;
+    float balance = 5;
 }
 
 message TransactionsStatisticsRequest {
