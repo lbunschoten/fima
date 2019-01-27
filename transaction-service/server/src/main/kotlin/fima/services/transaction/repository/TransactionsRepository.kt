@@ -40,7 +40,7 @@ class TransactionsRepository {
         Transactions
           .selectAll()
           .limit(limit, offset)
-          .orderBy(Transactions.date to false)
+          .orderBy(Transactions.date to false, Transactions.id to false)
       ).toList()
     }
   }
