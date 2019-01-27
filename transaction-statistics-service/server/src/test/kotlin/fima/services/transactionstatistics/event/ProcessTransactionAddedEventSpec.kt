@@ -15,8 +15,9 @@ class ProcessTransactionAddedEventSpec : StringSpec() {
 
   init {
     val repository = mockk<StatisticsRepository>(relaxed = true)
-    val personalAccount = "MyAccount"
-    val event = ProcessTransactionAddedEvent(repository, personalAccount)
+    val checkingAccountNumber = "CheckingAccountNumber"
+    val savingsAccountNumber = "SavingsAccountNumber"
+    val event = ProcessTransactionAddedEvent(repository, checkingAccountNumber, savingsAccountNumber)
 
     "it should insert a transaction to the statistics repository" {
       event.invoke(ConsumerRecord("topic", 1, 0, 1L, transactionAddedEvent()))
