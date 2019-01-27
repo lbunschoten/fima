@@ -33,6 +33,8 @@ class TransactionsRepository {
 
   fun getRecent(offset: Int, limit: Int): List<TransactionDao> {
     return dbtransaction {
+      logger.addLogger(StdOutSqlLogger)
+
       TransactionDao
         .all()
         .limit(limit, offset)
