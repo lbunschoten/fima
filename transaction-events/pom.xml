@@ -11,13 +11,13 @@
     </parent>
 
     <artifactId>fima-transaction-events-contract</artifactId>
-    <version>19.05.1</version>
+    <version>19.05.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
         <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>fima-transaction-events-contract-19.05.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
