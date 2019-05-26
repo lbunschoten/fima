@@ -131,7 +131,7 @@
     <distributionManagement>
         <repository>
             <id>fima-releases</id>
-            <url>http://${env.NEXUS_HOST}:8081/repository/fima-releases</url>
+            <url>http://${env.NEXUS_HOST}/repository/fima-releases</url>
         </repository>
         <snapshotRepository>
             <id>MavenLocalSnapshot</id>
