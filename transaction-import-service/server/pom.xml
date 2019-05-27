@@ -8,7 +8,7 @@
     <parent>
         <groupId>fima</groupId>
         <artifactId>fima-base-kotlin</artifactId>
-        <version>18.08.2</version>
+        <version>19.05.1</version>
         <relativePath/>
     </parent>
 
