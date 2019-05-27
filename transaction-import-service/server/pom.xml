@@ -65,7 +65,7 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-events-contract</artifactId>
-            <version>18.07.1</version>
+            <version>19.05.1</version>
         </dependency>
 
         <dependency>
