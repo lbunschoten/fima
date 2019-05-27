@@ -34,7 +34,7 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-domain-contract</artifactId>
-            <version>18.07.2</version>
+            <version>19.05.1</version>
         </dependency>
     </dependencies>
 
