@@ -2,17 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>fima</groupId>
-        <artifactId>fima-base-grpc</artifactId>
-        <version>19.05.1</version>
-        <relativePath />
-    </parent>
-
+    <groupId>fima</groupId>
     <artifactId>fima-transaction-events-contract</artifactId>
     <version>19.05.2-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <properties>
+        <grpc.version>1.13.2</grpc.version>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+        <java-lang.encoding>UTF-8</java-lang.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <scm>
         <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
@@ -24,18 +25,98 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-domain-contract</artifactId>
-            <version>19.05.1</version>
+            <version>19.06.1</version>
         </dependency>
     </dependencies>
+
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/proto</sourceDirectory>
+
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.0</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.5.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:3.6.0:exe:${os.detected.classifier}
+                    </protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>
+                        io.grpc:protoc-gen-grpc-java:1.13.2:exe:${os.detected.classifier}
+                    </pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>releases</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <serverId>fima-releases</serverId>
+                            <nexusUrl>http://${env.NEXUS_HOST}/</nexusUrl>
+                            <skipStaging>true</skipStaging>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>fima-releases</id>
+            <url>http://${env.NEXUS_HOST}/repository/fima-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>MavenLocalSnapshot</id>
+            <name>Local file system</name>
+            <url>file://${user.home}/.m2/repository</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
