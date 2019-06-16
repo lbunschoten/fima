@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fima</groupId>
     <artifactId>fima-transaction-domain-contract</artifactId>
-    <version>19.06.1</version>
+    <version>19.06.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
         <connection>scm:git:git://github.com:lbunschoten/fima.git</connection>
         <developerConnection>scm:git:git@github.com:lbunschoten/fima.git</developerConnection>
-        <tag>fima-transaction-domain-contract-19.06.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
