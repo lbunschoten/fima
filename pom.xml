@@ -18,6 +18,8 @@
         <module>base</module>
         <module>base-grpc</module>
         <module>base-kotlin</module>
+        <module>jenkins</module>
+        <module>nexus</module>
         <module>mysql-db</module>
         <module>traefik</module>
         <module>transaction-api</module>

@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Deploy') {
+            steps {
+                script {
+                    dir("${env.JOB_NAME}") {
+                        sh "kubectl apply -f manifest.yaml"
+                    }
+                }
+            }
+        }
+    }
+}
