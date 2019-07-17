@@ -15,9 +15,6 @@
     </properties>
 
     <modules>
-        <module>base</module>
-        <module>base-grpc</module>
-        <module>base-kotlin</module>
         <module>jenkins</module>
         <module>nexus</module>
         <module>mysql-db</module>
@@ -31,7 +28,6 @@
         <module>transaction-service/server</module>
         <module>transaction-statistics-service/contract</module>
         <module>transaction-statistics-service/server</module>
-        <module>web-frontend</module>
     </modules>
 
 </project>

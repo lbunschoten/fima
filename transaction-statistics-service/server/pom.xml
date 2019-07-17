@@ -4,14 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>fima</groupId>
-        <artifactId>fima-base-kotlin</artifactId>
-        <version>19.05.1</version>
-        <relativePath/>
-    </parent>
-
+    <groupId>fima</groupId>
     <artifactId>fima-transaction-statistics-service-server</artifactId>
     <version>18.03.1-SNAPSHOT</version>
 
@@ -19,6 +12,7 @@
         <grpc.version>1.13.2</grpc.version>
         <mysql-connector.version>6.0.6</mysql-connector.version>
         <kafka.version>0.10.0.1</kafka.version>
+        <kotlin.version>1.2.51</kotlin.version>
     </properties>
 
     <dependencies>
@@ -26,6 +20,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
 
         <dependency>
@@ -61,25 +56,27 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-statistics-service-contract</artifactId>
-            <version>19.04.2</version>
+            <version>19.06.1</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-events-contract</artifactId>
-            <version>19.05.1</version>
+            <version>19.06.1</version>
         </dependency>
 
         <dependency>
             <groupId>io.kotlintest</groupId>
             <artifactId>kotlintest-runner-junit5</artifactId>
             <scope>test</scope>
+            <version>3.1.9</version>
         </dependency>
 
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk</artifactId>
             <scope>test</scope>
+            <version>1.8.6</version>
         </dependency>
 
     </dependencies>
@@ -87,20 +84,90 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/test/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                </configuration>
             </plugin>
 
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Spec*</include>
+                    </includes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.2.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>fima-releases</id>
+            <url>http://${env.NEXUS_HOST}/repository/fima-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>MavenLocalSnapshot</id>
+            <name>Local file system</name>
+            <url>file://${user.home}/.m2/repository</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
