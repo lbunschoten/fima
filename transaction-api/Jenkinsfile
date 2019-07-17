@@ -1,20 +1,28 @@
-pipeline {
-    agent any
+podTemplate(label: 'mypod', containers: [
+    containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', command: 'cat', ttyEnabled: true),
+    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+  ],
+  volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+  ]
+  ) {
+    node('mypod') {
+        stage('Check running containers') {
+            container('docker') {
+                sh 'docker ps'
+            }
+        }
 
-    tools {
-        maven 'Maven 3.5.4'
-    }
-
-    stages {
         stage('Clone repository') {
-            steps {
+            container('git') {
                 cleanWs()
                 checkout scm
             }
         }
 
         stage('Build') {
-            steps {
+            container('maven') {
                 dir("${env.JOB_NAME}") {
                     sh 'mvn -DskipTests clean package'
                 }
@@ -22,31 +30,9 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
+            container('maven') {
                 dir("${env.JOB_NAME}") {
                     sh 'mvn test'
-                }
-            }
-        }
-
-        stage('Push docker image') {
-            steps {
-                script {
-                    docker.withRegistry(env.DOCKER_REGISTRY, 'nexus-docker-registry') {
-                        docker.build("${env.JOB_NAME}:${env.BUILD_ID}", "./${env.JOB_NAME}").push()
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    dir("${env.JOB_NAME}") {
-                        sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                        sh "sed -i 's/\$NEXUS_HOST/${env.NEXUS_HOST}/g' manifest.yaml"
-                        sh "kubectl apply -f manifest.yaml"
-                    }
                 }
             }
         }
