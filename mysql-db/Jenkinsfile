@@ -6,7 +6,7 @@ podTemplate(label: 'mypod', containers: [
     node('mypod') {
         stage('Deploy') {
             container('kubectl') {
-                dir("${env.JOB_NAME}/server") {
+                dir("${env.JOB_NAME}") {
                     sh "kubectl proxy &"
                     sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
