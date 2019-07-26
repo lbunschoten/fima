@@ -48,5 +48,12 @@ podTemplate(label: 'mypod', containers: [
                 }
             }
         }
+
+        stage('Deploy') {
+            container('kubectl') {
+                sh "kubectl proxy"
+                sh "kubectl get pods"
+            }
+        }
     }
 }
