@@ -48,11 +48,5 @@ podTemplate(label: 'mypod', containers: [
                 }
             }
         }
-
-        stage('Deploy') {
-            container('kubectl') {
-                sh "kubectl get pods"
-            }
-        }
     }
 }
