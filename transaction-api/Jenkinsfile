@@ -16,7 +16,6 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Clone repository') {
             container('git') {
-                cleanWs()
                 checkout scm
             }
         }
@@ -24,7 +23,9 @@ podTemplate(label: 'mypod', containers: [
         stage('Build') {
             container('maven') {
                 dir("${env.JOB_NAME}") {
-                    sh 'mvn -DskipTests clean package'
+                    configFileProvider([configFile(fileId: 'UUID', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
+                        sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS -DskipTests clean package'
+                    }
                 }
             }
         }
@@ -32,7 +33,9 @@ podTemplate(label: 'mypod', containers: [
         stage('Test') {
             container('maven') {
                 dir("${env.JOB_NAME}") {
-                    sh 'mvn test'
+                    configFileProvider([configFile(fileId: 'UUID', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
+                        sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS test'
+                    }
                 }
             }
         }
