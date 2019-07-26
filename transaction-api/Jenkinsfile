@@ -54,7 +54,7 @@ podTemplate(label: 'mypod', containers: [
                 dir("${env.JOB_NAME}") {
                     sh "kubectl proxy &"
                     sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                    sh "kubectl apply -f manifest.yaml"
+                    sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
             }
         }
