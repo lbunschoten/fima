@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: transaction-statistics-service
-          image: "$NEXUS_HOST:8123/transaction-statistics-service:$BUILD_ID"
+          image: "transaction-statistics-service:$BUILD_ID"
           ports:
             - name: http
               containerPort: 9997
