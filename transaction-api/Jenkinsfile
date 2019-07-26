@@ -23,7 +23,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Build') {
             container('maven') {
                 dir("${env.JOB_NAME}") {
-                    configFileProvider([configFile(fileId: 'UUID', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
+                    configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
                         sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS -DskipTests clean package'
                     }
                 }
@@ -33,7 +33,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Test') {
             container('maven') {
                 dir("${env.JOB_NAME}") {
-                    configFileProvider([configFile(fileId: 'UUID', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
+                    configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
                         sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS test'
                     }
                 }
