@@ -33,7 +33,7 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Test') {
             container('maven') {
-                dir("${env.JOB_NAME/server}") {
+                dir("${env.JOB_NAME"}/server") {
                     configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
                         sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS test'
                     }
