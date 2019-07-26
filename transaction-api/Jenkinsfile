@@ -43,7 +43,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Build docker image') {
             container('docker') {
                 dir("${env.JOB_NAME}") {
-                    sh 'docker build -t ${env.JOB_NAME}:${env.BUILD_ID} .'
+                    sh "docker build -t ${env.JOB_NAME}:${env.BUILD_ID} ."
                 }
             }
         }
