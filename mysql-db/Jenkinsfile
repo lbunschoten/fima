@@ -8,6 +8,7 @@ podTemplate(label: 'mypod', containers: [
             container('kubectl') {
                 dir("${env.JOB_NAME}") {
                     sh "ls -la"
+                    sh "ls -la .."
                     sh "kubectl proxy &"
                     sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
