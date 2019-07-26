@@ -4,6 +4,12 @@ podTemplate(label: 'mypod', containers: [
   volumes: []
   ) {
     node('mypod') {
+        stage('Clone repository') {
+            container('git') {
+                checkout scm
+            }
+        }
+
         stage('Deploy') {
             container('kubectl') {
                 dir("${env.JOB_NAME}") {

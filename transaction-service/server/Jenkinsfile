@@ -9,11 +9,6 @@ podTemplate(label: 'mypod', containers: [
   ]
   ) {
     node('mypod') {
-        stage('Check running containers') {
-            container('docker') {
-                sh 'docker ps'
-            }
-        }
 
         stage('Clone repository') {
             container('git') {
