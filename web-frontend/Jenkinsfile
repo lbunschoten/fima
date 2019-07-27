@@ -17,7 +17,7 @@ podTemplate(label: 'mypod', containers: [
         }
 
         stage('Build') {
-            container('maven') {
+            container('node') {
                 dir("${env.JOB_NAME}") {
                     sh 'npm install'
                     sh 'npm run build'
