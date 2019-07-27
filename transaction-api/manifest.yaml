@@ -17,7 +17,7 @@ spec:
           image: "transaction-api:$BUILD_ID"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
       imagePullSecrets:
         - name: regcred
 ---
