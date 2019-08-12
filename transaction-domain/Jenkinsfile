@@ -1,0 +1,25 @@
+podTemplate(label: 'mypod', containers: [
+    containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'maven', image: 'maven:3.6.1-jdk-11-slim', command: 'cat', ttyEnabled: true)
+  ],
+  volumes: []
+) {
+    node('mypod') {
+
+        stage('Clone repository') {
+            container('git') {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            container('maven') {
+                dir("${env.JOB_NAME}") {
+                    configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
+                        sh 'mvn -gs $MAVEN_GLOBAL_SETTINGS -DskipTests clean package'
+                    }
+                }
+            }
+        }
+    }
+}
