@@ -24,3 +24,5 @@ npm-debug.log
 node/
 
 build/
+
+secrets/
