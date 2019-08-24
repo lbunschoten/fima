@@ -4,4 +4,13 @@ EXPOSE 80
 
 COPY ./target/fima-transaction-api-17.12.1-SNAPSHOT.jar fima.jar
 
-ENTRYPOINT ["java", "-jar", "fima.jar", "--transaction.service.host=transaction-service", "--transaction.service.port=9997", "--transaction.statistics.service.host=transaction-statistics-service", "--transaction.statistics.service.port=9997", "--transaction.import.service.host=transaction-import-service", "--transaction.import.service.port=9997", "--server.port=8080", "--server.servlet.context-path=/transaction"]
+ENV TRANSACTION_SERVICE_HOST=transaction-service
+ENV TRANSACTION_SERVICE_PORT=9997
+
+ENV TRANSACTION_STATISTICS_SERVICE_HOST=transaction-statistics-service
+ENV TRANSACTION_STATISTICS_SERVICE_PORT=9997
+
+ENV TRANSACTION_IMPORT_SERVICE_HOST=transaction-import-service
+ENV TRANSACTION_IMPORT_SERVICE_PORT=9997
+
+ENTRYPOINT ["java", "-jar", "fima.jar", "--server.port=8080", "--server.servlet.context-path=/transaction"]
