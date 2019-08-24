@@ -52,7 +52,6 @@ spec:
           hostnames:
             - "jenkins.fima.dev"
             - "nexus.fima.dev"
-            - "docker-registry.fima.dev"
 ---
 apiVersion: v1
 kind: Service
