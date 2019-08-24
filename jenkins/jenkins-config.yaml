@@ -38,6 +38,11 @@ master:
   customConfigMap: false
   nodeSelector: {}
   tolerations: {}
+  hostAliases:
+    - ip: "192.168.64.3"
+      hostnames:
+        - "jenkins.fima.dev"
+        - "nexus.fima.dev"
 
 agent:
   enabled: true
