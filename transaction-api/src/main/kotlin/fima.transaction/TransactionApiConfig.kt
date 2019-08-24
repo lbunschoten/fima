@@ -11,22 +11,22 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class TransactionApiConfig {
 
-    @Value("\${TRANSACTION_SERVICE_HOST:localhost}")
+    @Value("\${TRANSACTION_SERVICE_SERVICE_HOST:localhost}")
     private var transactionServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_SERVICE_PORT:9997}")
+    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT:9997}")
     private var transactionServicePort: Int = 9997
 
-    @Value("\${TRANSACTION_STATISTICS_SERVICE_HOST:localhost}")
+    @Value("\${TRANSACTION_STATISTICS_SERVICE_SERVICE_HOST:localhost}")
     private var transactionStatisticsServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_STATISTICS_SERVICE_PORT:9997}")
+    @Value("\${TRANSACTION_STATISTICS_SERVICE_SERVICE_PORT:9997}")
     private var transactionStatisticsServicePort: Int = 9997
 
-    @Value("\${TRANSACTION_IMPORT_SERVICE_HOST:localhost}")
+    @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_HOST:localhost}")
     private var transactionImportServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_IMPORT_SERVICE_PORT:9997}")
+    @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_PORT:9997}")
     private var transactionImportServicePort: Int = 9997
 
     @Bean
