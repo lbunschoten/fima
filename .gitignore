@@ -26,3 +26,4 @@ node/
 build/
 
 secrets/
+env.json
