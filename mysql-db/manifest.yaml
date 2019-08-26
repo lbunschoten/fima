@@ -50,17 +50,16 @@ spec:
         persistentVolumeClaim:
           claimName: mysql-db-volume-claim
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: fima-mysql-db
-  labels:
-    app: fima
 spec:
+  selector:
+    app: fima
+    tier: frontend
+    name: fima-mysql-db
   ports:
     - protocol: TCP
       port: 3306
       targetPort: mysql
-  selector:
-    app: fima
-    name: fima-mysql-db
