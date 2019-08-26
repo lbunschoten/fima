@@ -63,4 +63,4 @@ spec:
       targetPort: mysql
   selector:
     app: fima
-    tier: mysql
+    name: fima-mysql-db
