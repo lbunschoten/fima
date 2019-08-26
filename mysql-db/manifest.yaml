@@ -58,7 +58,6 @@ spec:
   selector:
     app: fima
     tier: mysql
-    name: fima-mysql-db
   ports:
     - protocol: TCP
       port: 3306
