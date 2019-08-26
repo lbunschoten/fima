@@ -57,7 +57,7 @@ metadata:
 spec:
   selector:
     app: fima
-    tier: frontend
+    tier: mysql
     name: fima-mysql-db
   ports:
     - protocol: TCP
