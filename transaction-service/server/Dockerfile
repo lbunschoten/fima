@@ -1,6 +1,6 @@
 FROM openjdk:10.0.2-jre-slim
 
-RUN apt-get update \
+RUN apt-get update && \
     apt-get install -y \
     nmap \
     curl \
