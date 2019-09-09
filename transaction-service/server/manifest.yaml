@@ -19,13 +19,13 @@ spec:
             - name: http
               containerPort: 9997
           env:
-            - name: DB_HOST
-              value: fima-mysql-db
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: fima-mysql-db-pass
                   key: password
+            - name: KAFKA_HOST
+              value: boostrap.kafka.svc.cluster.local
       imagePullSecrets:
         - name: regcred
 ---

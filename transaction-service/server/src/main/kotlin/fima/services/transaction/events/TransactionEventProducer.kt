@@ -11,12 +11,14 @@ import java.util.Properties
 
 class TransactionEventProducer : KafkaProducer<Long, TransactionAddedEvent>(producerProperties()) {
 
-  private val logger = LoggerFactory.getLogger(javaClass)
-
   companion object {
+    private val logger = LoggerFactory.getLogger(TransactionEventProducer::class.java)
+
     fun producerProperties(): Properties {
       val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
       val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
+
+      logger.info("Connecting to kafka on $kafkaHost:$kafkaPort")
 
       val producerProps = Properties()
       producerProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "$kafkaHost:$kafkaPort"

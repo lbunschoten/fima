@@ -10,8 +10,8 @@ import org.jetbrains.exposed.sql.Database
 
 
 fun main(args: Array<String>) {
-    val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
-    val dbPort: String = System.getenv("DB_PORT") ?: "3306"
+    val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
+    val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
     Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
