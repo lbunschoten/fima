@@ -19,8 +19,8 @@ spec:
             - name: http
               containerPort: 9997
           env:
-            - name: DB_HOST
-              value: fima-mysql-db
+            - name: KAFKA_HOST
+              value: 10.108.62.237
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

@@ -13,8 +13,8 @@ import java.util.*
 
 
 fun main(args: Array<String>) {
-    val dbHost: String = System.getenv("DB_HOST") ?: "localhost"
-    val dbPort: String = System.getenv("DB_PORT") ?: "3306"
+    val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
+    val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
     val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
     val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
