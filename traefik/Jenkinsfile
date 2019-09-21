@@ -1,13 +1,20 @@
-pipeline {
-    agent any
+podTemplate(label: 'mypod', containers: [
+    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.15.1', command: 'cat', ttyEnabled: true)
+  ],
+  volumes: []
+  ) {
+    node('mypod') {
+        stage('Clone repository') {
+            container('git') {
+                checkout scm
+            }
+        }
 
-    stages {
         stage('Deploy') {
-            steps {
-                script {
-                    dir("${env.JOB_NAME}") {
-                        sh "kubectl apply -f manifest.yaml"
-                    }
+            container('kubectl') {
+                dir("${env.JOB_NAME}") {
+                    sh "kubectl proxy &"
+                    sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
             }
         }
