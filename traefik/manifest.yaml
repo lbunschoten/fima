@@ -39,7 +39,8 @@ spec:
             - NET_BIND_SERVICE
         args:
         - --api
-        - --log.level=INFO
+        - --kubernetes
+        - --logLevel=INFO
 ---
 kind: Service
 apiVersion: v1
