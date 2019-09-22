@@ -41,11 +41,11 @@ master:
   hostAliases:
     - ip: "192.168.64.3"
       hostnames:
-        - "jenkins.fima.dev"
-        - "nexus.fima.dev"
+        - "jenkins.fima.local"
+        - "nexus.fima.local"
   ingress:
     enabled: true
-    hostName: jenkins.fima.dev
+    hostName: jenkins.fima.local
     annotations:
       kubernetes.io/ingress.class: traefik
 

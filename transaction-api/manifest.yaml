@@ -43,7 +43,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: api.fima.dev
+  - host: api.fima.local
     http:
       paths:
       - path: /transaction

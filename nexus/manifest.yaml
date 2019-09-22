@@ -88,7 +88,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-    - host: nexus.fima.dev
+    - host: nexus.fima.local
       http:
         paths:
           - backend:
