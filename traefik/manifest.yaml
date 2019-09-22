@@ -11,6 +11,9 @@ metadata:
   labels:
     k8s-app: traefik-ingress-lb
 spec:
+  selector:
+    matchLabels:
+      name: traefik-ingress-lb
   template:
     metadata:
       labels:
