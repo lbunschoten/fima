@@ -4,6 +4,9 @@ metadata:
   name: transaction-api
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: transaction-api
   template:
     metadata:
       labels:

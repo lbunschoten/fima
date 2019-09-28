@@ -4,6 +4,9 @@ metadata:
   name: transaction-import-service
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: transaction-import-service
   template:
     metadata:
       labels:
