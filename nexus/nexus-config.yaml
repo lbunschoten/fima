@@ -1,0 +1,24 @@
+nexus:
+  imageName: sonatype/nexus3
+  imageTag: 3.16.1
+
+nexusProxy:
+  enabled: false
+
+service:
+  name: nexus
+  ports:
+    - port: 8081
+      targetPort: nexus-http
+
+ingress:
+  enabled: false
+
+persistence:
+  storageClass: standard
+  storageSize: 50Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 4800Mi
