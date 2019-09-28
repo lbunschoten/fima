@@ -1,9 +1,12 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web-frontend
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: web-frontend
   template:
     metadata:
       labels:
@@ -44,7 +47,7 @@ metadata:
     traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: fima.dev
+  - host: fima.local
     http:
       paths:
       - path: /
