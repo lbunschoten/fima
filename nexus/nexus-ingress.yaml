@@ -1,0 +1,16 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nexus
+  namespace: fima-infra
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: nexus.fima.local
+      http:
+        paths:
+          - backend:
+              serviceName: nexus
+              servicePort: 8081
