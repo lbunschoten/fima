@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package services;
+
+option java_multiple_files = true;
+option java_package = "fima.services.transaction.write";
+option java_outer_classname = "TransactionWritesServiceProtos";
+
+message OpenBankAccountRequest {
+    string accountNumber = 1;
+}
+
+message OpenBankAccountResponse {
+    repeated string errorMessages = 1;
+}
+
+message WithdrawalRequest {
+    int32 date = 1;
+    string name = 2;
+    string from_account = 3;
+    string to_account = 4;
+    string type = 5;
+    float amount = 6;
+    string details = 7;
+}
+
+message WithdrawalResponse {
+    repeated string errorMessages = 1;
+}
+
+message DepositRequest {
+    int32 date = 1;
+    string name = 2;
+    string from_account = 3;
+    string to_account = 4;
+    string type = 5;
+    float amount = 6;
+    string details = 7;
+}
+
+message DepositResponse {
+    repeated string errorMessages = 1;
+}
+
+
+service TransactionWritesService {
+
+    rpc openBankAccount(OpenBankAccountRequest) returns (OpenBankAccountResponse) {}
+
+    rpc withdraw(WithdrawalRequest) returns (WithdrawalResponse) {}
+
+    rpc deposit(DepositRequest) returns (DepositResponse) {}
+
+}
