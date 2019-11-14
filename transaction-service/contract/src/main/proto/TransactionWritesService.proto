@@ -8,6 +8,7 @@ option java_outer_classname = "TransactionWritesServiceProtos";
 
 message OpenBankAccountRequest {
     string accountNumber = 1;
+    float initialBalance = 2;
 }
 
 message OpenBankAccountResponse {
