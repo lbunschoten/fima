@@ -7,14 +7,14 @@ import fima.services.transaction.events.TransactionEventProducer
 import fima.services.transaction.repository.TransactionsRepository
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
+import fima.services.transaction.write.TransactionWritesServiceImpl
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.store.BankAccountEventStore
-import fima.services.transaction.write.TransactionWritesServiceImpl
 import io.grpc.ServerBuilder
 import org.jetbrains.exposed.sql.Database
 
 
-fun main(args: Array<String>) {
+fun main() {
     val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
     val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"

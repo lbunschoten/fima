@@ -37,7 +37,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: transaction-service
+  name: transaction-service-reads
 spec:
   selector:
     app: fima
@@ -48,6 +48,17 @@ spec:
       protocol: TCP
       port: 9997
       targetPort: http-reads
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: transaction-service-writes
+spec:
+  selector:
+    app: fima
+    tier: backend
+    name: transaction-service
+  ports:
     - name: http-writes
       protocol: TCP
       port: 9998
