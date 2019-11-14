@@ -2,13 +2,14 @@ package fima.services.transactionimport
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvToBeanBuilder
-import fima.domain.transaction.RawTransaction
-import fima.services.transaction.InsertTransactionRequest
-import fima.services.transaction.TransactionServiceGrpc
+import fima.services.transaction.write.DepositRequest
+import fima.services.transaction.write.OpenBankAccountRequest
+import fima.services.transaction.write.TransactionWritesServiceGrpc
+import fima.services.transaction.write.WithdrawalRequest
 import io.grpc.stub.StreamObserver
 import java.io.StringReader
 
-class TransactionImportServiceImpl(private val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub) : TransactionImportServiceGrpc.TransactionImportServiceImplBase() {
+class TransactionImportServiceImpl(private val transactionService: TransactionWritesServiceGrpc.TransactionWritesServiceBlockingStub) : TransactionImportServiceGrpc.TransactionImportServiceImplBase() {
 
     override fun importTransactions(request: ImportTransactionsRequest, responseObserver: StreamObserver<ImportTransactionsResponse>) {
         StringReader(request.transactions).use { reader ->
@@ -20,31 +21,51 @@ class TransactionImportServiceImpl(private val transactionService: TransactionSe
                     .withSkipLines(1)
                     .build()
 
-            csvReader.parse().forEach {
-                val transaction = RawTransaction.newBuilder().run {
-                    date = it.date
-                    name = it.name
-                    type = it.type
-                    amount = it.amount.replace(',', '.').toFloat()
-                    details = it.details
+            transactionService.openBankAccount(
+              OpenBankAccountRequest
+                .newBuilder()
+                .setAccountNumber("")
+                .build()
+            )
 
-                    if (it.direction == "Af") {
-                        fromAccount = it.firstAccount
-                        toAccount = it.secondAccount
-                    } else {
-                        fromAccount = it.secondAccount
-                        toAccount = it.firstAccount
-                    }
-
-                    build()
+            csvReader.parse().forEachIndexed { index, transaction ->
+                if (index == 0) {
+                    transactionService.openBankAccount(
+                      OpenBankAccountRequest
+                        .newBuilder()
+                        .setAccountNumber(if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount)
+                        .build()
+                    )
                 }
 
-                transactionService.insertTransaction(
-                        InsertTransactionRequest
-                                .newBuilder()
-                                .setTransaction(transaction)
-                                .build()
-                )
+                if (transaction.direction == "Af") {
+                    transactionService.withdraw(
+                      WithdrawalRequest
+                        .newBuilder()
+                        .setAmount(transaction.amount.replace(',', '.').toFloat())
+                        .setDate(transaction.date)
+                        .setDetails(transaction.details)
+                        .setName(transaction.name)
+                        .setFromAccount(transaction.firstAccount)
+                        .setToAccount(transaction.secondAccount)
+                        .setType(transaction.type)
+                        .build()
+                    )
+                } else {
+                    transactionService.deposit(
+                      DepositRequest
+                        .newBuilder()
+                        .setAmount(transaction.amount.replace(',', '.').toFloat())
+                        .setDate(transaction.date)
+                        .setDetails(transaction.details)
+                        .setName(transaction.name)
+                        .setFromAccount(transaction.secondAccount)
+                        .setToAccount(transaction.firstAccount)
+                        .setType(transaction.type)
+                        .build()
+                    )
+                }
+
             }
         }
 
