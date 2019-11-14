@@ -27,6 +27,7 @@ class TransactionImportServiceImpl(private val transactionService: TransactionWr
                       OpenBankAccountRequest
                         .newBuilder()
                         .setAccountNumber(if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount)
+                        .setInitialBalance(5000F) // FIXME: Make configurable
                         .build()
                     )
                 }
