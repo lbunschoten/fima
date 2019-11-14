@@ -21,13 +21,6 @@ class TransactionImportServiceImpl(private val transactionService: TransactionWr
                     .withSkipLines(1)
                     .build()
 
-            transactionService.openBankAccount(
-              OpenBankAccountRequest
-                .newBuilder()
-                .setAccountNumber("")
-                .build()
-            )
-
             csvReader.parse().forEachIndexed { index, transaction ->
                 if (index == 0) {
                     transactionService.openBankAccount(

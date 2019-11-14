@@ -24,7 +24,7 @@ class BankAccountEventStore : EventStore() {
   @ImplicitReflectionSerializer
   override fun readEvents(aggregateId: String): List<Event> {
     val serializedEvents = dbtransaction {
-      BankAccountEventsDao.find { BankAccountEvents.aggregateId eq aggregateId.toString() }.toList().map { it.event }
+      BankAccountEventsDao.find { BankAccountEvents.aggregateId eq aggregateId }.toList().map { it.event }
     }
 
     return deserializeEvents(serializedEvents)
@@ -34,7 +34,7 @@ class BankAccountEventStore : EventStore() {
     dbtransaction {
       events.forEach { event ->
         BankAccountEvents.insert {
-          it[BankAccountEvents.aggregateId] = aggregateId.toString()
+          it[BankAccountEvents.aggregateId] = aggregateId
           it[BankAccountEvents.at] = event.at
           it[BankAccountEvents.version] = event.version.toLong()
           it[BankAccountEvents.event] = serializeEvent(event)
@@ -44,7 +44,7 @@ class BankAccountEventStore : EventStore() {
   }
 
   object BankAccountEvents : IntIdTable() {
-    val aggregateId = varchar("aggregate_id", 255).uniqueIndex()
+    val aggregateId = varchar("aggregate_id", 255).index()
     val at = long("at")
     val version = long("version")
     val event = text("event")
