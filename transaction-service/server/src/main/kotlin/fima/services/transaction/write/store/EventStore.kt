@@ -1,9 +1,6 @@
 package fima.services.transaction.write.store
 
-import fima.services.transaction.write.event.BankAccountClosedEvent
-import fima.services.transaction.write.event.BankAccountOpenedEvent
-import fima.services.transaction.write.event.Event
-import fima.services.transaction.write.event.MoneyDepositedEvent
+import fima.services.transaction.write.event.*
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -12,9 +9,10 @@ import kotlinx.serialization.parse
 abstract class EventStore {
 
   private val eventSerializers = SerializersModule {
-    polymorphic(Event::class) {
+    polymorphic<Event> {
       BankAccountOpenedEvent::class with BankAccountOpenedEvent.serializer()
       MoneyDepositedEvent::class with MoneyDepositedEvent.serializer()
+      MoneyWithdrawnEvent::class with MoneyWithdrawnEvent.serializer()
       BankAccountClosedEvent::class with BankAccountClosedEvent.serializer()
     }
   }
