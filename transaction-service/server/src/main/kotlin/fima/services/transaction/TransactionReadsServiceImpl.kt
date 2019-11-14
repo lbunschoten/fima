@@ -9,9 +9,9 @@ import fima.services.transaction.events.TransactionEventProducer
 import fima.services.transaction.repository.TransactionsRepository
 import io.grpc.stub.StreamObserver
 
-class TransactionServiceImpl(private val transactionsRepository: TransactionsRepository,
-                             private val transactionEventProducer: TransactionEventProducer,
-                             private val toTransactionConverter: RawTransactionToTransactionConverter) : TransactionServiceGrpc.TransactionServiceImplBase() {
+class TransactionReadsServiceImpl(private val transactionsRepository: TransactionsRepository,
+                                  private val transactionEventProducer: TransactionEventProducer,
+                                  private val toTransactionConverter: RawTransactionToTransactionConverter) : TransactionServiceGrpc.TransactionServiceImplBase() {
 
     override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
         val response = GetTransactionResponse

@@ -5,6 +5,11 @@ import fima.services.transaction.conversion.RawTransactionToTransactionConverter
 import fima.services.transaction.conversion.RawTypeToTransactionTypeConverter
 import fima.services.transaction.events.TransactionEventProducer
 import fima.services.transaction.repository.TransactionsRepository
+import fima.services.transaction.write.CommandHandler
+import fima.services.transaction.write.EventProcessor
+import fima.services.transaction.write.listener.EventLoggingListener
+import fima.services.transaction.write.store.BankAccountEventStore
+import fima.services.transaction.write.TransactionWritesServiceImpl
 import io.grpc.ServerBuilder
 import org.jetbrains.exposed.sql.Database
 
@@ -16,9 +21,9 @@ fun main(args: Array<String>) {
     Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
 
     val transactionEventProducer = TransactionEventProducer()
-    val server = ServerBuilder
+    val readSideServer = ServerBuilder
             .forPort(9997)
-            .addService(TransactionServiceImpl(
+            .addService(TransactionReadsServiceImpl(
                     transactionsRepository = TransactionsRepository(),
                     transactionEventProducer = transactionEventProducer,
                     toTransactionConverter = RawTransactionToTransactionConverter(
@@ -27,12 +32,25 @@ fun main(args: Array<String>) {
                     )))
             .build()
 
-    server.start()
-    println("Transaction service started")
+    val writeSideServer = ServerBuilder
+      .forPort(9998)
+      .addService(TransactionWritesServiceImpl(
+        CommandHandler(
+          BankAccountEventStore(),
+          EventProcessor(),
+          setOf(EventLoggingListener())
+        )
+      ))
+      .build()
+
+    readSideServer.start()
+    writeSideServer.start()
+    println("Transaction services started")
 
     Runtime.getRuntime().addShutdownHook(Thread { println("Ups, JVM shutdown") })
-    server.awaitTermination()
+    readSideServer.awaitTermination()
+    writeSideServer.awaitTermination()
 
-    println("Transaction service stopped")
+    println("Transaction services stopped")
 }
 
