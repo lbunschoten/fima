@@ -2,6 +2,7 @@ package fima.services.transaction.write
 
 import fima.services.transaction.write.command.DepositMoneyCommand
 import fima.services.transaction.write.command.OpenBankAccountCommand
+import fima.services.transaction.write.command.WithdrawMoneyCommand
 import io.grpc.stub.StreamObserver
 
 class TransactionWritesServiceImpl(private val commandHandler: CommandHandler) : TransactionWritesServiceGrpc.TransactionWritesServiceImplBase() {
@@ -31,7 +32,7 @@ class TransactionWritesServiceImpl(private val commandHandler: CommandHandler) :
   }
 
   override fun withdraw(request: WithdrawalRequest, responseObserver: StreamObserver<WithdrawalResponse>) {
-    val errorMessages = commandHandler.processCommand(request.fromAccount, DepositMoneyCommand((request.amount * 100).toLong()))
+    val errorMessages = commandHandler.processCommand(request.fromAccount, WithdrawMoneyCommand((request.amount * 100).toLong()))
 
     val response = WithdrawalResponse
       .newBuilder()
