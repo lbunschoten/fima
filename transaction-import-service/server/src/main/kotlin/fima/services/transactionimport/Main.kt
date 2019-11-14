@@ -6,8 +6,8 @@ import io.grpc.ServerBuilder
 
 
 fun main(args: Array<String>) {
-    val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")
-    val transactionServiceWritesPort = System.getenv("TRANSACTION_SERVICE_SERVICE_PORT").toInt()
+    val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_HOST")
+    val transactionServiceWritesPort = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_PORT").toInt()
 
     val transactionService: TransactionWritesServiceGrpc.TransactionWritesServiceBlockingStub = {
         val channel = ManagedChannelBuilder.forAddress(transactionServiceHost, transactionServiceWritesPort).usePlaintext().build()
