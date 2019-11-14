@@ -44,9 +44,11 @@ spec:
     tier: backend
     name: transaction-service
   ports:
-    - protocol: TCP
+    - name: http-reads
+      protocol: TCP
       port: 9997
       targetPort: http-reads
-    - protocol: TCP
+    - name: http-writes
+      protocol: TCP
       port: 9998
       targetPort: http-writes
