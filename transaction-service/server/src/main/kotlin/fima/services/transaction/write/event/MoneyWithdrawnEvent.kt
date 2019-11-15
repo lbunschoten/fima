@@ -17,6 +17,6 @@ data class MoneyWithdrawnEvent(override val version: Int,
   override fun apply(aggregate: BankAccount): BankAccount {
     return aggregate
       .withVersion(version)
-      .withBalance(aggregate.balanceInCents + amountInCents)
+      .withBalance(aggregate.balanceInCents - amountInCents)
   }
 }

@@ -17,7 +17,7 @@ class TransactionStatisticsListener(private val transactionStatisticsStore: Tran
       }
       is MoneyWithdrawnEvent -> {
         val date = rawDateToDateConverter(event.date)
-        transactionStatisticsStore.insertTransaction(date.month, date.year, event.amountInCents)
+        transactionStatisticsStore.insertTransaction(date.month, date.year, -event.amountInCents)
       }
     }
   }
