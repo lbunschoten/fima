@@ -3,6 +3,7 @@ package fima.services.transaction.write.store
 import fima.services.transaction.write.event.*
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.parse
 
@@ -17,7 +18,7 @@ abstract class EventStore {
     }
   }
 
-  val json = Json(context = eventSerializers)
+  val json = Json(context = eventSerializers, configuration = JsonConfiguration.Stable.copy(classDiscriminator = "t"))
 
   abstract fun readEvents(aggregateId: String): List<Event>
 
