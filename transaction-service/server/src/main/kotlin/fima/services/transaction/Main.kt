@@ -9,7 +9,9 @@ import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
 import fima.services.transaction.write.TransactionWritesServiceImpl
 import fima.services.transaction.write.listener.EventLoggingListener
+import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.store.BankAccountEventStore
+import fima.services.transaction.write.store.TransactionStatisticsStore
 import io.grpc.ServerBuilder
 import org.jetbrains.exposed.sql.Database
 
@@ -38,7 +40,7 @@ fun main() {
         CommandHandler(
           BankAccountEventStore(),
           EventProcessor(),
-          setOf(EventLoggingListener())
+          setOf(EventLoggingListener(), TransactionStatisticsListener(TransactionStatisticsStore(0.0)))
         )
       ))
       .build()
