@@ -16,7 +16,7 @@ message OpenBankAccountResponse {
 }
 
 message WithdrawRequest {
-    string date = 1;
+    int32 date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
@@ -30,7 +30,7 @@ message WithdrawResponse {
 }
 
 message DepositRequest {
-    string date = 1;
+    int32 date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
