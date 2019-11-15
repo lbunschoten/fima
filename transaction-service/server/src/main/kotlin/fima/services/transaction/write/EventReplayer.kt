@@ -30,8 +30,8 @@ class TransactionCounter: (Event) -> Unit {
 @ImplicitReflectionSerializer
 fun main() {
   val create = OpenBankAccountCommand("ABC", 0)
-  val addTransaction1 = WithdrawMoneyCommand(100)
-  val addTransaction2 = WithdrawMoneyCommand(-50)
+  val addTransaction1 = WithdrawMoneyCommand(10000, 20170101, "name", "details", "ACCOUNT_NUMBER", "type")
+  val addTransaction2 = WithdrawMoneyCommand(-5000, 20170101, "name", "details", "ACCOUNT_NUMBER", "type")
   val close = CloseBankAccountCommand()
 
   val eventStore = InMemoryBankAccountEventStore()

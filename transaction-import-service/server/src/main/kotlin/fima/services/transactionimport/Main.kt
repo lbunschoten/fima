@@ -5,7 +5,7 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.ServerBuilder
 
 
-fun main(args: Array<String>) {
+fun main() {
     val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_HOST")
     val transactionServiceWritesPort = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_PORT").toInt()
 

@@ -20,7 +20,17 @@ class TransactionWritesServiceImpl(private val commandHandler: CommandHandler) :
   }
 
   override fun deposit(request: DepositRequest, responseObserver: StreamObserver<DepositResponse>) {
-    val errorMessages = commandHandler.processCommand(request.toAccount, DepositMoneyCommand((request.amount * 100).toLong()))
+    val errorMessages = commandHandler.processCommand(
+      request.toAccount,
+      DepositMoneyCommand(
+        request.amountInCents,
+        request.date,
+        request.name,
+        request.details,
+        request.fromAccount,
+        request.type
+      )
+    )
 
     val response = DepositResponse
       .newBuilder()
@@ -31,10 +41,20 @@ class TransactionWritesServiceImpl(private val commandHandler: CommandHandler) :
     responseObserver.onCompleted()
   }
 
-  override fun withdraw(request: WithdrawalRequest, responseObserver: StreamObserver<WithdrawalResponse>) {
-    val errorMessages = commandHandler.processCommand(request.fromAccount, WithdrawMoneyCommand((request.amount * 100).toLong()))
+  override fun withdraw(request: WithdrawRequest, responseObserver: StreamObserver<WithdrawResponse>) {
+    val errorMessages = commandHandler.processCommand(
+      request.fromAccount,
+      WithdrawMoneyCommand(
+        request.amountInCents,
+        request.date,
+        request.name,
+        request.details,
+        request.toAccount,
+        request.type
+      )
+    )
 
-    val response = WithdrawalResponse
+    val response = WithdrawResponse
       .newBuilder()
       .addAllErrorMessages(errorMessages)
       .build()

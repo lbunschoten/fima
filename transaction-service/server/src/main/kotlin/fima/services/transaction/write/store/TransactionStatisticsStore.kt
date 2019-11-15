@@ -6,9 +6,8 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.math.BigDecimal
 
-class TransactionStatisticsStore(private val initialBalance: Double) {
+class TransactionStatisticsStore(private val initialBalanceInCents: Long) {
 
   init {
     transaction {
@@ -18,7 +17,7 @@ class TransactionStatisticsStore(private val initialBalance: Double) {
     }
   }
 
-  fun insertTransaction(month: Int, year: Int, amount: Double) {
+  fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
     transaction {
       val statistics = getStatistics(month, year)
       statistics?.let {
@@ -26,8 +25,8 @@ class TransactionStatisticsStore(private val initialBalance: Double) {
           it[MonthlyTransactionStatisticsTable.month] = month
           it[MonthlyTransactionStatisticsTable.year] = year
           it[MonthlyTransactionStatisticsTable.numTransactions] = statistics.numTransactions + 1
-          it[MonthlyTransactionStatisticsTable.sum] = statistics.sum.add(BigDecimal(amount))
-          it[MonthlyTransactionStatisticsTable.balance] = statistics.balance.add(BigDecimal(amount))
+          it[MonthlyTransactionStatisticsTable.sum] = statistics.sum + amountInCents
+          it[MonthlyTransactionStatisticsTable.balance] = statistics.balance + amountInCents
         }
       } ?: {
         val previousMonthStatistics = getPreviousMonthStatistics(month, year)
@@ -36,8 +35,8 @@ class TransactionStatisticsStore(private val initialBalance: Double) {
           it[MonthlyTransactionStatisticsTable.month] = month
           it[MonthlyTransactionStatisticsTable.year] = year
           it[MonthlyTransactionStatisticsTable.numTransactions] = 1
-          it[MonthlyTransactionStatisticsTable.sum] = BigDecimal(amount)
-          it[MonthlyTransactionStatisticsTable.balance] = (previousMonthStatistics?.balance ?: BigDecimal(initialBalance)).add(BigDecimal(amount))
+          it[MonthlyTransactionStatisticsTable.sum] = amountInCents
+          it[MonthlyTransactionStatisticsTable.balance] = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents
         }
       }()
     }
@@ -80,8 +79,8 @@ class TransactionStatisticsStore(private val initialBalance: Double) {
     val month = integer("month").index()
     val year = integer("year").index()
     val numTransactions = integer("numTransactions")
-    val sum = decimal("sum", 9, 2)
-    val balance = decimal("balance", 9, 2)
+    val sum = long("sum")
+    val balance = long("balance")
   }
 
   class MonthlyTransactionStatisticsDao(id: EntityID<Int>) : IntEntity(id) {
@@ -102,8 +101,8 @@ class TransactionStatisticsStore(private val initialBalance: Double) {
     val month: Int,
     val year: Int,
     val numTransactions: Int,
-    val sum: BigDecimal,
-    val balance: BigDecimal
+    val sum: Long,
+    val balance: Long
   )
 
 }

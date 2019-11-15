@@ -40,7 +40,7 @@ fun main() {
         CommandHandler(
           BankAccountEventStore(),
           EventProcessor(),
-          setOf(EventLoggingListener(), TransactionStatisticsListener(TransactionStatisticsStore(0.0)))
+          setOf(EventLoggingListener(), TransactionStatisticsListener(TransactionStatisticsStore(0L), RawDateToDateConverter()))
         )
       ))
       .build()
