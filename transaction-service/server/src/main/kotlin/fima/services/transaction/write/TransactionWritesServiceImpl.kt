@@ -8,7 +8,7 @@ import io.grpc.stub.StreamObserver
 class TransactionWritesServiceImpl(private val commandHandler: CommandHandler) : TransactionWritesServiceGrpc.TransactionWritesServiceImplBase() {
 
   override fun openBankAccount(request: OpenBankAccountRequest, responseObserver: StreamObserver<OpenBankAccountResponse>) {
-    val errorMessages = commandHandler.processCommand(request.accountNumber, OpenBankAccountCommand(request.accountNumber))
+    val errorMessages = commandHandler.processCommand(request.accountNumber, OpenBankAccountCommand(request.accountNumber, (request.initialBalance * 100).toLong()))
 
     val response = OpenBankAccountResponse
       .newBuilder()
