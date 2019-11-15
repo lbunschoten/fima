@@ -6,12 +6,6 @@ option java_multiple_files = true;
 option java_package = "fima.services.transaction.write";
 option java_outer_classname = "TransactionWritesServiceProtos";
 
-message Date {
-    int32 day = 1;
-    int32 month = 2;
-    int32 year = 3;
-}
-
 message OpenBankAccountRequest {
     string accountNumber = 1;
     float initialBalance = 2;
@@ -22,12 +16,12 @@ message OpenBankAccountResponse {
 }
 
 message WithdrawRequest {
-    Date date = 1;
+    string date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
     string type = 5;
-    float amount = 6;
+    int64 amountInCents = 6;
     string details = 7;
 }
 
@@ -36,12 +30,12 @@ message WithdrawResponse {
 }
 
 message DepositRequest {
-    Date date = 1;
+    string date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
     string type = 5;
-    float amount = 6;
+    int64 amountInCents = 6;
     string details = 7;
 }
 
