@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction as dbtransaction
 
@@ -15,7 +16,7 @@ class BankAccountEventStore : EventStore() {
 
   init {
     dbtransaction {
-      logger.addLogger(StdOutSqlLogger)
+      addLogger(StdOutSqlLogger)
 
       SchemaUtils.create(BankAccountEvents)
     }

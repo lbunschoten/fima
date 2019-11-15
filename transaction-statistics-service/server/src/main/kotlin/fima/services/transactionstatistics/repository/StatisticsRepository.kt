@@ -12,7 +12,7 @@ class StatisticsRepository(private val initialBalance: Double) {
 
   init {
     transaction {
-      logger.addLogger(StdOutSqlLogger)
+      addLogger(StdOutSqlLogger)
 
       SchemaUtils.create(MonthlyTransactionStatisticsTable)
     }
