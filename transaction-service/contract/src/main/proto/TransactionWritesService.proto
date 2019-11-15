@@ -6,6 +6,12 @@ option java_multiple_files = true;
 option java_package = "fima.services.transaction.write";
 option java_outer_classname = "TransactionWritesServiceProtos";
 
+message Date {
+    int32 day = 1;
+    int32 month = 2;
+    int32 year = 3;
+}
+
 message OpenBankAccountRequest {
     string accountNumber = 1;
     float initialBalance = 2;
@@ -15,8 +21,8 @@ message OpenBankAccountResponse {
     repeated string errorMessages = 1;
 }
 
-message WithdrawalRequest {
-    int32 date = 1;
+message WithdrawRequest {
+    Date date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
@@ -25,12 +31,12 @@ message WithdrawalRequest {
     string details = 7;
 }
 
-message WithdrawalResponse {
+message WithdrawResponse {
     repeated string errorMessages = 1;
 }
 
 message DepositRequest {
-    int32 date = 1;
+    Date date = 1;
     string name = 2;
     string from_account = 3;
     string to_account = 4;
@@ -43,12 +49,11 @@ message DepositResponse {
     repeated string errorMessages = 1;
 }
 
-
 service TransactionWritesService {
 
     rpc openBankAccount(OpenBankAccountRequest) returns (OpenBankAccountResponse) {}
 
-    rpc withdraw(WithdrawalRequest) returns (WithdrawalResponse) {}
+    rpc withdraw(WithdrawRequest) returns (WithdrawResponse) {}
 
     rpc deposit(DepositRequest) returns (DepositResponse) {}
 
