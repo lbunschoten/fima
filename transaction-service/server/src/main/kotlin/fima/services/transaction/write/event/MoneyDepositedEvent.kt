@@ -12,7 +12,7 @@ data class MoneyDepositedEvent(override val version: Int,
                                val name: String,
                                val details: String,
                                val accountNumber: String,
-                               val type: String) : Event(), EventVersion1 {
+                               val transactionType: String) : Event(), EventVersion1 {
 
   override fun apply(aggregate: BankAccount): BankAccount {
     return aggregate
