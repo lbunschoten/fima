@@ -39,7 +39,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Build docker image') {
             container('docker') {
                 dir("${env.JOB_NAME}") {
-                    sh "docker build -t $${env.DOCKER_REGISTRY_PREFIX}/{env.JOB_NAME}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${env.JOB_NAME}:latest ."
+                    sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/{env.JOB_NAME}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${env.JOB_NAME}:latest ."
                     sh "docker push"
                 }
             }
