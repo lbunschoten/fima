@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: transaction-service
-          image: "transaction-service:$BUILD_ID"
+          image: "$DOCKER_REGISTRY_PREFIX/transaction-service:$BUILD_ID"
           ports:
             - name: http-reads
               containerPort: 9997
