@@ -47,7 +47,7 @@ metadata:
     traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: fima.local
+  - host: fima.test
     http:
       paths:
       - path: /

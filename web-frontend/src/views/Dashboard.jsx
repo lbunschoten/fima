@@ -46,7 +46,7 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://api.fima.local/transaction/statistics") // FIXME: Don't use hardcoded domain name
+    fetch("http://api.fima.test/transaction/statistics") // FIXME: Don't use hardcoded domain name
       .then(res => res.json())
       .then(results => {
         this.setState({
@@ -189,7 +189,7 @@ class Dashboard extends React.Component {
         );
       });
 
-    fetch("http://api.fima.local/transaction/recent?offset=0&limit=10") // FIXME: Don't use hardcoded domain name
+    fetch("http://api.fima.test/transaction/recent?offset=0&limit=10") // FIXME: Don't use hardcoded domain name
       .then(res => res.json())
       .then(results => {
         this.setState({
