@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: web-frontend
-          image: "web-frontend:$BUILD_ID"
+          image: "$DOCKER_REGISTRY_PREFIX/web-frontend:$BUILD_ID"
           ports:
             - name: http
               containerPort: 80
