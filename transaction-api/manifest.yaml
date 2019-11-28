@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: transaction-api
-          image: "$(DOCKER_REGISTRY_PREFIX)/transaction-api:$(BUILD_ID)"
+          image: "$DOCKER_REGISTRY_PREFIX/transaction-api:$BUILD_ID"
           ports:
             - name: http
               containerPort: 8080

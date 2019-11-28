@@ -48,6 +48,8 @@ podTemplate(label: 'mypod', containers: [
         stage('Deploy') {
             container('kubectl') {
                 dir("${env.JOB_NAME}") {
+                    sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
+                    sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
                     sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
             }
