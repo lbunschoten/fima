@@ -39,7 +39,8 @@ podTemplate(label: 'mypod', containers: [
         stage('Build docker image') {
             container('docker') {
                 dir("${env.JOB_NAME}") {
-                    sh "docker build -t ${env.JOB_NAME}:${env.BUILD_ID} -t ${env.JOB_NAME}:latest ."
+                    sh "docker build -t $${env.DOCKER_REGISTRY_PREFIX}/{env.JOB_NAME}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${env.JOB_NAME}:latest ."
+                    sh "docker push"
                 }
             }
         }
@@ -47,8 +48,6 @@ podTemplate(label: 'mypod', containers: [
         stage('Deploy') {
             container('kubectl') {
                 dir("${env.JOB_NAME}") {
-                    sh "kubectl proxy &"
-                    sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
                     sh "kubectl apply -f manifest.yaml --namespace=default"
                 }
             }
