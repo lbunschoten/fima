@@ -31,15 +31,18 @@ abstract class TransactionsStore {
     val amount = Transactions.long("amount")
   }
 
-  class TransactionDao(id: EntityID<Int>, private val rawTypeToTransactionTypeConverter: RawTypeToTransactionTypeConverter) : IntEntity(id) {
+  class TransactionDao(
+    id: EntityID<Int>,
+    private val rawTypeToTransactionTypeConverter: RawTypeToTransactionTypeConverter = RawTypeToTransactionTypeConverter()
+  ) : IntEntity(id) {
     companion object : IntEntityClass<TransactionDao>(Transactions)
 
-    val date by Transactions.date
-    val name by Transactions.name
-    val fromAccount by Transactions.fromAccount
-    val toAccount by Transactions.toAccount
-    val type by Transactions.type
-    val amount by Transactions.amount
+    private val date by Transactions.date
+    private val name by Transactions.name
+    private val fromAccount by Transactions.fromAccount
+    private val toAccount by Transactions.toAccount
+    private val type by Transactions.type
+    private val amount by Transactions.amount
 
     fun toProto(): Transaction {
       return Transaction
