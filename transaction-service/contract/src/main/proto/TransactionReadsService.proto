@@ -8,6 +8,19 @@ option java_multiple_files = true;
 option java_package = "fima.services.transaction";
 option java_outer_classname = "TransactionServiceProtos";
 
+message MonthInYear {
+    int32 month = 2;
+    int32 year = 3;
+}
+
+message MonthlyStatistics {
+    int32 month = 1;
+    int32 year = 2;
+    int32 transaction = 3;
+    float sum = 4;
+    float balance = 5;
+}
+
 message GetTransactionRequest {
     int32 id = 1;
 }
@@ -40,14 +53,20 @@ message DeleteTransactionRequest {
 message DeleteTransactionResponse {
 }
 
+message TransactionsStatisticsRequest {
+    MonthInYear startDate = 1;
+    MonthInYear endDate = 2;
+}
+
+message TransactionStatisticsResponse {
+    repeated MonthlyStatistics monthlyStatistics = 1;
+}
+
 service TransactionService {
 
     rpc getTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
 
     rpc getRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionResponse) {}
 
-    rpc insertTransaction(InsertTransactionRequest) returns (InsertTransactionResponse) {}
-
-    rpc deleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse) {}
-
+    rpc getMonthlyStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
 }
