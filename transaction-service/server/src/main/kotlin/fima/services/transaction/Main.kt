@@ -12,8 +12,8 @@ import fima.services.transaction.write.store.BankAccountEventStore
 import fima.services.transaction.write.store.TransactionStatisticsStore
 import io.grpc.ServerBuilder
 import org.jetbrains.exposed.sql.Database
-import fima.services.transaction.read.store.TransactionsStore as TransactionReadsStore
-import fima.services.transaction.write.store.TransactionsStore as TransactionWritesStore
+import fima.services.transaction.read.store.TransactionsReadsStore as TransactionReadsStore
+import fima.services.transaction.write.store.TransactionsWritesStore as TransactionWritesStore
 
 
 fun main() {

@@ -4,11 +4,11 @@ import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.write.event.Event
 import fima.services.transaction.write.event.MoneyDepositedEvent
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
-import fima.services.transaction.write.store.TransactionsStore
+import fima.services.transaction.write.store.TransactionsWritesStore
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-class TransactionListener(private val transactionsStore: TransactionsStore,
+class TransactionListener(private val transactionsStore: TransactionsWritesStore,
                           private val rawDateToDateConverter: RawDateToDateConverter) : (Event) -> Unit {
 
   override fun invoke(event: Event) {

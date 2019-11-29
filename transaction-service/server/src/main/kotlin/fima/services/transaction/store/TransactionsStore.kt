@@ -1,52 +1,37 @@
-package fima.services.transaction.read.store
+package fima.services.transaction.store
 
 import fima.domain.transaction.Date
 import fima.domain.transaction.Transaction
-import fima.domain.transaction.TransactionType
+import fima.services.transaction.conversion.RawTypeToTransactionTypeConverter
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction as dbtransaction
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.transactions.transaction
 
-class TransactionsStore {
+abstract class TransactionsStore {
 
   init {
-    dbtransaction {
+    transaction {
       addLogger(StdOutSqlLogger)
 
       SchemaUtils.create(Transactions)
     }
   }
 
-  fun getById(id: Int): TransactionDao? {
-    return dbtransaction {
-      TransactionDao.findById(id)
-    }
-  }
-
-  fun getRecent(offset: Int, limit: Int): List<TransactionDao> {
-    return dbtransaction {
-      TransactionDao.wrapRows(
-        Transactions
-          .selectAll()
-          .limit(limit, offset)
-          .orderBy(Transactions.date to SortOrder.DESC, Transactions.id to SortOrder.DESC)
-      ).toList()
-    }
-  }
-
   object Transactions : IntIdTable() {
-    val date = date("date")
-    val name = varchar("name", 255)
-    val fromAccount = varchar("from_account", 255).nullable()
-    val toAccount = varchar("to_account", 255).nullable()
-    val type = integer("type")
-    val amount = decimal("amount", 9, 2)
+    val date = Transactions.date("date")
+    val name = Transactions.varchar("name", 255)
+    val fromAccount = Transactions.varchar("from_account", 255).nullable()
+    val toAccount = Transactions.varchar("to_account", 255).nullable()
+    val type = Transactions.varchar("type", 2)
+    val amount = Transactions.long("amount")
   }
 
-  class TransactionDao(id: EntityID<Int>) : IntEntity(id) {
+  class TransactionDao(id: EntityID<Int>, private val rawTypeToTransactionTypeConverter: RawTypeToTransactionTypeConverter) : IntEntity(id) {
     companion object : IntEntityClass<TransactionDao>(Transactions)
 
     val date by Transactions.date
@@ -60,7 +45,7 @@ class TransactionsStore {
       return Transaction
         .newBuilder()
         .setId(id.value)
-        .setType(TransactionType.forNumber(type))
+        .setType(rawTypeToTransactionTypeConverter(type))
         .setDate(Date.newBuilder().setDay(date.dayOfMonth().get()).setMonth(date.monthOfYear().get()).setYear(date.year().get()).build())
         .setName(name)
         .setFromAccount(fromAccount)

@@ -4,10 +4,10 @@ import fima.domain.transaction.Date
 import fima.domain.transaction.Transaction
 import fima.domain.transaction.TransactionType
 import fima.services.transaction.*
-import fima.services.transaction.read.store.TransactionsStore
+import fima.services.transaction.read.store.TransactionsReadsStore
 import io.grpc.stub.StreamObserver
 
-class TransactionReadsServiceImpl(private val transactionsStore: TransactionsStore) : TransactionServiceGrpc.TransactionServiceImplBase() {
+class TransactionReadsServiceImpl(private val transactionsStore: TransactionsReadsStore) : TransactionServiceGrpc.TransactionServiceImplBase() {
 
   override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
     val response = GetTransactionResponse.newBuilder()
