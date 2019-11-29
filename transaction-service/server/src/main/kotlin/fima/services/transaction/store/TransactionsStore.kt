@@ -31,10 +31,7 @@ abstract class TransactionsStore {
     val amount = Transactions.long("amount")
   }
 
-  class TransactionDao(
-    id: EntityID<Int>,
-    private val rawTypeToTransactionTypeConverter: RawTypeToTransactionTypeConverter = RawTypeToTransactionTypeConverter()
-  ) : IntEntity(id) {
+  class TransactionDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TransactionDao>(Transactions)
 
     private val date by Transactions.date
@@ -48,7 +45,7 @@ abstract class TransactionsStore {
       return Transaction
         .newBuilder()
         .setId(id.value)
-        .setType(rawTypeToTransactionTypeConverter(type))
+        .setType(RawTypeToTransactionTypeConverter()(type))
         .setDate(Date.newBuilder().setDay(date.dayOfMonth().get()).setMonth(date.monthOfYear().get()).setYear(date.year().get()).build())
         .setName(name)
         .setFromAccount(fromAccount)
