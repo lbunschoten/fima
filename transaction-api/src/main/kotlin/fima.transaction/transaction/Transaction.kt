@@ -16,14 +16,14 @@ enum class TransactionType {
 
 fun fima.domain.transaction.TransactionType.simple(): TransactionType {
     return when (this) {
-        fima.domain.transaction.TransactionType.WIRE_TRANSFER -> fima.transaction.transaction.TransactionType.WireTransfer
-        fima.domain.transaction.TransactionType.DIRECT_DEBIT -> fima.transaction.transaction.TransactionType.DirectDebit
-        fima.domain.transaction.TransactionType.PAYMENT_TERMINAL -> fima.transaction.transaction.TransactionType.PaymentTerminal
-        fima.domain.transaction.TransactionType.TRANSFER -> fima.transaction.transaction.TransactionType.Transfer
-        fima.domain.transaction.TransactionType.ONLINE_TRANSFER -> fima.transaction.transaction.TransactionType.OnlineTransfer
-        fima.domain.transaction.TransactionType.ATM -> fima.transaction.transaction.TransactionType.ATM
-        fima.domain.transaction.TransactionType.TRANSER_COLLECTION -> fima.transaction.transaction.TransactionType.TransferCollection
-        else -> fima.transaction.transaction.TransactionType.Other
+        fima.domain.transaction.TransactionType.WIRE_TRANSFER -> TransactionType.WireTransfer
+        fima.domain.transaction.TransactionType.DIRECT_DEBIT -> TransactionType.DirectDebit
+        fima.domain.transaction.TransactionType.PAYMENT_TERMINAL -> TransactionType.PaymentTerminal
+        fima.domain.transaction.TransactionType.TRANSFER -> TransactionType.Transfer
+        fima.domain.transaction.TransactionType.ONLINE_TRANSFER -> TransactionType.OnlineTransfer
+        fima.domain.transaction.TransactionType.ATM -> TransactionType.ATM
+        fima.domain.transaction.TransactionType.TRANSER_COLLECTION -> TransactionType.TransferCollection
+        else -> TransactionType.Other
     }
 }
 
@@ -32,7 +32,7 @@ fun fima.domain.transaction.Transaction.simple(): Transaction {
     return Transaction(this.id, transactionDate, this.type.simple(), this.name, this.description, this.toAccount, this.fromAccount, this.amount)
 }
 
-fun fima.services.transactionstatistics.MonthlyStatistics.simple(): TransactionStatistics {
+fun fima.services.transaction.MonthlyStatistics.simple(): TransactionStatistics {
     return TransactionStatistics(this.month, this.year, this.transaction, this.sum, this.balance)
 }
 

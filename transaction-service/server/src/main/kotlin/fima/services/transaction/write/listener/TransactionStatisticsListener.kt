@@ -4,9 +4,9 @@ import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.write.event.Event
 import fima.services.transaction.write.event.MoneyDepositedEvent
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
-import fima.services.transaction.write.store.TransactionStatisticsStore
+import fima.services.transaction.write.store.TransactionStatisticsWritesStore
 
-class TransactionStatisticsListener(private val transactionStatisticsStore: TransactionStatisticsStore,
+class TransactionStatisticsListener(private val transactionStatisticsStore: TransactionStatisticsWritesStore,
                                     private val rawDateToDateConverter: RawDateToDateConverter) : (Event) -> Unit {
 
   override fun invoke(event: Event) {

@@ -2,6 +2,7 @@ package fima.services.transaction
 
 import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.read.TransactionReadsServiceImpl
+import fima.services.transaction.read.store.TransactionStatisticsReadsStore
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
 import fima.services.transaction.write.TransactionWritesServiceImpl
@@ -9,7 +10,7 @@ import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.store.BankAccountEventStore
-import fima.services.transaction.write.store.TransactionStatisticsStore
+import fima.services.transaction.write.store.TransactionStatisticsWritesStore
 import io.grpc.ServerBuilder
 import org.jetbrains.exposed.sql.Database
 import fima.services.transaction.read.store.TransactionsReadsStore as TransactionReadsStore
@@ -25,7 +26,8 @@ fun main() {
   val readSideServer = ServerBuilder
     .forPort(9997)
     .addService(TransactionReadsServiceImpl(
-      transactionsStore = TransactionReadsStore()
+      transactionsStore = TransactionReadsStore(),
+      transactionStatisticsStore = TransactionStatisticsReadsStore()
     ))
     .build()
 
@@ -38,7 +40,7 @@ fun main() {
         setOf(
           EventLoggingListener(),
           TransactionListener(TransactionWritesStore(), RawDateToDateConverter()),
-          TransactionStatisticsListener(TransactionStatisticsStore(0L), RawDateToDateConverter()))
+          TransactionStatisticsListener(TransactionStatisticsWritesStore(0L), RawDateToDateConverter()))
       )
     ))
     .build()
