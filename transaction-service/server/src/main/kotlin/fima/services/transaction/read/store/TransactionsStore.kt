@@ -1,4 +1,4 @@
-package fima.services.transaction.repository
+package fima.services.transaction.read.store
 
 import fima.domain.transaction.Date
 import fima.domain.transaction.Transaction
@@ -8,12 +8,9 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.*
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import java.math.BigDecimal
 import org.jetbrains.exposed.sql.transactions.transaction as dbtransaction
 
-class TransactionsRepository {
+class TransactionsStore {
 
   init {
     dbtransaction {
@@ -37,19 +34,6 @@ class TransactionsRepository {
           .limit(limit, offset)
           .orderBy(Transactions.date to SortOrder.DESC, Transactions.id to SortOrder.DESC)
       ).toList()
-    }
-  }
-
-  fun insertTransaction(transaction: fima.domain.transaction.Transaction) {
-    dbtransaction {
-      Transactions.insert {
-        it[date] = DateTime(transaction.date.year, transaction.date.month, transaction.date.day, 0, 0, DateTimeZone.UTC)
-        it[name] = transaction.name
-        it[fromAccount] = transaction.fromAccount
-        it[toAccount] = transaction.toAccount
-        it[type] = transaction.typeValue
-        it[amount] = BigDecimal(transaction.amount.toDouble())
-      }
     }
   }
 

@@ -13,7 +13,7 @@ class CommandHandler(private val eventStore: EventStore,
       val historicEvents = eventStore.readEvents(aggregateId)
       val inputAggregate = eventProcessor.process(historicEvents)
 
-      val newEvents: List<Event> = command.events().mapIndexed { idx, buildEvent ->
+      val newEvents: List<Event> = command.events(aggregateId).mapIndexed { idx, buildEvent ->
         buildEvent(1 + idx + inputAggregate.version)
       }
       val outputAggregate = newEvents.fold(inputAggregate, { agg, e -> e.apply(agg) })

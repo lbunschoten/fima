@@ -7,10 +7,10 @@ data class WithdrawMoneyCommand(val amountInCents: Long,
                                 val date: Int,
                                 val name: String,
                                 val details: String,
-                                val accountNumber: String,
+                                val toAccountNumber: String,
                                 val type: String) : Command {
 
-  override fun events(): List<(Int) -> Event> {
-    return listOf { version: Int -> MoneyWithdrawnEvent(version, amountInCents, date, name, details, accountNumber, type) }
+  override fun events(aggregateId: String): List<(Int) -> Event> {
+    return listOf { version: Int -> MoneyWithdrawnEvent(version, amountInCents, date, name, details, aggregateId, toAccountNumber, type) }
   }
 }
