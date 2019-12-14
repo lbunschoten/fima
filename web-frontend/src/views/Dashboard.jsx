@@ -650,7 +650,7 @@ class Dashboard extends React.Component {
                           <tr>
                             <td>{t.date}</td>
                             <td>{t.name}</td>
-                            <td className="text-center">&euro;{parseFloat(t.amount).toFixed(2)}</td>
+                            <td className="text-center">&euro;{t.amount / 100}</td>
                           </tr>
                         ))
                       }
