@@ -70,13 +70,13 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-service-contract</artifactId>
-            <version>19.11.6</version>
+            <version>20.04.1</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-events-contract</artifactId>
-            <version>19.08.1</version>
+            <version>20.04.1</version>
         </dependency>
 
         <dependency>
