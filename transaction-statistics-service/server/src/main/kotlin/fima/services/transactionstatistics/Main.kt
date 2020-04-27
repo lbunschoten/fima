@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.Database
 import java.util.*
 
 
-fun main(args: Array<String>) {
+fun main() {
     val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
     val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"

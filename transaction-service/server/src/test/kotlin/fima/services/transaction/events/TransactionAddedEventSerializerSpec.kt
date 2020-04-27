@@ -1,12 +1,10 @@
 package fima.services.transaction.events
 
 import fima.events.transaction.TransactionAddedEvent
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
 class TransactionAddedEventSerializerSpec : StringSpec() {
-
-  override fun isInstancePerTest(): Boolean = true
 
   init {
     val serializer = TransactionAddedEventSerializer()

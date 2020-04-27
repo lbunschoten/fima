@@ -1,15 +1,12 @@
 package fima.services.transaction.conversion
 
 import fima.domain.transaction.Date
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
 class RawDateToDateConverterSpec : StringSpec() {
 
-  override fun isInstancePerTest(): Boolean = true
-
   init {
-
     val converter = RawDateToDateConverter()
 
     "it should convert a rawDate to a date" {

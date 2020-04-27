@@ -1,13 +1,11 @@
 package fima.services.transaction.conversion
 
 import fima.domain.transaction.TransactionType
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.StringSpec
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
 class RawTypeToTransactionTypeConverterSpec : StringSpec() {
-
-  override fun isInstancePerTest(): Boolean = true
 
   init {
 

@@ -4,14 +4,12 @@ import fima.domain.transaction.Date
 import fima.domain.transaction.RawTransaction
 import fima.domain.transaction.Transaction
 import fima.domain.transaction.TransactionType
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 
 class RawTransactionToTransactionConverterSpec : StringSpec() {
-
-  override fun isInstancePerTest(): Boolean = true
 
   init {
 

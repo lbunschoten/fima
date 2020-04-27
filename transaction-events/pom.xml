@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>fima</groupId>
@@ -8,7 +9,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <grpc.version>1.13.2</grpc.version>
+        <grpc.version>1.29.0</grpc.version>
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
         <java-lang.encoding>UTF-8</java-lang.encoding>
@@ -49,7 +50,7 @@
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>1.6.2</version>
             </extension>
         </extensions>
 
@@ -57,14 +58,11 @@
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.5.1</version>
+                <version>0.6.1</version>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.6.0:exe:${os.detected.classifier}
-                    </protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.11.0:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>
-                        io.grpc:protoc-gen-grpc-java:1.13.2:exe:${os.detected.classifier}
-                    </pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <execution>
