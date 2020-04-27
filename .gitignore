@@ -27,4 +27,5 @@ build/
 
 secrets/
 env.json
+.mvn
 *.kotlintest
