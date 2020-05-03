@@ -17,26 +17,26 @@ class TransactionStatisticsWritesStore(
     logger.info("Inserting statistic")
     try {
 
+      val statistics = transactionStatisticsStore.getStatistics(month, year).orElse(null)
+      statistics?.let {
+        updateStatistic(
+          numTransactions = statistics.numTransactions,
+          sum = statistics.sum + amountInCents,
+          balance = statistics.balance + amountInCents,
+          month = month,
+          year = year
+        )
+      } ?: run {
+        val previousMonthStatistics = transactionStatisticsStore.getPreviousMonthStatistics(month, year)
+        insertStatistic(
+          sum = amountInCents,
+          balance = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents,
+          month = month,
+          year = year
+        )
+      }
     } catch (e: Exception) {
       logger.error("Failed to insert statistic", e)
-    }
-    val statistics = transactionStatisticsStore.getStatistics(month, year).orElse(null)
-    statistics?.let {
-      updateStatistic(
-        numTransactions = statistics.numTransactions,
-        sum = statistics.sum + amountInCents,
-        balance = statistics.balance + amountInCents,
-        month = month,
-        year = year
-      )
-    } ?: run {
-      val previousMonthStatistics = transactionStatisticsStore.getPreviousMonthStatistics(month, year)
-      insertStatistic(
-        sum = amountInCents,
-        balance = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents,
-        month = month,
-        year = year
-      )
     }
   }
 
