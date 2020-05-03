@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 interface TransactionsWritesStore {
 
   @SqlUpdate("""
-    INSERT INTO (date, name, fromAccount, toAccount, type, amount)
+    INSERT INTO Transactions(date, name, fromAccount, toAccount, type, amount)
     VALUES (:date, :name, :fromAccount, :toAccount, :type, :amountInCents)
   """)
   fun insertTransaction(date: ZonedDateTime, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)

@@ -19,7 +19,7 @@ class BankAccountEventStore(private val handle: Handle) : EventStore() {
   override fun writeEvents(aggregateId: String, events: List<Event>) {
     events.forEach { event ->
       handle.execute("""
-          INSERT INTO (aggregate_id, at, version, event)
+          INSERT INTO BankAccountEvents(aggregate_id, at, version, event)
           VALUES (?, ?, ?, ?)
         """, aggregateId, event.at, event.version.toLong(), serializeEvent(event))
     }
