@@ -14,7 +14,7 @@ class TransactionStatisticsWritesStore(
   private val logger = LoggerFactory.getLogger(TransactionStatisticsWritesStore::class.java)
 
   fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
-    logger.info("Inserting statistic")
+    println("Inserting statistic")
     try {
 
       val statistics = transactionStatisticsStore.getStatistics(month, year).orElse(null)
@@ -36,7 +36,9 @@ class TransactionStatisticsWritesStore(
         )
       }
     } catch (e: Exception) {
-      logger.error("Failed to insert statistic", e)
+      println("Failure to insert statistic: ${e.message}")
+      e.printStackTrace()
+      throw e
     }
   }
 

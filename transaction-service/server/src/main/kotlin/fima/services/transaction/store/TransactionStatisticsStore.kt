@@ -15,7 +15,7 @@ interface TransactionStatisticsStore {
     private val logger = LoggerFactory.getLogger(StatisticsRowMapper::class.java)
 
     override fun map(rs: ResultSet, ctx: StatementContext): MonthlyTransactionStatistics {
-      logger.info("Mapping MonthlyTransactionStatistics")
+      println("Mapping MonthlyTransactionStatistics")
       return try {
         MonthlyTransactionStatistics(
           month = rs.getInt("month"),
@@ -25,7 +25,8 @@ interface TransactionStatisticsStore {
           balance = rs.getLong("balance")
         )
       } catch(e: Exception) {
-        logger.error("Failure to map: ${e.message}", e)
+        println("Failure to map: ${e.message}")
+        e.printStackTrace()
         throw e
       }
     }
