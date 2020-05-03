@@ -31,7 +31,7 @@ interface TransactionReads {
   @RegisterRowMapper(TransactionMapper::class)
   fun getById(id: Int): Transaction
 
-  @SqlQuery("SELECT * FROM Transactions LIMIT :limit, :offset")
+  @SqlQuery("SELECT * FROM Transactions LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(TransactionMapper::class)
   fun getRecent(offset: Int, limit: Int): List<Transaction>
 }
