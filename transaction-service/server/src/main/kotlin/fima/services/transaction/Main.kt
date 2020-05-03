@@ -2,6 +2,7 @@ package fima.services.transaction
 
 import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.read.TransactionReadsServiceImpl
+import fima.services.transaction.read.store.TransactionReads
 import fima.services.transaction.read.store.TransactionStatisticsReadsStore
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
@@ -16,7 +17,6 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.jetbrains.exposed.sql.Database
-import fima.services.transaction.read.store.TransactionsReadsStore as TransactionReadsStore
 import fima.services.transaction.write.store.TransactionsWritesStore as TransactionWritesStore
 
 
@@ -32,7 +32,7 @@ fun main() {
   val readSideServer = ServerBuilder
     .forPort(9997)
     .addService(TransactionReadsServiceImpl(
-      transactionsStore = TransactionReadsStore(),
+      transactionsStore = db.onDemand(TransactionReads::class.java),
       transactionStatisticsStore = TransactionStatisticsReadsStore()
     ))
     .build()
