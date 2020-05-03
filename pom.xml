@@ -26,8 +26,6 @@
         <module>transaction-import-service/server</module>
         <module>transaction-service/contract</module>
         <module>transaction-service/server</module>
-        <module>transaction-statistics-service/contract</module>
-        <module>transaction-statistics-service/server</module>
     </modules>
 
 </project>
