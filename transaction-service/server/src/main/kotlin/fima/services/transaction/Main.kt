@@ -3,7 +3,7 @@ package fima.services.transaction
 import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.read.TransactionReadsServiceImpl
 import fima.services.transaction.read.store.TransactionReads
-import fima.services.transaction.read.store.TransactionStatisticsReadsStore
+import fima.services.transaction.read.store.TransactionStatisticsStore
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
 import fima.services.transaction.write.TransactionWritesServiceImpl
@@ -16,7 +16,6 @@ import io.grpc.ServerBuilder
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
-import org.jetbrains.exposed.sql.Database
 import fima.services.transaction.write.store.TransactionsWritesStore as TransactionWritesStore
 
 
@@ -24,7 +23,6 @@ fun main() {
   val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
   val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
   val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-  Database.connect("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = dbPassword)
   val db = Jdbi.create("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", "root", dbPassword)
     .installPlugin(KotlinPlugin())
     .installPlugin(KotlinSqlObjectPlugin())
@@ -33,20 +31,28 @@ fun main() {
     .forPort(9997)
     .addService(TransactionReadsServiceImpl(
       transactionsStore = db.onDemand(TransactionReads::class.java),
-      transactionStatisticsStore = TransactionStatisticsReadsStore()
+      transactionStatisticsStore = db.onDemand(TransactionStatisticsStore::class.java)
     ))
     .build()
+
+  val bankAccountEventStoreHandle = db.open()
+  val transactionStatisticsWritesStoreHandle = db.open()
 
   val writeSideServer = ServerBuilder
     .forPort(9998)
     .addService(TransactionWritesServiceImpl(
       CommandHandler(
-        BankAccountEventStore(),
+        BankAccountEventStore(bankAccountEventStoreHandle),
         EventProcessor(),
         setOf(
           EventLoggingListener(),
-          TransactionListener(TransactionWritesStore(), RawDateToDateConverter()),
-          TransactionStatisticsListener(TransactionStatisticsWritesStore(0L), RawDateToDateConverter()))
+          TransactionListener(db.onDemand(TransactionWritesStore::class.java), RawDateToDateConverter()),
+          TransactionStatisticsListener(
+            TransactionStatisticsWritesStore(
+              transactionStatisticsWritesStoreHandle,
+              db.onDemand(fima.services.transaction.store.TransactionStatisticsStore::class.java),
+              0L
+            ), RawDateToDateConverter()))
       )
     ))
     .build()
@@ -55,7 +61,11 @@ fun main() {
   writeSideServer.start()
   println("Transaction services started")
 
-  Runtime.getRuntime().addShutdownHook(Thread { println("Ups, JVM shutdown") })
+  Runtime.getRuntime().addShutdownHook(Thread {
+    println("JVM is shutting down")
+    bankAccountEventStoreHandle.close()
+    transactionStatisticsWritesStoreHandle.close()
+  })
   readSideServer.awaitTermination()
   writeSideServer.awaitTermination()
 

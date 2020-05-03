@@ -1,68 +1,37 @@
 package fima.services.transaction.store
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jdbi.v3.core.mapper.RowMapper
+import org.jdbi.v3.core.statement.StatementContext
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper
+import org.jdbi.v3.sqlobject.statement.SqlQuery
+import java.sql.ResultSet
 
-abstract class TransactionStatisticsStore {
+interface TransactionStatisticsStore {
 
-  init {
-    transaction {
-      addLogger(StdOutSqlLogger)
-
-      SchemaUtils.create(MonthlyTransactionStatisticsTable)
+  private class StatisticsRowMapper : RowMapper<MonthlyTransactionStatistics> {
+    override fun map(rs: ResultSet, ctx: StatementContext): MonthlyTransactionStatistics {
+      return MonthlyTransactionStatistics(
+        month = rs.getInt("month"),
+        year = rs.getInt("year"),
+        numTransactions = rs.getInt("numTransactions"),
+        sum = rs.getLong("sum"),
+        balance = rs.getLong("balance")
+      )
     }
   }
 
-  protected fun getStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
-    return transaction {
-      MonthlyTransactionStatisticsDao.find {
-        MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year)
-      }.firstOrNull()?.simple()
-    }
+  @SqlQuery("""
+    SELECT *
+    FROM MonthlyTransactionStatistics
+    WHERE month = :month
+    AND year = :year
+  """)
+  @RegisterRowMapper(StatisticsRowMapper::class)
+  fun getStatistics(month: Int, year: Int): MonthlyTransactionStatistics?
+
+  fun getPreviousMonthStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
+    return if (month == 1) getStatistics(12, year - 1)
+    else getStatistics(month - 1, year)
   }
-
-  protected fun getPreviousMonthStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
-    return {
-      if (month == 1) getStatistics(12, year - 1)
-      else getStatistics(month - 1, year)
-    }()
-  }
-
-  object MonthlyTransactionStatisticsTable : IntIdTable() {
-    val month = integer("month").index()
-    val year = integer("year").index()
-    val numTransactions = integer("numTransactions")
-    val sum = long("sum")
-    val balance = long("balance")
-  }
-
-  class MonthlyTransactionStatisticsDao(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<MonthlyTransactionStatisticsDao>(MonthlyTransactionStatisticsTable)
-
-    val month by MonthlyTransactionStatisticsTable.month
-    val year by MonthlyTransactionStatisticsTable.year
-    val numTransactions by MonthlyTransactionStatisticsTable.numTransactions
-    val sum by MonthlyTransactionStatisticsTable.sum
-    val balance by MonthlyTransactionStatisticsTable.balance
-
-    fun simple(): MonthlyTransactionStatistics {
-      return MonthlyTransactionStatistics(month, year, numTransactions, sum, balance)
-    }
-  }
-
-  data class MonthlyTransactionStatistics(
-    val month: Int,
-    val year: Int,
-    val numTransactions: Int,
-    val sum: Long,
-    val balance: Long
-  )
 
 }

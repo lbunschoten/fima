@@ -1,36 +1,52 @@
 package fima.services.transaction.write.store
 
 import fima.services.transaction.store.TransactionStatisticsStore
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
+import org.jdbi.v3.core.Handle
 
-class TransactionStatisticsWritesStore(private val initialBalanceInCents: Long): TransactionStatisticsStore()  {
+class TransactionStatisticsWritesStore(
+  private val handle: Handle,
+  private val transactionStatisticsStore: TransactionStatisticsStore,
+  private val initialBalanceInCents: Long
+) {
 
   fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
-    transaction {
-      val statistics = getStatistics(month, year)
-      statistics?.let {
-        MonthlyTransactionStatisticsTable.update({ MonthlyTransactionStatisticsTable.month eq month and (MonthlyTransactionStatisticsTable.year eq year) }) {
-          it[MonthlyTransactionStatisticsTable.month] = month
-          it[MonthlyTransactionStatisticsTable.year] = year
-          it[MonthlyTransactionStatisticsTable.numTransactions] = statistics.numTransactions + 1
-          it[MonthlyTransactionStatisticsTable.sum] = statistics.sum + amountInCents
-          it[MonthlyTransactionStatisticsTable.balance] = statistics.balance + amountInCents
-        }
-      } ?: {
-        val previousMonthStatistics = getPreviousMonthStatistics(month, year)
-
-        MonthlyTransactionStatisticsTable.insert {
-          it[MonthlyTransactionStatisticsTable.month] = month
-          it[MonthlyTransactionStatisticsTable.year] = year
-          it[MonthlyTransactionStatisticsTable.numTransactions] = 1
-          it[MonthlyTransactionStatisticsTable.sum] = amountInCents
-          it[MonthlyTransactionStatisticsTable.balance] = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents
-        }
-      }()
+    val statistics = transactionStatisticsStore.getStatistics(month, year)
+    statistics?.let {
+      updateStatistic(
+        numTransactions = statistics.numTransactions,
+        sum = statistics.sum + amountInCents,
+        balance = statistics.balance + amountInCents,
+        month = month,
+        year = year
+      )
+    } ?: run {
+      val previousMonthStatistics = transactionStatisticsStore.getPreviousMonthStatistics(month, year)
+      insertStatistic(
+        sum = amountInCents,
+        balance = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents,
+        month = month,
+        year = year
+      )
     }
   }
 
+  private fun insertStatistic(sum: Long, balance: Long, month: Int, year: Int) {
+    handle.execute("""
+      INSERT INTO MonthlyTransactionStatistics (month, year, numTransactions, sum, balance)
+      VALUES (?, ?, 1, ?, ?)
+    """, month, year, sum, balance)
+  }
+
+  private fun updateStatistic(numTransactions: Int, sum: Long, balance: Long, month: Int, year: Int) {
+    handle.execute("""
+        UPDATE MonthlyTransactionStatistics
+        SET 
+          numTransactions = ?,
+          sum = ?,
+          balance = ?
+        WHERE month = ? AND year = ?
+        """,
+      numTransactions, sum, balance, month, year
+    )
+  }
 }
