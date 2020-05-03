@@ -5,8 +5,8 @@ import fima.services.transaction.write.event.Event
 import fima.services.transaction.write.event.MoneyDepositedEvent
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
 import fima.services.transaction.write.store.TransactionsWritesStore
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class TransactionListener(private val transactionsStore: TransactionsWritesStore,
                           private val rawDateToDateConverter: RawDateToDateConverter) : (Event) -> Unit {
@@ -16,7 +16,7 @@ class TransactionListener(private val transactionsStore: TransactionsWritesStore
       is MoneyDepositedEvent -> {
         val date = rawDateToDateConverter(event.date)
         transactionsStore.insertTransaction(
-          date = DateTime(date.year, date.month, date.day, 0, 0, DateTimeZone.UTC),
+          date = ZonedDateTime.of(date.year, date.month, date.day, 0, 0, 0, 0, ZoneId.of("UTC")),
           name = event.name,
           fromAccount = event.fromAccountNumber,
           toAccount = event.toAccountNumber,
@@ -27,7 +27,7 @@ class TransactionListener(private val transactionsStore: TransactionsWritesStore
       is MoneyWithdrawnEvent -> {
         val date = rawDateToDateConverter(event.date)
         transactionsStore.insertTransaction(
-          date = DateTime(date.year, date.month, date.day, 0, 0, DateTimeZone.UTC),
+          date = ZonedDateTime.of(date.year, date.month, date.day, 0, 0, 0, 0, ZoneId.of("UTC")),
           name = event.name,
           fromAccount = event.fromAccountNumber,
           toAccount = event.toAccountNumber,

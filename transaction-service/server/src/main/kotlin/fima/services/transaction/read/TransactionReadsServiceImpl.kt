@@ -1,31 +1,27 @@
 package fima.services.transaction.read
 
-import fima.domain.transaction.Date
-import fima.domain.transaction.Transaction
-import fima.domain.transaction.TransactionType
-import fima.services.transaction.*
-import fima.services.transaction.read.store.TransactionStatisticsReadsStore
-import fima.services.transaction.read.store.TransactionsReadsStore
+import fima.services.transaction.GetRecentTransactionResponse
+import fima.services.transaction.GetRecentTransactionsRequest
+import fima.services.transaction.GetTransactionRequest
+import fima.services.transaction.GetTransactionResponse
+import fima.services.transaction.TransactionServiceGrpc
+import fima.services.transaction.TransactionStatisticsResponse
+import fima.services.transaction.TransactionsStatisticsRequest
+import fima.services.transaction.read.store.TransactionReads
+import fima.services.transaction.read.store.TransactionStatisticsStore
 import io.grpc.stub.StreamObserver
 
-class TransactionReadsServiceImpl(private val transactionsStore: TransactionsReadsStore,
-                                  private val transactionStatisticsStore: TransactionStatisticsReadsStore) : TransactionServiceGrpc.TransactionServiceImplBase() {
+class TransactionReadsServiceImpl(
+  private val transactionsStore: TransactionReads,
+  private val transactionStatisticsStore: TransactionStatisticsStore
+) : TransactionServiceGrpc.TransactionServiceImplBase() {
 
   override fun getTransaction(request: GetTransactionRequest, responseObserver: StreamObserver<GetTransactionResponse>) {
     val response = GetTransactionResponse.newBuilder()
       .setTransaction(
-        transactionsStore.getById(request.id)?.toProto() ?: run {
-          Transaction.newBuilder()
-            .setId(1)
-            .setName("test transaction")
-            .setDescription("test transaction description")
-            .setDate(Date.newBuilder().setDay(1).setMonth(2).setYear(2018).build())
-            .setAmount(20.32F)
-            .setFromAccount("From account")
-            .setToAccount("From account")
-            .setType(TransactionType.TRANSFER)
-            .build()
-        }
+        transactionsStore
+          .getById(request.id)
+          .toProto()
       )
       .build()
 
@@ -35,7 +31,11 @@ class TransactionReadsServiceImpl(private val transactionsStore: TransactionsRea
 
   override fun getRecentTransactions(request: GetRecentTransactionsRequest, responseObserver: StreamObserver<GetRecentTransactionResponse>) {
     val response = GetRecentTransactionResponse.newBuilder()
-      .addAllTransactions(transactionsStore.getRecent(request.offset, request.limit).map { it.toProto() })
+      .addAllTransactions(
+        transactionsStore
+          .getRecent(request.offset, request.limit)
+          .map { it.toProto() }
+      )
       .build()
 
     responseObserver.onNext(response)
@@ -48,16 +48,7 @@ class TransactionReadsServiceImpl(private val transactionsStore: TransactionsRea
       .addAllMonthlyStatistics(
         transactionStatisticsStore
           .getMonthlyStatistics(request.startDate.month, request.startDate.year, request.endDate.month, request.endDate.year)
-          .map {
-            MonthlyStatistics
-              .newBuilder()
-              .setMonth(it.month)
-              .setYear(it.year)
-              .setTransaction(it.numTransactions)
-              .setSum(it.sum.toFloat())
-              .setBalance(it.balance.toFloat())
-              .build()
-          }
+          .map { it.toProto() }
       )
 
     responseObserver.onNext(responseBuilder.build())
