@@ -10,7 +10,7 @@ interface  TransactionStatisticsStore {
   @SqlQuery("""
     SELECT *
     FROM MonthlyTransactionStatistics
-    WHERE ((month >= :startMonth AND year >= :startYear) OR year > startYear)
+    WHERE ((month >= :startMonth AND year >= :startYear) OR year > :startYear)
     AND ((month <= :endMonth AND year <= :endYear) OR year < :endYear) 
     ORDER BY year, month
   """)
