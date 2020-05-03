@@ -13,7 +13,7 @@ class TransactionStatisticsWritesStore(
     val statistics = transactionStatisticsStore.getStatistics(month, year).orElse(null)
     statistics?.let {
       updateStatistic(
-        numTransactions = statistics.numTransactions,
+        numTransactions = statistics.numTransactions + 1,
         sum = statistics.sum + amountInCents,
         balance = statistics.balance + amountInCents,
         month = month,
