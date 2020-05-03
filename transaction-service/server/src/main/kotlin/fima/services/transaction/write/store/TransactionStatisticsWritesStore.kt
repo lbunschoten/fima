@@ -10,7 +10,7 @@ class TransactionStatisticsWritesStore(
 ) {
 
   fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
-    val statistics = transactionStatisticsStore.getStatistics(month, year)
+    val statistics = transactionStatisticsStore.getStatistics(month, year).orElse(null)
     statistics?.let {
       updateStatistic(
         numTransactions = statistics.numTransactions,
