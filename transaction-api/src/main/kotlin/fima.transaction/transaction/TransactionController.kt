@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.nio.charset.Charset
+import java.util.UUID
 
 @RestController
 class TransactionController @Autowired constructor(
@@ -16,8 +17,8 @@ class TransactionController @Autowired constructor(
 
   @CrossOrigin
   @GetMapping("/{id}")
-  fun getTransaction(@PathVariable("id") transactionId: Int): Transaction {
-    val request = GetTransactionRequest.newBuilder().setId(transactionId).build()
+  fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
+    val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
 
     return transactionService.getTransaction(request).transaction.simple()
   }

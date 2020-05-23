@@ -4,12 +4,13 @@ import fima.services.transaction.store.Transaction
 import fima.services.transaction.store.TransactionMapper
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
+import java.util.UUID
 
 interface TransactionReads {
 
   @SqlQuery("SELECT * FROM Transactions WHERE id = :id")
   @RegisterRowMapper(TransactionMapper::class)
-  fun getById(id: Int): Transaction
+  fun getById(id: String): Transaction
 
   @SqlQuery("SELECT * FROM Transactions LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(TransactionMapper::class)

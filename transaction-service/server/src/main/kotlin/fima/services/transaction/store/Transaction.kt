@@ -5,11 +5,12 @@ import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet
 import java.time.LocalDate
+import java.util.UUID
 import fima.domain.transaction.Transaction as ProtoTransaction
 import fima.domain.transaction.TransactionType as ProtoTransactionType
 
 data class Transaction(
-  val id: Int,
+  val id: UUID,
   val type: TransactionType,
   val date: LocalDate,
   val name: String,
@@ -21,7 +22,7 @@ data class Transaction(
   fun toProto(): ProtoTransaction {
     return ProtoTransaction
       .newBuilder()
-      .setId(id)
+      .setId(id.toString())
       .setType(type.toProto())
       .setDate(Date.newBuilder().setDay(date.dayOfMonth).setMonth(date.monthValue).setYear(date.year).build())
       .setName(name)
@@ -78,7 +79,7 @@ enum class TransactionType(private val abbreviation: String) {
 class TransactionMapper : RowMapper<Transaction> {
   override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
     return Transaction(
-      id = rs.getInt("id"),
+      id = UUID.fromString(rs.getString("id")),
       type = TransactionType.of(rs.getString("type")),
       date = rs.getDate("date").toLocalDate(),
       name = rs.getString("name"),
