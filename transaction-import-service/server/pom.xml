@@ -10,7 +10,6 @@
 
     <properties>
         <grpc.version>1.29.0</grpc.version>
-        <kafka.version>0.10.0.1</kafka.version>
         <kotlin.version>1.3.72</kotlin.version>
         <java-lang.encoding>UTF-8</java-lang.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,12 +32,6 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
             <version>${grpc.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>${kafka.version}</version>
         </dependency>
 
         <dependency>
@@ -68,7 +61,7 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-domain-contract</artifactId>
-            <version>20.04.1</version>
+            <version>20.05.1</version>
         </dependency>
 
         <dependency>
