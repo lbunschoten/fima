@@ -16,6 +16,7 @@ class TransactionListener(private val transactionsStore: TransactionsWritesStore
       is MoneyDepositedEvent -> {
         val date = rawDateToDateConverter(event.date)
         transactionsStore.insertTransaction(
+          id = event.id,
           date = ZonedDateTime.of(date.year, date.month, date.day, 0, 0, 0, 0, ZoneId.of("UTC")),
           name = event.name,
           fromAccount = event.fromAccountNumber,
@@ -27,6 +28,7 @@ class TransactionListener(private val transactionsStore: TransactionsWritesStore
       is MoneyWithdrawnEvent -> {
         val date = rawDateToDateConverter(event.date)
         transactionsStore.insertTransaction(
+          id = event.id,
           date = ZonedDateTime.of(date.year, date.month, date.day, 0, 0, 0, 0, ZoneId.of("UTC")),
           name = event.name,
           fromAccount = event.fromAccountNumber,

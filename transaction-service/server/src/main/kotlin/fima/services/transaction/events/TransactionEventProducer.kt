@@ -29,7 +29,7 @@ class TransactionEventProducer : KafkaProducer<Long, TransactionAddedEvent>(prod
   }
 
   fun produce(event: TransactionAddedEvent) {
-    send(ProducerRecord<Long, TransactionAddedEvent>("fima-added-transactions", event)) { metadata, exception ->
+    send(ProducerRecord("fima-added-transactions", event)) { metadata, exception ->
       if (exception != null) {
         logger.error("Could not produce event: ${exception.message}")
       } else {

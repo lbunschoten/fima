@@ -1,12 +1,15 @@
 package fima.services.transaction.write.event
 
 import fima.services.transaction.write.aggregate.BankAccount
+import fima.services.transaction.write.store.UUIDSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 @SerialName("MoneyWithdrawnEvent")
 data class MoneyWithdrawnEvent(override val version: Int,
+                               @Serializable(with= UUIDSerializer::class) val id: UUID,
                                val amountInCents: Long,
                                val date: Int,
                                val name: String,

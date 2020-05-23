@@ -10,8 +10,10 @@ import fima.services.transaction.write.TransactionWritesServiceImpl
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
+import fima.services.transaction.write.listener.TransactionTaggingListener
 import fima.services.transaction.write.store.BankAccountEventStore
 import fima.services.transaction.write.store.TransactionStatisticsWritesStore
+import fima.services.transaction.write.store.TransactionTagsWritesStore
 import io.grpc.ServerBuilder
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
@@ -37,22 +39,30 @@ fun main() {
 
   val bankAccountEventStoreHandle = db.open()
   val transactionStatisticsWritesStoreHandle = db.open()
+  val transactionTagsWritesStoreHandle = db.open()
 
   val writeSideServer = ServerBuilder
     .forPort(9998)
     .addService(TransactionWritesServiceImpl(
       CommandHandler(
-        BankAccountEventStore(bankAccountEventStoreHandle),
-        EventProcessor(),
-        setOf(
-          EventLoggingListener(),
-          TransactionListener(db.onDemand(TransactionWritesStore::class.java), RawDateToDateConverter()),
-          TransactionStatisticsListener(
-            TransactionStatisticsWritesStore(
-              transactionStatisticsWritesStoreHandle,
-              db.onDemand(fima.services.transaction.store.TransactionStatisticsStore::class.java),
-              0L
-            ), RawDateToDateConverter()))
+          eventStore = BankAccountEventStore(bankAccountEventStoreHandle),
+          eventProcessor = EventProcessor(),
+          eventListeners = setOf(
+              EventLoggingListener(),
+              TransactionListener(db.onDemand(TransactionWritesStore::class.java), RawDateToDateConverter()),
+              TransactionStatisticsListener(
+                  TransactionStatisticsWritesStore(
+                      transactionStatisticsWritesStoreHandle,
+                      db.onDemand(fima.services.transaction.store.TransactionStatisticsStore::class.java),
+                      0L
+                  ), RawDateToDateConverter()
+              ),
+              TransactionTaggingListener(
+                  TransactionTagsWritesStore(
+                      transactionTagsWritesStoreHandle
+                  )
+              )
+          )
       )
     ))
     .build()

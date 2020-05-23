@@ -66,13 +66,13 @@
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-service-contract</artifactId>
-            <version>20.04.1</version>
+            <version>20.05.1</version>
         </dependency>
 
         <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-import-service-contract</artifactId>
-            <version>20.04.1</version>
+            <version>20.05.1</version>
         </dependency>
 
         <dependency>
