@@ -10,7 +10,7 @@ class TransactionTagsWritesStore(
     fun storeTags(transactionId: UUID, tags: Map<String, String>) {
         val insertTagsQuery = handle.prepareBatch("""
           INSERT INTO TransactionTags (id, transaction_id, key, value)
-          VALUES (?, ?, ?)
+          VALUES (:id, :transaction_id, :key, :value)
           ON DUPLICATE KEY UPDATE
             value = :value
         """)
