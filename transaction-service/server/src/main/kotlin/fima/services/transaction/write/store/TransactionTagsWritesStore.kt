@@ -17,8 +17,8 @@ class TransactionTagsWritesStore(
 
         tags.forEach { (key, value) ->
             insertTagsQuery
-                .bind("id", UUID.randomUUID())
-                .bind("transaction_id", transactionId)
+                .bind("id", UUID.randomUUID().toString())
+                .bind("transaction_id", transactionId.toString())
                 .bind("key", key)
                 .bind("value", value)
                 .add()
