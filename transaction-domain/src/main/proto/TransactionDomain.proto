@@ -24,7 +24,7 @@ enum TransactionType {
 }
 
 message Transaction {
-    int32 id = 1;
+    string id = 1;
     Date date = 2;
     TransactionType type = 3;
     string name = 4;

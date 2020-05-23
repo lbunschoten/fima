@@ -22,7 +22,7 @@ message MonthlyStatistics {
 }
 
 message GetTransactionRequest {
-    int32 id = 1;
+    string id = 1;
 }
 
 message GetTransactionResponse {
@@ -47,7 +47,7 @@ message InsertTransactionResponse {
 }
 
 message DeleteTransactionRequest {
-    int32 id = 1;
+    string id = 1;
 }
 
 message DeleteTransactionResponse {
