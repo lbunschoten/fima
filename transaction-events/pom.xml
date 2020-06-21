@@ -15,6 +15,7 @@
         <maven.compiler.target>10</maven.compiler.target>
         <java-lang.encoding>UTF-8</java-lang.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <protobuf.version>3.12.3</protobuf.version>
     </properties>
 
     <scm>
@@ -37,15 +38,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-kotlin-stub</artifactId>
-            <version>${grpc.kotlin.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>fima</groupId>
             <artifactId>fima-transaction-domain-contract</artifactId>
-            <version>20.06.2</version>
+            <version>20.06.3</version>
         </dependency>
     </dependencies>
 
@@ -67,9 +62,9 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>0.6.1</version>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.11.0:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-kotlin:${grpc.kotlin.version}:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <execution>
