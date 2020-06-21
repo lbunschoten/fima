@@ -1,23 +1,32 @@
 package fima.transaction.transaction
 
-import fima.services.transaction.*
+import fima.services.transaction.GetRecentTransactionsRequest
+import fima.services.transaction.GetTransactionRequest
+import fima.services.transaction.MonthInYear
+import fima.services.transaction.TransactionServiceGrpcKt
+import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
-import fima.services.transactionimport.TransactionImportServiceGrpc
+import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.nio.charset.Charset
 import java.util.UUID
 
 @RestController
 class TransactionController @Autowired constructor(
-  private val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub,
-  private val transactionImportService: TransactionImportServiceGrpc.TransactionImportServiceBlockingStub
+  private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub,
+  private val transactionImportService: TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub
 ) {
 
   @CrossOrigin
   @GetMapping("/{id}")
-  fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
+  suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
     val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
 
     return transactionService.getTransaction(request).transaction.simple()
@@ -25,7 +34,7 @@ class TransactionController @Autowired constructor(
 
   @CrossOrigin
   @GetMapping("/recent")
-  fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
+  suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
     val request = GetRecentTransactionsRequest
       .newBuilder()
       .setOffset(offset)
@@ -37,7 +46,7 @@ class TransactionController @Autowired constructor(
 
   @CrossOrigin
   @GetMapping("/statistics")
-  fun getStatistics(): List<TransactionStatistics> {
+  suspend fun getStatistics(): List<TransactionStatistics> {
     val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2018)
     val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2018)
     return transactionService
@@ -47,7 +56,7 @@ class TransactionController @Autowired constructor(
   }
 
   @PutMapping("/import")
-  fun importTransactions(@RequestParam("transactions") transactions: MultipartFile) {
+  suspend fun importTransactions(@RequestParam("transactions") transactions: MultipartFile) {
     val request = ImportTransactionsRequest.newBuilder().setTransactions(String(transactions.bytes, Charset.forName("UTF-8"))).build()
     transactionImportService.importTransactions(request)
   }

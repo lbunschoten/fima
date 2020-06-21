@@ -1,6 +1,6 @@
 package fima.services.transactionimport
 
-import fima.services.transaction.write.TransactionWritesServiceGrpc
+import fima.services.transaction.write.TransactionWritesServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
 import io.grpc.ServerBuilder
 
@@ -9,9 +9,9 @@ fun main() {
     val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_HOST")
     val transactionServiceWritesPort = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_PORT").toInt()
 
-    val transactionService: TransactionWritesServiceGrpc.TransactionWritesServiceBlockingStub = {
+    val transactionService: TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub = {
         val channel = ManagedChannelBuilder.forAddress(transactionServiceHost, transactionServiceWritesPort).usePlaintext().build()
-        TransactionWritesServiceGrpc.newBlockingStub(channel)
+        TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub(channel)
     }()
 
     val server = ServerBuilder

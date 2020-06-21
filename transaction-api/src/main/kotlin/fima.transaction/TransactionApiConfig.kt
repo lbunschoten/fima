@@ -1,7 +1,7 @@
 package fima.transaction
 
-import fima.services.transaction.TransactionServiceGrpc
-import fima.services.transactionimport.TransactionImportServiceGrpc
+import fima.services.transaction.TransactionServiceGrpcKt
+import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -23,21 +23,21 @@ open class TransactionApiConfig {
     private var transactionImportServicePort: Int = 9997
 
     @Bean
-    open fun getTransactionService(): TransactionServiceGrpc.TransactionServiceBlockingStub {
+    open fun getTransactionService(): TransactionServiceGrpcKt.TransactionServiceCoroutineStub {
         val channel = ManagedChannelBuilder
                 .forAddress(transactionServiceHost, transactionServicePort)
                 .usePlaintext()
                 .build()
-        return TransactionServiceGrpc.newBlockingStub(channel)
+        return TransactionServiceGrpcKt.TransactionServiceCoroutineStub(channel)
     }
 
     @Bean
-    open fun getTransactionImportService(): TransactionImportServiceGrpc.TransactionImportServiceBlockingStub {
+    open fun getTransactionImportService(): TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub {
         val channel = ManagedChannelBuilder
                 .forAddress(transactionImportServiceHost, transactionImportServicePort)
                 .usePlaintext()
                 .build()
-        return TransactionImportServiceGrpc.newBlockingStub(channel)
+        return TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub(channel)
     }
 
 }

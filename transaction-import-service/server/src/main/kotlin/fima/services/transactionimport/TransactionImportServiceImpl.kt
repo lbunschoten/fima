@@ -2,13 +2,15 @@ package fima.services.transactionimport
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvToBeanBuilder
-import fima.services.transaction.write.*
-import io.grpc.stub.StreamObserver
+import fima.services.transaction.write.DepositRequest
+import fima.services.transaction.write.OpenBankAccountRequest
+import fima.services.transaction.write.TransactionWritesServiceGrpcKt
+import fima.services.transaction.write.WithdrawRequest
 import java.io.StringReader
 
-class TransactionImportServiceImpl(private val transactionService: TransactionWritesServiceGrpc.TransactionWritesServiceBlockingStub) : TransactionImportServiceGrpc.TransactionImportServiceImplBase() {
+class TransactionImportServiceImpl(private val transactionService: TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub) : TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineImplBase() {
 
-  override fun importTransactions(request: ImportTransactionsRequest, responseObserver: StreamObserver<ImportTransactionsResponse>) {
+  override suspend fun importTransactions(request: ImportTransactionsRequest): ImportTransactionsResponse {
     StringReader(request.transactions).use { reader ->
       val csvReader = CsvToBeanBuilder<Transaction>(reader)
         .withSeparator(',')
@@ -60,8 +62,7 @@ class TransactionImportServiceImpl(private val transactionService: TransactionWr
       }
     }
 
-    responseObserver.onNext(ImportTransactionsResponse.newBuilder().build())
-    responseObserver.onCompleted()
+    return ImportTransactionsResponse.newBuilder().build()
   }
 }
 

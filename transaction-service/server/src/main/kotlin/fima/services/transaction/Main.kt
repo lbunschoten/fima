@@ -60,7 +60,8 @@ fun main() {
               TransactionTaggingListener(
                   TransactionTagsWritesStore(
                       transactionTagsWritesStoreHandle
-                  )
+                  ),
+                  emptySet()
               )
           )
       )

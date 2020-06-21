@@ -23,4 +23,14 @@ data class MoneyDepositedEvent(override val version: Int,
       .withVersion(version)
       .withBalance(aggregate.balanceInCents + amountInCents)
   }
+
+  fun fields(): Map<String, String> {
+    return mapOf(
+        "name" to name,
+        "details" to details,
+        "from" to fromAccountNumber,
+        "to" to toAccountNumber,
+        "price" to amountInCents.toString()
+    )
+  }
 }

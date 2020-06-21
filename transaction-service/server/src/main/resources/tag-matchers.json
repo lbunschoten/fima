@@ -1,0 +1,15 @@
+[
+  {
+    "fields": [
+      "name",
+      "details"
+    ],
+    "matcher": {
+      "t": "contains",
+      "pattern": "test"
+    },
+    "tags": [
+      "tags"
+    ]
+  }
+]
