@@ -4,4 +4,4 @@ EXPOSE 80
 
 COPY ./target/fima-transaction-api-17.12.1-SNAPSHOT.jar fima.jar
 
-ENTRYPOINT ["java", "-jar", "fima.jar", "--server.port=8080", "--server.servlet.context-path=/transaction"]
+ENTRYPOINT ["java", "-jar", "fima.jar", "--server.port=8080", "--spring.webflux.base-path==/transaction"]
