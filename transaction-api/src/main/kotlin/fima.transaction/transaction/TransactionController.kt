@@ -24,7 +24,6 @@ class TransactionController @Autowired constructor(
   private val transactionImportService: TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub
 ) {
 
-  @CrossOrigin
   @GetMapping("/{id}")
   suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
     val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
@@ -32,7 +31,6 @@ class TransactionController @Autowired constructor(
     return transactionService.getTransaction(request).transaction.simple()
   }
 
-  @CrossOrigin
   @GetMapping("/recent")
   suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
     val request = GetRecentTransactionsRequest
@@ -44,7 +42,6 @@ class TransactionController @Autowired constructor(
     return transactionService.getRecentTransactions(request).transactionsList.map { it.simple() }
   }
 
-  @CrossOrigin
   @GetMapping("/statistics")
   suspend fun getStatistics(): List<TransactionStatistics> {
     val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2018)
