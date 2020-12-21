@@ -1,6 +1,6 @@
 FROM openjdk:10.0.2-jre-slim
 
-COPY ./target/fima-transaction-import-service-18.03.1-SNAPSHOT-jar-with-dependencies.jar fima.jar
+COPY ./target/transaction-import-service-1.0.0-SNAPSHOT-jar-with-dependencies.jar fima.jar
 
 EXPOSE 9997
 
