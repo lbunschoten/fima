@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 open class TransactionApiConfig {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Value("\${TRANSACTION_SERVICE_READS_SERVICE_HOST:localhost}")
     private var transactionServiceHost: String = "localhost"
 
@@ -25,7 +27,7 @@ open class TransactionApiConfig {
 
     @Bean
     open fun getTransactionService(): TransactionServiceGrpcKt.TransactionServiceCoroutineStub {
-        println("Connecting to transaction-service at ${transactionServiceHost}:${transactionServicePort}")
+        logger.info("Connecting to transaction-service at ${transactionServiceHost}:${transactionServicePort}")
         val channel = ManagedChannelBuilder
                 .forAddress(transactionServiceHost, transactionServicePort)
                 .usePlaintext()
@@ -35,7 +37,7 @@ open class TransactionApiConfig {
 
     @Bean
     open fun getTransactionImportService(): TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub {
-        println("Connecting to transaction-import-service at ${transactionImportServiceHost}:${transactionImportServicePort}")
+        logger.info("Connecting to transaction-import-service at ${transactionImportServiceHost}:${transactionImportServicePort}")
         val channel = ManagedChannelBuilder
                 .forAddress(transactionImportServiceHost, transactionImportServicePort)
                 .usePlaintext()

@@ -9,10 +9,8 @@ fun main() {
     val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_HOST")
     val transactionServiceWritesPort = System.getenv("TRANSACTION_SERVICE_WRITES_SERVICE_PORT").toInt()
 
-    val transactionService: TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub = {
-        val channel = ManagedChannelBuilder.forAddress(transactionServiceHost, transactionServiceWritesPort).usePlaintext().build()
-        TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub(channel)
-    }()
+    val channel = ManagedChannelBuilder.forAddress(transactionServiceHost, transactionServiceWritesPort).usePlaintext().build()
+    val transactionService: TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub = TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub(channel)
 
     val server = ServerBuilder
             .forPort(9997)

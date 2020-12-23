@@ -17,6 +17,7 @@
         <kafka.version>2.6.0</kafka.version>
         <kotlin.version>1.4.21</kotlin.version>
         <mysql-connector.version>6.0.6</mysql-connector.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <maven.compiler.target>14</maven.compiler.target>
         <java-lang.encoding>UTF-8</java-lang.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -83,6 +84,12 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
