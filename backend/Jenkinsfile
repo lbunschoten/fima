@@ -19,7 +19,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Build') {
             container('maven') {
                 configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
-                    sh 'mvn -f backend -B -gs $MAVEN_GLOBAL_SETTINGS clean package'
+                    sh 'mvn -T4 -f backend -B -gs $MAVEN_GLOBAL_SETTINGS clean package'
                 }
             }
         }
