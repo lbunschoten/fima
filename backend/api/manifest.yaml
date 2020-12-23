@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-api
+  name: api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: transaction-api
+      name: api
   template:
     metadata:
       labels:
         app: fima
         tier: frontend
         track: stable
-        name: transaction-api
+        name: api
     spec:
       containers:
-        - name: transaction-api
-          image: "$DOCKER_REGISTRY_PREFIX/transaction-api:$BUILD_ID"
+        - name: api
+          image: "$DOCKER_REGISTRY_PREFIX/api:$BUILD_ID"
           ports:
             - name: http
               containerPort: 8080
@@ -27,12 +27,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: transaction-api
+  name: api
 spec:
   selector:
     app: fima
     tier: frontend
-    name: transaction-api
+    name: api
   ports:
     - protocol: TCP
       port: 80
@@ -41,7 +41,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: transaction-api
+  name: api
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
@@ -51,5 +51,5 @@ spec:
       paths:
       - path: /transaction
         backend:
-          serviceName: transaction-api
+          serviceName: api
           servicePort: 80
