@@ -18,15 +18,7 @@ podTemplate(label: 'mypod', containers: [
         stage('Build') {
             container('maven') {
                 configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
-                    sh 'mvn -f backend -B -gs $MAVEN_GLOBAL_SETTINGS -DskipTests clean package'
-                }
-            }
-        }
-
-        stage('Test') {
-            container('maven') {
-                configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
-                    sh 'mvn -f backend -B -gs $MAVEN_GLOBAL_SETTINGS test'
+                    sh 'mvn -f backend -B -gs $MAVEN_GLOBAL_SETTINGS clean package'
                 }
             }
         }
