@@ -1,4 +1,4 @@
-FROM openjdk:10.0.2-jre-slim
+FROM adoptopenjdk/openjdk15:jre15u-debianslim-nightly
 
 RUN apt-get update && \
     apt-get install -y \

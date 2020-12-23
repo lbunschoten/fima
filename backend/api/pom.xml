@@ -17,7 +17,7 @@
         <grpc.version>1.34.1</grpc.version>
         <kotlin.version>1.4.21</kotlin.version>
         <kotlinx.coroutines.version>1.4.2</kotlinx.coroutines.version>
-        <maven.compiler.target>10</maven.compiler.target>
+        <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot-version>2.4.1</spring.boot-version>
     </properties>
