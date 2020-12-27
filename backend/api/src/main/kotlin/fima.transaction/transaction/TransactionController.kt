@@ -7,10 +7,11 @@ import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
-import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -68,10 +69,11 @@ class TransactionController @Autowired constructor(
         logger.info("Received import request")
         return transactions.map {
             logger.info("Import request contained file parts")
-            it.content().map { dataBuffer ->
-                logger.info("Import request contained file content")
+            DataBufferUtils.join(it.content()).map { dataBuffer ->
                 runBlocking {
+                    logger.info("Import request contained file content")
                     dataBuffer.asInputStream().use { input ->
+                        logger.info("Import request contained file content")
                         val request = ImportTransactionsRequest
                             .newBuilder()
                             .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
@@ -84,6 +86,6 @@ class TransactionController @Autowired constructor(
             }
         }.map {
             ResponseEntity.ok("Upload successful")
-        }.awaitFirst()
+        }.awaitSingle()
     }
 }
