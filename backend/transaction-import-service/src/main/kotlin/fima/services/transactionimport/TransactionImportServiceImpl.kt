@@ -6,9 +6,12 @@ import fima.services.transaction.write.DepositRequest
 import fima.services.transaction.write.OpenBankAccountRequest
 import fima.services.transaction.write.TransactionWritesServiceGrpcKt
 import fima.services.transaction.write.WithdrawRequest
+import org.slf4j.LoggerFactory
 import java.io.StringReader
 
 class TransactionImportServiceImpl(private val transactionService: TransactionWritesServiceGrpcKt.TransactionWritesServiceCoroutineStub) : TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineImplBase() {
+
+  private val logger = LoggerFactory.getLogger(javaClass)
 
   override suspend fun importTransactions(request: ImportTransactionsRequest): ImportTransactionsResponse {
     StringReader(request.transactions).use { reader ->
@@ -20,7 +23,10 @@ class TransactionImportServiceImpl(private val transactionService: TransactionWr
         .withSkipLines(1)
         .build()
 
-      csvReader.parse().forEachIndexed { index, transaction ->
+      val transactions = csvReader.parse()
+      logger.info("Importing ${transactions.size} transactions")
+
+      transactions.forEachIndexed { index, transaction ->
         if (index == 0) {
           transactionService.openBankAccount(
             OpenBankAccountRequest

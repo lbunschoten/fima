@@ -67,7 +67,7 @@ class TransactionController @Autowired constructor(
 
     @PutMapping("/import")
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> = coroutineScope {
-        logger.info("Received import")
+        logger.info("Received import request")
         transactions.map {
             it.content().map { dataBuffer ->
                 async {

@@ -16,6 +16,7 @@
         <grpc.version>1.34.1</grpc.version>
         <java-lang.encoding>UTF-8</java-lang.encoding>
         <kotlin.version>1.4.21</kotlin.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -38,6 +39,18 @@
             <artifactId>netty-handler-proxy</artifactId>
             <version>4.1.55.Final</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
