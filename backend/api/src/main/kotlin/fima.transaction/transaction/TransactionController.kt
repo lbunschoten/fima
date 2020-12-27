@@ -65,13 +65,19 @@ class TransactionController @Autowired constructor(
 
     @PutMapping("/import", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_STREAM_JSON_VALUE])
     suspend fun importTransactions(@RequestPart("transactions") transactions: Mono<FilePart>): Flux<String> {
+        logger.info("Received import")
+        println("Received import")
         return transactions.toFlux().flatMap {
+            logger.info("Received import part")
+            println("Received import part")
             it.content().map { dataBuffer ->
                 val bytes = ByteArray(dataBuffer.readableByteCount())
                 dataBuffer.read(bytes)
                 DataBufferUtils.release(dataBuffer)
-
-                String(bytes, StandardCharsets.UTF_8)
+                val s = String(bytes, StandardCharsets.UTF_8)
+                logger.info(s)
+                println(s)
+                s
             }
         }
             .map(this::processAndGetLinesAsList)
@@ -81,6 +87,7 @@ class TransactionController @Autowired constructor(
     private fun processAndGetLinesAsList(s: String): List<String> {
         return s.lines().map {
             logger.info(it)
+            println(it)
             it
         }
     }
