@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.MediaType
 import org.springframework.http.codec.multipart.FilePart
+import org.springframework.http.codec.multipart.Part
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -62,7 +63,7 @@ class TransactionController @Autowired constructor(
   }
 
   @PutMapping("/import", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_STREAM_JSON_VALUE])
-  suspend fun importTransactions(@RequestBody transactions: FilePart): Flux<String> {
+  suspend fun importTransactions(@RequestBody transactions: Part): Flux<String> {
       return transactions.content().map { dataBuffer ->
           val bytes = ByteArray(dataBuffer.readableByteCount())
           dataBuffer.read(bytes)
