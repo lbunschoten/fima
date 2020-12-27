@@ -69,9 +69,10 @@ class TransactionController @Autowired constructor(
         logger.info("Received import request")
         return transactions.map {
             logger.info("Import request contained file parts")
-            DataBufferUtils.join(it.content()).map { dataBuffer ->
+            val b = DataBufferUtils.join(it.content())
+            b.map { dataBuffer ->
+                logger.info("Import request contained file content: ${dataBuffer.asInputStream().readAllBytes()}")
                 runBlocking {
-                    logger.info("Import request contained file content")
                     dataBuffer.asInputStream().use { input ->
                         logger.info("Import request contained file content")
                         val request = ImportTransactionsRequest
