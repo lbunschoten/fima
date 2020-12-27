@@ -5,11 +5,13 @@ import fima.services.transaction.GetTransactionRequest
 import fima.services.transaction.MonthInYear
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
+import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.io.buffer.DataBufferUtils
-import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,10 +20,9 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import java.nio.charset.StandardCharsets
+import reactor.kotlin.core.publisher.toMono
+import java.nio.charset.Charset
 import java.util.UUID
 
 @RestController
@@ -63,32 +64,24 @@ class TransactionController @Autowired constructor(
             .map { it.simple() }
     }
 
-    @PutMapping("/import", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_STREAM_JSON_VALUE])
-    suspend fun importTransactions(@RequestPart("transactions") transactions: Mono<FilePart>): Flux<String> {
+    @PutMapping("/import")
+    suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): Mono<ResponseEntity<String>> = coroutineScope {
         logger.info("Received import")
-        println("Received import")
-        return transactions.toFlux().flatMap {
-            logger.info("Received import part")
-            println("Received import part")
+        transactions.map {
             it.content().map { dataBuffer ->
-                val bytes = ByteArray(dataBuffer.readableByteCount())
-                dataBuffer.read(bytes)
-                DataBufferUtils.release(dataBuffer)
-                val s = String(bytes, StandardCharsets.UTF_8)
-                logger.info(s)
-                println(s)
-                s
-            }
-        }
-            .map(this::processAndGetLinesAsList)
-            .flatMapIterable { it }
-    }
+                async {
+                    dataBuffer.asInputStream().use { input ->
+                        val request = ImportTransactionsRequest
+                            .newBuilder()
+                            .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
+                            .build()
 
-    private fun processAndGetLinesAsList(s: String): List<String> {
-        return s.lines().map {
-            logger.info(it)
-            println(it)
-            it
+                        transactionImportService.importTransactions(request).toMono()
+                    }
+                }
+            }
+        }.map {
+            ResponseEntity.ok("Upload successful")
         }
     }
 }
