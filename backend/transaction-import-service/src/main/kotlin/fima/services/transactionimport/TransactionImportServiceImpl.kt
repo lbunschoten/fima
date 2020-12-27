@@ -14,7 +14,6 @@ class TransactionImportServiceImpl(private val transactionService: TransactionWr
   private val logger = LoggerFactory.getLogger(javaClass)
 
   override suspend fun importTransactions(request: ImportTransactionsRequest): ImportTransactionsResponse {
-    logger.info("Importing transactions: ${request.transactions}")
     StringReader(request.transactions).use { reader ->
       val csvReader = CsvToBeanBuilder<Transaction>(reader)
         .withSeparator(',')

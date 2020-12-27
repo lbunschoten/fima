@@ -32,13 +32,6 @@ class TransactionTaggingListener(
     }
 
     private fun tagWithdrawal(event: MoneyWithdrawnEvent): Map<String, String> {
-        if (event.name.contains("hypotheken")) {
-            return mapOf(
-                "tag1" to "tag1-value",
-                "tag2" to "tag2-value"
-            )
-        }
-
         return emptyMap()
     }
 

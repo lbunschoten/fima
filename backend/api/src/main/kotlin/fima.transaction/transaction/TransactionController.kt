@@ -67,25 +67,23 @@ class TransactionController @Autowired constructor(
     @PutMapping("/import")
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
-        
-        return transactions.flatMap {
-            logger.info("Import request contained file parts")
-            DataBufferUtils.join(it.content()).map { dataBuffer ->
-                runBlocking {
-                    dataBuffer.asInputStream().use { input ->
-                        logger.info("Import request contained file content")
-                        val request = ImportTransactionsRequest
-                            .newBuilder()
-                            .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
-                            .build()
 
-                        logger.info("Sending request for transaction import")
-                        transactionImportService.importTransactions(request)
+        return transactions
+            .flatMap {
+                DataBufferUtils.join(it.content()).map { dataBuffer ->
+                    runBlocking {
+                        dataBuffer.asInputStream().use { input ->
+                            val request = ImportTransactionsRequest
+                                .newBuilder()
+                                .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
+                                .build()
+
+                            transactionImportService.importTransactions(request)
+                        }
                     }
                 }
-            }
-        }.map {
-            ResponseEntity.ok("Upload successful")
-        }.awaitSingle()
+            }.map {
+                ResponseEntity.ok("Upload successful")
+            }.awaitSingle()
     }
 }
