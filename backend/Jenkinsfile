@@ -10,6 +10,21 @@ podTemplate(label: 'mypod', containers: [
   ]
   ) {
     node('mypod') {
+        def services = ['api', 'transaction-service', 'transaction-import-service']
+        def deployments = [:]
+
+        services.each { service ->
+            stage ("Deploy ${service}"){
+                branches["deploy_${service}"] = {
+                    dir("backend/${service}") {
+                        sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
+                        sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
+                        sh "kubectl apply -f manifest.yaml --namespace=default"
+                    }
+                }
+            }
+        }
+
         stage('Clone repository') {
             container('git') {
                 checkout scm
@@ -26,7 +41,7 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Build docker image') {
             container('docker') {
-                ['api', 'transaction-service', 'transaction-import-service'].each { service ->
+                services.each { service ->
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
@@ -37,13 +52,7 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Deploy') {
             container('kubectl') {
-                ['api', 'transaction-service', 'transaction-import-service'].each { service ->
-                    dir("backend/${service}") {
-                        sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
-                        sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                        sh "kubectl apply -f manifest.yaml --namespace=default"
-                    }
-                }
+                parallel deployments
             }
         }
     }
