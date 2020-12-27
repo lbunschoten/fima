@@ -7,7 +7,6 @@ import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
@@ -65,9 +64,9 @@ class TransactionController @Autowired constructor(
     }
 
     @PutMapping("/import")
-    suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> = coroutineScope {
+    suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
-        transactions.map {
+        return transactions.map {
             logger.info("Import request contained file parts")
             it.content().map { dataBuffer ->
                 logger.info("Import request contained file content")
