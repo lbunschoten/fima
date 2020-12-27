@@ -14,8 +14,8 @@ podTemplate(label: 'mypod', containers: [
         def deployments = [:]
 
         services.each { service ->
-            stage ("Deploy ${service}") {
-                deployments[service] = {
+            deployments[service] = {
+                stage ("Deploy ${service}") {
                     dir("backend/${service}") {
                         sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
