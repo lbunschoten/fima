@@ -26,7 +26,7 @@ podTemplate(label: 'mypod', containers: [
             }
 
             buildImages[service] = {
-                stage ("Deploy ${service}") {
+                stage ("Build docker image for ${service}") {
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
