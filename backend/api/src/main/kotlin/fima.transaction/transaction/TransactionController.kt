@@ -71,7 +71,6 @@ class TransactionController @Autowired constructor(
         return transactions.flatMap {
             logger.info("Import request contained file parts")
             DataBufferUtils.join(it.content()).map { dataBuffer ->
-                logger.info("Import request contained file content: ${dataBuffer.asInputStream().readAllBytes()}")
                 runBlocking {
                     dataBuffer.asInputStream().use { input ->
                         logger.info("Import request contained file content")
