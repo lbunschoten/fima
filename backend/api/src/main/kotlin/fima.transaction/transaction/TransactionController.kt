@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.MediaType
-import org.springframework.http.codec.multipart.Part
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -61,16 +61,14 @@ class TransactionController @Autowired constructor(
       .map { it.simple() }
   }
 
-  @PutMapping("/import", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_NDJSON_VALUE])
-  suspend fun importTransactions(@RequestBody transactions: Flux<Part>): Flux<String> {
-      return transactions.flatMap { filePart ->
-          filePart.content().map { dataBuffer ->
-              val bytes = ByteArray(dataBuffer.readableByteCount())
-              dataBuffer.read(bytes)
-              DataBufferUtils.release(dataBuffer)
+  @PutMapping("/import", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_STREAM_JSON_VALUE])
+  suspend fun importTransactions(@RequestBody transactions: FilePart): Flux<String> {
+      return transactions.content().map { dataBuffer ->
+          val bytes = ByteArray(dataBuffer.readableByteCount())
+          dataBuffer.read(bytes)
+          DataBufferUtils.release(dataBuffer)
 
-              String(bytes, StandardCharsets.UTF_8)
-          }
+          String(bytes, StandardCharsets.UTF_8)
       }
       .map(this::processAndGetLinesAsList)
       .flatMapIterable { it }
