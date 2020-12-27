@@ -4,7 +4,6 @@ import fima.services.transaction.store.Transaction
 import fima.services.transaction.store.TransactionMapper
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
-import java.util.UUID
 
 interface TransactionReads {
 
@@ -12,7 +11,7 @@ interface TransactionReads {
   @RegisterRowMapper(TransactionMapper::class)
   fun getById(id: String): Transaction
 
-  @SqlQuery("SELECT * FROM Transactions LIMIT :limit OFFSET :offset")
+  @SqlQuery("SELECT * FROM Transactions ORDER BY `date` DESC LIMIT :limit OFFSET :offset")
   @RegisterRowMapper(TransactionMapper::class)
   fun getRecent(offset: Int, limit: Int): List<Transaction>
 }
