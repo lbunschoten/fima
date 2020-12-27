@@ -11,6 +11,7 @@ podTemplate(label: 'mypod', containers: [
   ) {
     node('mypod') {
         def services = ['api', 'transaction-service', 'transaction-import-service']
+        def buildImages = [:]
         def deployments = [:]
 
         services.each { service ->
@@ -23,7 +24,18 @@ podTemplate(label: 'mypod', containers: [
                     }
                 }
             }
+
+            buildImages[service] = {
+                stage ("Deploy ${service}") {
+                    dir("backend/${service}") {
+                        sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
+                        sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
+                    }
+                }
+            }
         }
+
+
 
         stage('Clone repository') {
             container('git') {
@@ -41,12 +53,7 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Build docker image') {
             container('docker') {
-                services.each { service ->
-                    dir("backend/${service}") {
-                        sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
-                        sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
-                    }
-                }
+                parralel buildImages
             }
         }
 
