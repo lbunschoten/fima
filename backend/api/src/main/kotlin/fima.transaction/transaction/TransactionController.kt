@@ -7,9 +7,9 @@ import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.nio.charset.Charset
 import java.util.UUID
 
@@ -69,14 +68,17 @@ class TransactionController @Autowired constructor(
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> = coroutineScope {
         logger.info("Received import request")
         transactions.map {
+            logger.info("Import request contained file parts")
             it.content().map { dataBuffer ->
-                async {
+                logger.info("Import request contained file content")
+                runBlocking {
                     dataBuffer.asInputStream().use { input ->
                         val request = ImportTransactionsRequest
                             .newBuilder()
                             .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
                             .build()
 
+                        logger.info("Sending request for transaction import")
                         transactionImportService.importTransactions(request)
                     }
                 }
