@@ -9,6 +9,7 @@ import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.reactive.awaitFirst
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -65,7 +66,7 @@ class TransactionController @Autowired constructor(
     }
 
     @PutMapping("/import")
-    suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): Mono<ResponseEntity<String>> = coroutineScope {
+    suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> = coroutineScope {
         logger.info("Received import")
         transactions.map {
             it.content().map { dataBuffer ->
@@ -76,12 +77,12 @@ class TransactionController @Autowired constructor(
                             .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
                             .build()
 
-                        transactionImportService.importTransactions(request).toMono()
+                        transactionImportService.importTransactions(request)
                     }
                 }
             }
         }.map {
             ResponseEntity.ok("Upload successful")
-        }
+        }.awaitFirst()
     }
 }
