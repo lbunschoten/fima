@@ -35,8 +35,6 @@ podTemplate(label: 'mypod', containers: [
             }
         }
 
-
-
         stage('Clone repository') {
             container('git') {
                 checkout scm
@@ -53,7 +51,7 @@ podTemplate(label: 'mypod', containers: [
 
         stage('Build docker image') {
             container('docker') {
-                parralel buildImages
+                parallel buildImages
             }
         }
 
