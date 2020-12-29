@@ -12,6 +12,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import java.util.UUID
+import java.util.regex.Pattern
 
 class TransactionTaggingListener(
     private val transactionTagsWritesStore: TransactionTagsWritesStore,
@@ -44,9 +46,19 @@ interface MatcherType {
 
 @Serializable
 @SerialName("contains")
-class ContainsMatcherType(private val pattern: String) : MatcherType {
+class ContainsMatcherType(private val pattern: String, private val ignoreCase: Boolean = true) : MatcherType {
     override fun matches(fields: List<String>): Boolean {
-        return fields.any { it.contains(pattern) }
+        return fields.any { it.contains(pattern, ignoreCase = ignoreCase) }
+    }
+}
+
+@Serializable
+@SerialName("regex")
+class RegexMatcherType(private val pattern: String) : MatcherType {
+
+    override fun matches(fields: List<String>): Boolean {
+        val regex = Pattern.compile(pattern)
+        return fields.any { regex.matcher(it).find() }
     }
 }
 
@@ -79,5 +91,9 @@ fun main() {
     println(a)
 
     val m = TagMatcher(listOf("name", "details"), ContainsMatcherType("test"), setOf("tags"))
+    val r = TagMatcher(listOf("name", "details"), RegexMatcherType("[a-zA-Z]}{0,5}$"), setOf("tags"))
     println(json.encodeToString(TagMatcher.serializer(), m))
+
+    println(m.matches(MoneyWithdrawnEvent(1, UUID.randomUUID(), 10, 10, "test", "", fromAccountNumber = "", toAccountNumber = "", type = "")))
+    println(r.matches(MoneyWithdrawnEvent(1, UUID.randomUUID(), 10, 10, "test5", "", fromAccountNumber = "", toAccountNumber = "", type = "")))
 }

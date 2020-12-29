@@ -18,68 +18,71 @@ import io.grpc.ServerBuilder
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
+import org.slf4j.LoggerFactory
 import fima.services.transaction.write.store.TransactionsWritesStore as TransactionWritesStore
 
 
 fun main() {
-  val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
-  val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
-  val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-  val db = Jdbi.create("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", "root", dbPassword)
-    .installPlugin(KotlinPlugin())
-    .installPlugin(KotlinSqlObjectPlugin())
+    val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
+    val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
+    val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
+    val db = Jdbi.create("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", "root", dbPassword)
+        .installPlugin(KotlinPlugin())
+        .installPlugin(KotlinSqlObjectPlugin())
 
-  val readSideServer = ServerBuilder
-    .forPort(9997)
-    .addService(TransactionReadsServiceImpl(
-      transactionsStore = db.onDemand(TransactionReads::class.java),
-      transactionStatisticsStore = db.onDemand(TransactionStatisticsStore::class.java)
-    ))
-    .build()
+    val readSideServer = ServerBuilder
+        .forPort(9997)
+        .addService(TransactionReadsServiceImpl(
+            transactionsStore = db.onDemand(TransactionReads::class.java),
+            transactionStatisticsStore = db.onDemand(TransactionStatisticsStore::class.java)
+        ))
+        .build()
 
-  val bankAccountEventStoreHandle = db.open()
-  val transactionStatisticsWritesStoreHandle = db.open()
-  val transactionTagsWritesStoreHandle = db.open()
+    val bankAccountEventStoreHandle = db.open()
+    val transactionStatisticsWritesStoreHandle = db.open()
+    val transactionTagsWritesStoreHandle = db.open()
 
-  val writeSideServer = ServerBuilder
-    .forPort(9998)
-    .addService(TransactionWritesServiceImpl(
-      CommandHandler(
-          eventStore = BankAccountEventStore(bankAccountEventStoreHandle),
-          eventProcessor = EventProcessor(),
-          eventListeners = setOf(
-              EventLoggingListener(),
-              TransactionListener(db.onDemand(TransactionWritesStore::class.java), RawDateToDateConverter()),
-              TransactionStatisticsListener(
-                  TransactionStatisticsWritesStore(
-                      transactionStatisticsWritesStoreHandle,
-                      db.onDemand(fima.services.transaction.store.TransactionStatisticsStore::class.java),
-                      0L
-                  ), RawDateToDateConverter()
-              ),
-              TransactionTaggingListener(
-                  TransactionTagsWritesStore(
-                      transactionTagsWritesStoreHandle
-                  ),
-                  emptySet()
-              )
-          )
-      )
-    ))
-    .build()
+    val writeSideServer = ServerBuilder
+        .forPort(9998)
+        .addService(TransactionWritesServiceImpl(
+            CommandHandler(
+                eventStore = BankAccountEventStore(bankAccountEventStoreHandle),
+                eventProcessor = EventProcessor(),
+                eventListeners = setOf(
+                    EventLoggingListener(),
+                    TransactionListener(db.onDemand(TransactionWritesStore::class.java), RawDateToDateConverter()),
+                    TransactionStatisticsListener(
+                        TransactionStatisticsWritesStore(
+                            handle = transactionStatisticsWritesStoreHandle,
+                            transactionStatisticsStore = db.onDemand(fima.services.transaction.store.TransactionStatisticsStore::class.java),
+                            initialBalanceInCents = 0L
+                        ), RawDateToDateConverter()
+                    ),
+                    TransactionTaggingListener(
+                        TransactionTagsWritesStore(
+                            transactionTagsWritesStoreHandle
+                        ),
+                        emptySet()
+                    )
+                )
+            )
+        ))
+        .build()
 
-  readSideServer.start()
-  writeSideServer.start()
-  println("Transaction services started")
+    readSideServer.start()
+    writeSideServer.start()
 
-  Runtime.getRuntime().addShutdownHook(Thread {
-    println("JVM is shutting down")
-    bankAccountEventStoreHandle.close()
-    transactionStatisticsWritesStoreHandle.close()
-  })
-  readSideServer.awaitTermination()
-  writeSideServer.awaitTermination()
+    val logger = LoggerFactory.getLogger("Main")
+    logger.info("Transaction services started")
 
-  println("Transaction services stopped")
+    Runtime.getRuntime().addShutdownHook(Thread {
+        logger.info("JVM is shutting down")
+        bankAccountEventStoreHandle.close()
+        transactionStatisticsWritesStoreHandle.close()
+    })
+    readSideServer.awaitTermination()
+    writeSideServer.awaitTermination()
+
+    logger.info("Transaction services stopped")
 }
 
