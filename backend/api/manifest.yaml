@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: api
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: frontend
+        track: stable
+        name: api
+    spec:
+      containers:
+        - name: api
+          image: "$DOCKER_REGISTRY_PREFIX/api:$BUILD_ID"
+          ports:
+            - name: http
+              containerPort: 8080
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: api
+spec:
+  selector:
+    app: fima
+    tier: frontend
+    name: api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: api.fima.test
+    http:
+      paths:
+      - path: /transaction
+        backend:
+          serviceName: api
+          servicePort: 80
