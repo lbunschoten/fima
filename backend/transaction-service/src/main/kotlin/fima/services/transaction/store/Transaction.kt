@@ -42,6 +42,7 @@ enum class TransactionType(private val abbreviation: String) {
   OnlineTransfer("GT"),
   ATM("GM"),
   TransferCollection("VZ"),
+  Ideal("ID"),
   Other("DV");
 
   companion object {
@@ -54,6 +55,7 @@ enum class TransactionType(private val abbreviation: String) {
         "GT" -> OnlineTransfer
         "GM" -> ATM
         "VZ" -> TransferCollection
+        "ID" -> Ideal
         "DV" -> Other
         else -> throw IllegalArgumentException("Argument contained an unsupported transaction type")
       }
@@ -69,6 +71,7 @@ enum class TransactionType(private val abbreviation: String) {
       OnlineTransfer -> ProtoTransactionType.ONLINE_TRANSFER
       ATM -> ProtoTransactionType.ATM
       TransferCollection -> ProtoTransactionType.TRANSER_COLLECTION
+      Ideal -> ProtoTransactionType.ONLINE_TRANSFER
       Other -> ProtoTransactionType.OTHER
     }
   }
