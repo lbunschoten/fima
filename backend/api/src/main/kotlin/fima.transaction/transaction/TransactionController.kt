@@ -56,8 +56,8 @@ class TransactionController @Autowired constructor(
     @CrossOrigin
     @GetMapping("/statistics")
     suspend fun getStatistics(): List<TransactionStatistics> {
-        val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2018)
-        val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2018)
+        val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
+        val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
         return transactionService
             .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
             .monthlyStatisticsList
