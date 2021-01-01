@@ -8,7 +8,6 @@ import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBufferUtils
@@ -71,13 +70,13 @@ class TransactionController @Autowired constructor(
         return transactions
             .flatMap {
                 DataBufferUtils.join(it.content()).map { dataBuffer ->
-                    runBlocking {
-                        dataBuffer.asInputStream().use { input ->
-                            val request = ImportTransactionsRequest
-                                .newBuilder()
-                                .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
-                                .build()
+                    dataBuffer.asInputStream().use { input ->
+                        val request = ImportTransactionsRequest
+                            .newBuilder()
+                            .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
+                            .build()
 
+                        suspend {
                             transactionImportService.importTransactions(request)
                         }
                     }
