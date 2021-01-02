@@ -25,7 +25,7 @@ class TaggingRulesStoreImpl(
 
     fun storeTaggingRule(regex: String, tags: Set<String>) {
         handle.execute(
-            """INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`)VALUES (?, ?, ?)""",
+            """INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (?, ?, ?)""",
             UUID.randomUUID().toString(), regex, tags.joinToString(",")
         )
     }
