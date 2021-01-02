@@ -15,12 +15,12 @@ data class TaggingRule(
         override fun fromProto(proto: ProtoTaggingRule): TaggingRule {
             return TaggingRule(UUID.fromString(proto.id), proto.regex, proto.tagsList.toSet())
         }
-
     }
 
     override fun toProto(): ProtoTaggingRule {
         return ProtoTaggingRule
             .newBuilder()
+            .setId(id?.toString() ?: "")
             .setRegex(regex)
             .addAllTags(tags)
             .build()

@@ -26,7 +26,7 @@ class TaggingRulesStoreImpl(
                 INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (:transaction_id, :regex, :tags)
                 ON DUPLICATE KEY UPDATE `regex` = :regex, tags = :tags
             """)
-            .bind("transaction_id", taggingRule.id?.takeIf { it.isNotBlank() }?.toString() ?: UUID.randomUUID().toString())
+            .bind("transaction_id", taggingRule.id?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString())
             .bind("regex", taggingRule.regex)
             .bind("tags", taggingRule.tagsList.toSet().joinToString(","))
             .execute()
