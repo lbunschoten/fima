@@ -41,7 +41,7 @@ interface TransactionsStore {
             ) as tags
         FROM Transactions t
         ORDER BY t.`date` DESC LIMIT :limit OFFSET :offset
-    """")
+    """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getRecent(offset: Int, limit: Int): List<Transaction>
 
