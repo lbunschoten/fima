@@ -43,7 +43,7 @@ class TransactionRowMapper : RowMapper<Transaction> {
             ?.takeIf { it.isNotBlank() }
             ?.split(",")
             ?.map { tag ->
-                val (key, value) = tag.split(",")
+                val (key, value) = tag.split(":")
                 Pair(key, value)
             }
             ?.toMap()
