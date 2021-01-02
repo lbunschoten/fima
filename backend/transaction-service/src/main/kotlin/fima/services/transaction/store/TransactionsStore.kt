@@ -7,15 +7,41 @@ import java.time.ZonedDateTime
 
 interface TransactionsStore {
 
-    @SqlQuery("SELECT * FROM Transactions")
+    @SqlQuery("""
+        SELECT 
+            t.*, 
+            (
+                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
+                FROM TransactionTags tt WHERE transaction_id = t.id
+            ) as tags
+        FROM Transactions t
+    """")
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getTransactions(): Set<Transaction>
 
-    @SqlQuery("SELECT * FROM Transactions WHERE id = :id")
+    @SqlQuery("""
+        SELECT 
+            t.*, 
+            (
+                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
+                FROM TransactionTags tt WHERE transaction_id = t.id
+            ) as tags
+        FROM Transactions t
+        WHERE t.id = :id
+    """")
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getById(id: String): Transaction
 
-    @SqlQuery("SELECT * FROM Transactions ORDER BY `date` DESC LIMIT :limit OFFSET :offset")
+    @SqlQuery("""
+        SELECT 
+            t.*, 
+            (
+                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
+                FROM TransactionTags tt WHERE transaction_id = t.id
+            ) as tags
+        FROM Transactions t
+        ORDER BY t.`date` DESC LIMIT :limit OFFSET :offset
+    """")
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getRecent(offset: Int, limit: Int): List<Transaction>
 

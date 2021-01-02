@@ -16,7 +16,8 @@ data class Transaction(
     val name: String,
     val fromAccount: String,
     val toAccount: String,
-    val amount: Float
+    val amount: Float,
+    val tags: Map<String, String>
 ) : ToProtoConvertable<ProtoTransaction> {
 
     override fun toProto(): ProtoTransaction {
@@ -29,6 +30,7 @@ data class Transaction(
             .setFromAccount(fromAccount)
             .setToAccount(toAccount)
             .setAmount(amount)
+            .putAllTags(tags)
             .build()
     }
 
@@ -36,6 +38,17 @@ data class Transaction(
 
 class TransactionRowMapper : RowMapper<Transaction> {
     override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
+        val tags = rs
+            .getString("tags")
+            ?.takeIf { it.isNotBlank() }
+            ?.split(",")
+            ?.map { tag ->
+                val (key, value) = tag.split(",")
+                Pair(key, value)
+            }
+            ?.toMap()
+            ?: emptyMap()
+
         return Transaction(
             id = UUID.fromString(rs.getString("id")),
             type = TransactionType.of(rs.getString("type")),
@@ -43,7 +56,8 @@ class TransactionRowMapper : RowMapper<Transaction> {
             name = rs.getString("name"),
             fromAccount = rs.getString("from_account"),
             toAccount = rs.getString("to_account"),
-            amount = rs.getFloat("amount")
+            amount = rs.getFloat("amount"),
+            tags = tags
         )
     }
 }

@@ -14,12 +14,13 @@ data class Transaction(
     val description: String,
     val toAccount: String,
     val fromAccount: String,
-    val amount: Float
+    val amount: Float,
+    val tags: Map<String, String>
 ) {
     companion object: FromProtoConvertable<ProtoTransaction, Transaction> {
         override fun fromProto(proto: ProtoTransaction): Transaction {
             val transactionDate = LocalDate.of(proto.date.year, proto.date.month, proto.date.day).format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-            return Transaction(UUID.fromString(proto.id), transactionDate, proto.type.let(TransactionType::fromProto), proto.name, proto.description, proto.toAccount, proto.fromAccount, proto.amount)
+            return Transaction(UUID.fromString(proto.id), transactionDate, proto.type.let(TransactionType::fromProto), proto.name, proto.description, proto.toAccount, proto.fromAccount, proto.amount, proto.tagsMap)
         }
     }
 }

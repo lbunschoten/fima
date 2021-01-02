@@ -32,6 +32,7 @@ message Transaction {
   string to_account = 6;
   string from_account = 7;
   float amount = 8;
+  map<string, string> tags = 9;
 }
 
 message RawTransaction {
