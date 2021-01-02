@@ -134,6 +134,7 @@ class TransactionServiceImpl(
                 taggingRuleStore.storeTaggingRule(taggingRule)
             }
         } catch (e: Exception) {
+            logger.error("Could not store tagging rule: ${e.message}")
             response.addErrorMessages(e.message)
         }
 
