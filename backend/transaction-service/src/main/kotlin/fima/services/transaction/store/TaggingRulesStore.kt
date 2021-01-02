@@ -23,11 +23,16 @@ class TaggingRulesStoreImpl(
 
     private val handle = db.open()
 
-    fun storeTaggingRule(regex: String, tags: Set<String>) {
-        handle.execute(
-            """INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (?, ?, ?)""",
-            UUID.randomUUID().toString(), regex, tags.joinToString(",")
-        )
+    fun storeTaggingRule(taggingRule: ProtoTaggingRule) {
+        handle
+            .createUpdate("""
+                INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (:transaction_id, :regex, :tags)
+                ON DUPLICATE KEY UPDATE `regex` = :regex, tags = :tags
+            """)
+            .bind(":transaction_id", taggingRule.id?.toString() ?: UUID.randomUUID().toString())
+            .bind(":regex", taggingRule.regex)
+            .bind(":tags", taggingRule.tagsList.toSet())
+            .execute()
     }
 
     override fun close() = handle.close()
@@ -47,15 +52,28 @@ data class TaggingRule(
     val id: UUID,
     val regex: String,
     val tags: List<String>
-) {
-    companion object {
-        fun toProto(taggingRule: TaggingRule): ProtoTaggingRule {
-            return ProtoTaggingRule
-                .newBuilder()
-                .setId(taggingRule.id.toString())
-                .setRegex(taggingRule.regex)
-                .addAllTags(taggingRule.tags)
-                .build()
-        }
+) : ToProtoConvertable<ProtoTaggingRule> {
+    override fun toProto(): ProtoTaggingRule {
+        return ProtoTaggingRule
+            .newBuilder()
+            .setId(id.toString())
+            .setRegex(regex)
+            .addAllTags(tags)
+            .build()
     }
+}
+
+interface ToProtoConvertable<P> {
+    fun toProto(): P
+}
+
+interface FromProtoConvertable<D> {
+    fun fromProto(): D
+}
+
+object ProtoUtils {
+
+    fun <D> Collection<FromProtoConvertable<D>>.fromProto() = this.map { it.fromProto() }
+    fun <P> Collection<ToProtoConvertable<P>>.toProto() = this.map { it.toProto() }
+
 }

@@ -28,7 +28,7 @@ class TaggingController @Autowired constructor(
         return transactionService
             .getTaggingRules(request)
             .taggingRulesList
-            .map { it.simple() }
+            .map(TaggingRule::fromProto)
             .toSet()
     }
 

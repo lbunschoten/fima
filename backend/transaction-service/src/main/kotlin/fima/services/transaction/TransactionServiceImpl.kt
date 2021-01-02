@@ -1,6 +1,6 @@
 package fima.services.transaction
 
-import fima.services.transaction.store.TaggingRule
+import fima.services.transaction.store.ProtoUtils.toProto
 import fima.services.transaction.store.TaggingRulesStoreImpl
 import fima.services.transaction.store.TransactionStatisticsStore
 import fima.services.transaction.store.TransactionsStore
@@ -112,7 +112,7 @@ class TransactionServiceImpl(
 
     override suspend fun getTaggingRules(request: GetTaggingRulesRequest): GetTaggingRulesResponse {
         val taggingRules = try {
-            taggingRuleStore.getTaggingRules().map(TaggingRule.Companion::toProto)
+            taggingRuleStore.getTaggingRules()
         } catch (e: Exception) {
             logger.error(e.message)
             emptyList()
@@ -120,7 +120,7 @@ class TransactionServiceImpl(
 
         return GetTaggingRulesResponse
             .newBuilder()
-            .addAllTaggingRules(taggingRules)
+            .addAllTaggingRules(taggingRules.toProto())
             .build()
     }
 
@@ -131,7 +131,7 @@ class TransactionServiceImpl(
 
         try {
             request.taggingRulesList.forEach { taggingRule ->
-                taggingRuleStore.storeTaggingRule(taggingRule.regex, taggingRule.tagsList.toSet())
+                taggingRuleStore.storeTaggingRule(taggingRule)
             }
         } catch (e: Exception) {
             response.addErrorMessages(e.message)

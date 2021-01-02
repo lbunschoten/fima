@@ -11,9 +11,21 @@ data class MonthlyTransactionStatistics(
     val numTransactions: Int,
     val sum: Long,
     val balance: Long
-) {
+): ToProtoConvertable<ProtoMonthlyTransactionStatistics> {
 
-    fun toProto(): ProtoMonthlyTransactionStatistics {
+    companion object: RowMapper<MonthlyTransactionStatistics> {
+        override fun map(rs: ResultSet, ctx: StatementContext): MonthlyTransactionStatistics {
+            return MonthlyTransactionStatistics(
+                month = rs.getInt("month"),
+                year = rs.getInt("year"),
+                numTransactions = rs.getInt("numTransactions"),
+                sum = rs.getLong("sum"),
+                balance = rs.getLong("balance")
+            )
+        }
+    }
+
+    override fun toProto(): ProtoMonthlyTransactionStatistics {
         return ProtoMonthlyTransactionStatistics
             .newBuilder()
             .setMonth(month)
@@ -22,20 +34,6 @@ data class MonthlyTransactionStatistics(
             .setSum(sum.toFloat())
             .setBalance(balance.toFloat())
             .build()
-    }
-
-}
-
-class MonthlyTransactionStatisticsRowMapper : RowMapper<MonthlyTransactionStatistics> {
-
-    override fun map(rs: ResultSet, ctx: StatementContext): MonthlyTransactionStatistics {
-        return MonthlyTransactionStatistics(
-            month = rs.getInt("month"),
-            year = rs.getInt("year"),
-            numTransactions = rs.getInt("numTransactions"),
-            sum = rs.getLong("sum"),
-            balance = rs.getLong("balance")
-        )
     }
 
 }

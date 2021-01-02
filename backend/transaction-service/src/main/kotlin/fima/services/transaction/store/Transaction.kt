@@ -17,9 +17,23 @@ data class Transaction(
     val fromAccount: String,
     val toAccount: String,
     val amount: Float
-) {
+): ToProtoConvertable<ProtoTransaction> {
 
-    fun toProto(): ProtoTransaction {
+    companion object : RowMapper<Transaction> {
+        override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
+            return Transaction(
+                id = UUID.fromString(rs.getString("id")),
+                type = TransactionType.of(rs.getString("type")),
+                date = rs.getDate("date").toLocalDate(),
+                name = rs.getString("name"),
+                fromAccount = rs.getString("from_account"),
+                toAccount = rs.getString("to_account"),
+                amount = rs.getFloat("amount")
+            )
+        }
+    }
+
+    override fun toProto(): ProtoTransaction {
         return ProtoTransaction
             .newBuilder()
             .setId(id.toString())
@@ -34,7 +48,7 @@ data class Transaction(
 
 }
 
-enum class TransactionType(private val abbreviation: String) {
+enum class TransactionType(private val abbreviation: String): ToProtoConvertable<ProtoTransactionType> {
     WireTransfer("AM"),
     DirectDebit("IC"),
     PaymentTerminal("BA"),
@@ -62,7 +76,7 @@ enum class TransactionType(private val abbreviation: String) {
         }
     }
 
-    fun toProto(): ProtoTransactionType {
+    override fun toProto(): ProtoTransactionType {
         return when (this) {
             WireTransfer -> ProtoTransactionType.WIRE_TRANSFER
             DirectDebit -> ProtoTransactionType.DIRECT_DEBIT
@@ -77,18 +91,4 @@ enum class TransactionType(private val abbreviation: String) {
     }
 
     override fun toString(): String = abbreviation
-}
-
-class TransactionMapper : RowMapper<Transaction> {
-    override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
-        return Transaction(
-            id = UUID.fromString(rs.getString("id")),
-            type = TransactionType.of(rs.getString("type")),
-            date = rs.getDate("date").toLocalDate(),
-            name = rs.getString("name"),
-            fromAccount = rs.getString("from_account"),
-            toAccount = rs.getString("to_account"),
-            amount = rs.getFloat("amount")
-        )
-    }
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -38,7 +37,10 @@ class TransactionController @Autowired constructor(
     suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
         val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
 
-        return transactionService.getTransaction(request).transaction.simple()
+        return transactionService
+            .getTransaction(request)
+            .transaction
+            .let(Transaction::fromProto)
     }
 
     @CrossOrigin
@@ -50,7 +52,10 @@ class TransactionController @Autowired constructor(
             .setLimit(limit)
             .build()
 
-        return transactionService.getRecentTransactions(request).transactionsList.map { it.simple() }
+        return transactionService
+            .getRecentTransactions(request)
+            .transactionsList
+            .map(Transaction::fromProto)
     }
 
     @CrossOrigin
@@ -61,7 +66,7 @@ class TransactionController @Autowired constructor(
         return transactionService
             .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
             .monthlyStatisticsList
-            .map { it.simple() }
+            .map(MonthlyTransactionStatistics::fromProto)
     }
 
     @PutMapping("/transaction/import")
