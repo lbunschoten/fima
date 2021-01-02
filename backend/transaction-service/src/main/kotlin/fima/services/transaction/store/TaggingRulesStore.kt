@@ -1,12 +1,9 @@
 package fima.services.transaction.store
 
 import org.jdbi.v3.core.Jdbi
-import org.jdbi.v3.core.mapper.RowMapper
-import org.jdbi.v3.core.statement.StatementContext
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import java.io.Closeable
-import java.sql.ResultSet
 import java.util.UUID
 import fima.domain.transaction.TaggingRule as ProtoTaggingRule
 
@@ -29,7 +26,7 @@ class TaggingRulesStoreImpl(
                 INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (:transaction_id, :regex, :tags)
                 ON DUPLICATE KEY UPDATE `regex` = :regex, tags = :tags
             """)
-            .bind("transaction_id", taggingRule.id?.toString() ?: UUID.randomUUID().toString())
+            .bind("transaction_id", taggingRule.id?.takeIf { it.isNotBlank() }?.toString() ?: UUID.randomUUID().toString())
             .bind("regex", taggingRule.regex)
             .bind("tags", taggingRule.tagsList.toSet().joinToString(","))
             .execute()
