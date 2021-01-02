@@ -31,7 +31,7 @@ class TaggingRulesStoreImpl(
             """)
             .bind("transaction_id", taggingRule.id?.toString() ?: UUID.randomUUID().toString())
             .bind("regex", taggingRule.regex)
-            .bind("tags", taggingRule.tagsList.toSet())
+            .bind("tags", taggingRule.tagsList.toSet().joinToString(","))
             .execute()
     }
 
