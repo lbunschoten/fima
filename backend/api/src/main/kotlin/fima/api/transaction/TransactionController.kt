@@ -3,6 +3,7 @@ package fima.api.transaction
 import fima.domain.transaction.MonthInYear
 import fima.services.transaction.GetRecentTransactionsRequest
 import fima.services.transaction.GetTransactionRequest
+import fima.services.transaction.TagTransactionsRequest
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
@@ -67,6 +68,17 @@ class TransactionController @Autowired constructor(
             .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
             .monthlyStatisticsList
             .map(MonthlyTransactionStatistics::fromProto)
+    }
+
+    @GetMapping("/tag")
+    suspend fun tagTransactions(): ResponseEntity<String> {
+        logger.info("Received request for tagging all transactions")
+
+        val request = TagTransactionsRequest.newBuilder().build()
+
+        transactionService.tagTransactions(request)
+
+        return ResponseEntity.ok("Successfully tagged all transactions")
     }
 
     @PutMapping("/transaction/import")

@@ -7,6 +7,10 @@ import java.time.ZonedDateTime
 
 interface TransactionsStore {
 
+    @SqlQuery("SELECT * FROM Transactions")
+    @RegisterRowMapper(TransactionRowMapper::class)
+    fun getTransactions(): Set<Transaction>
+
     @SqlQuery("SELECT * FROM Transactions WHERE id = :id")
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getById(id: String): Transaction

@@ -97,6 +97,12 @@ message StoreTaggingRuleResponse {
 message GetTaggingRulesRequest {
 }
 
+message TagTransactionsRequest {
+}
+
+message TagTransactionsResponse {
+}
+
 message GetTaggingRulesResponse {
   repeated domain.TaggingRule taggingRules = 1;
 }
@@ -109,7 +115,10 @@ service TransactionService {
 
   rpc getMonthlyStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
 
+
   rpc getTaggingRules(GetTaggingRulesRequest) returns (GetTaggingRulesResponse) {}
+
+  rpc storeTaggingRule(StoreTaggingRuleRequest) returns (StoreTaggingRuleResponse) {}
 
 
   rpc openBankAccount(OpenBankAccountRequest) returns (OpenBankAccountResponse) {}
@@ -118,7 +127,6 @@ service TransactionService {
 
   rpc deposit(DepositRequest) returns (DepositResponse) {}
 
-  rpc storeTaggingRule(StoreTaggingRuleRequest) returns (StoreTaggingRuleResponse) {}
-
+  rpc tagTransactions(TagTransactionsRequest) returns (TagTransactionsResponse) {}
 
 }

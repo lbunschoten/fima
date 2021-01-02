@@ -4,9 +4,16 @@ import fima.services.transaction.write.event.Event
 import org.jdbi.v3.core.Jdbi
 import java.io.Closeable
 
-class BankAccountEventStore(private val db: Jdbi) : EventStore(), Closeable {
+class BankAccountEventStore(db: Jdbi) : EventStore(), Closeable {
 
     private val handle = db.open()
+
+    override fun aggregates(): List<String> {
+        return handle
+            .select("SELECT DISTINCT aggregate_id FROM BankAccountEvents")
+            .mapTo(String::class.java)
+            .list()
+    }
 
     override fun readEvents(aggregateId: String): List<Event> {
         val serializedEvents = handle

@@ -8,6 +8,7 @@ import fima.services.transaction.store.TransactionTagsStore
 import fima.services.transaction.store.TransactionsStore
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
+import fima.services.transaction.write.TaggingService
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
@@ -30,8 +31,14 @@ fun main() {
     val bankAccountEventStore = BankAccountEventStore(db)
     val transactionsStore = db.onDemand(TransactionsStore::class.java)
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
-    val transactionTaggingStore = TransactionTagsStore(db)
+    val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
+
+    val taggingService = TaggingService(
+        bankAccountEventStore,
+        taggingRuleStore,
+        transactionTagsStore
+    )
 
     val transactionServiceServer = ServerBuilder
         .forPort(9997)
@@ -46,9 +53,10 @@ fun main() {
                     EventLoggingListener(),
                     TransactionListener(transactionsStore, RawDateToDateConverter()),
                     TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
-                    TransactionTaggingListener(transactionTaggingStore, taggingRuleStore)
+                    TransactionTaggingListener(taggingService)
                 )
             ),
+            taggingService = taggingService
         ))
         .build()
 
@@ -60,7 +68,7 @@ fun main() {
     Runtime.getRuntime().addShutdownHook(Thread {
         logger.info("JVM is shutting down")
         bankAccountEventStore.close()
-        transactionTaggingStore.close()
+        transactionTagsStore.close()
         transactionStatisticsStore.close()
         taggingRuleStore.close()
     })

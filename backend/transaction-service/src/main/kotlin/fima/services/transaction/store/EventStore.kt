@@ -31,6 +31,8 @@ abstract class EventStore {
 
     val json = Json { serializersModule = eventSerializers; classDiscriminator = "t" }
 
+    abstract fun aggregates(): List<String>
+
     abstract fun readEvents(aggregateId: String): List<Event>
 
     abstract fun writeEvents(aggregateId: String, events: List<Event>)

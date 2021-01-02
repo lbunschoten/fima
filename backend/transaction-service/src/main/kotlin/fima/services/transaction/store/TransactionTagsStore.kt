@@ -8,6 +8,12 @@ class TransactionTagsStore(db: Jdbi) : Closeable {
 
     private val handle = db.open()
 
+    fun deleteTags() {
+        handle
+            .createUpdate("""DELETE FROM TransactionTags""")
+            .execute()
+    }
+
     fun storeTags(transactionId: UUID, tags: Map<String, String>) {
         val insertTagsQuery = handle.prepareBatch("""
           INSERT INTO TransactionTags (`id`, `transaction_id`, `key`, `value`)

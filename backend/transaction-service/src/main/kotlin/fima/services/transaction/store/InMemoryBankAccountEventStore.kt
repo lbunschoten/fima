@@ -7,6 +7,8 @@ class InMemoryBankAccountEventStore : EventStore() {
 
     private val storage = mutableMapOf<String, List<String>>()
 
+    override fun aggregates(): List<String> = storage.keys.toList()
+
     override fun readEvents(aggregateId: String): List<Event> {
         val serializedEvents = storage.getOrDefault(aggregateId, emptyList())
         return serializedEvents.map { e ->

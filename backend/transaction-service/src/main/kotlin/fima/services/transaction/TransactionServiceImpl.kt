@@ -4,6 +4,7 @@ import fima.services.transaction.store.TaggingRulesStoreImpl
 import fima.services.transaction.store.TransactionStatisticsStore
 import fima.services.transaction.store.TransactionsStore
 import fima.services.transaction.write.CommandHandler
+import fima.services.transaction.write.TaggingService
 import fima.services.transaction.write.command.DepositMoneyCommand
 import fima.services.transaction.write.command.OpenBankAccountCommand
 import fima.services.transaction.write.command.WithdrawMoneyCommand
@@ -16,6 +17,7 @@ class TransactionServiceImpl(
     private val transactionsStore: TransactionsStore,
     private val transactionStatisticsStore: TransactionStatisticsStore,
     private val taggingRuleStore: TaggingRulesStoreImpl,
+    private val taggingService: TaggingService,
     private val commandHandler: CommandHandler
 ) : TransactionServiceGrpcKt.TransactionServiceCoroutineImplBase() {
 
@@ -141,4 +143,11 @@ class TransactionServiceImpl(
         return response.build()
     }
 
+    override suspend fun tagTransactions(request: TagTransactionsRequest): TagTransactionsResponse {
+        logger.info("Received request to tag all transactions")
+
+        taggingService.tagTransactions()
+
+        return TagTransactionsResponse.newBuilder().build()
+    }
 }
