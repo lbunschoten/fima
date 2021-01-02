@@ -26,7 +26,6 @@ import java.nio.charset.Charset
 import java.util.UUID
 
 @RestController
-@RequestMapping("/transaction")
 class TransactionController @Autowired constructor(
     private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub,
     private val transactionImportService: TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub
@@ -35,7 +34,7 @@ class TransactionController @Autowired constructor(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @CrossOrigin
-    @GetMapping("/{id}")
+    @GetMapping("/transaction/{id}")
     suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
         val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
 
@@ -43,7 +42,7 @@ class TransactionController @Autowired constructor(
     }
 
     @CrossOrigin
-    @GetMapping("/recent")
+    @GetMapping("/transaction/recent")
     suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
         val request = GetRecentTransactionsRequest
             .newBuilder()
@@ -55,7 +54,7 @@ class TransactionController @Autowired constructor(
     }
 
     @CrossOrigin
-    @GetMapping("/statistics")
+    @GetMapping("/transaction/statistics")
     suspend fun getStatistics(): List<MonthlyTransactionStatistics> {
         val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
         val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
@@ -65,7 +64,7 @@ class TransactionController @Autowired constructor(
             .map { it.simple() }
     }
 
-    @PutMapping("/import")
+    @PutMapping("/transaction/import")
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
 

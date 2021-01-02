@@ -10,18 +10,16 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/tagging-rules")
 class TaggingController @Autowired constructor(
     private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/tagging-rules", produces = [MediaType.APPLICATION_JSON_VALUE])
     suspend fun getTaggingRules(): Set<TaggingRule> {
         logger.info("Received request for retrieving tagging rules")
 
@@ -34,13 +32,13 @@ class TaggingController @Autowired constructor(
             .toSet()
     }
 
-    @PutMapping
-    suspend fun putTaggingRule(@RequestBody(required = true) taggingRules: Set<TaggingRule>): ResponseEntity<String> {
-        logger.info("Received request for adding tagging rules")
+    @PutMapping("/tagging-rule", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    suspend fun putTaggingRule(@RequestBody(required = true) taggingRule: TaggingRule): ResponseEntity<String> {
+        logger.info("Received request for storing a tagging rule")
 
         val request = StoreTaggingRuleRequest
             .newBuilder()
-            .addAllTaggingRules(taggingRules.map { it.toProto() })
+            .addTaggingRules(taggingRule.toProto())
             .build()
 
         transactionService.storeTaggingRule(request)
