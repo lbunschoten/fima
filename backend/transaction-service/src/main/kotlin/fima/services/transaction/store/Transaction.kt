@@ -1,13 +1,13 @@
 package fima.services.transaction.store
 
 import fima.domain.transaction.Date
+import fima.services.utils.ToProtoConvertable
 import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet
 import java.time.LocalDate
 import java.util.UUID
 import fima.domain.transaction.Transaction as ProtoTransaction
-import fima.domain.transaction.TransactionType as ProtoTransactionType
 
 data class Transaction(
     val id: UUID,
@@ -17,21 +17,7 @@ data class Transaction(
     val fromAccount: String,
     val toAccount: String,
     val amount: Float
-): ToProtoConvertable<ProtoTransaction> {
-
-    companion object : RowMapper<Transaction> {
-        override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
-            return Transaction(
-                id = UUID.fromString(rs.getString("id")),
-                type = TransactionType.of(rs.getString("type")),
-                date = rs.getDate("date").toLocalDate(),
-                name = rs.getString("name"),
-                fromAccount = rs.getString("from_account"),
-                toAccount = rs.getString("to_account"),
-                amount = rs.getFloat("amount")
-            )
-        }
-    }
+) : ToProtoConvertable<ProtoTransaction> {
 
     override fun toProto(): ProtoTransaction {
         return ProtoTransaction
@@ -48,47 +34,17 @@ data class Transaction(
 
 }
 
-enum class TransactionType(private val abbreviation: String): ToProtoConvertable<ProtoTransactionType> {
-    WireTransfer("AM"),
-    DirectDebit("IC"),
-    PaymentTerminal("BA"),
-    Transfer("OV"),
-    OnlineTransfer("GT"),
-    ATM("GM"),
-    TransferCollection("VZ"),
-    Ideal("ID"),
-    Other("DV");
-
-    companion object {
-        fun of(abbreviation: String): TransactionType {
-            return when (abbreviation) {
-                "AM" -> WireTransfer
-                "IC" -> DirectDebit
-                "BA" -> PaymentTerminal
-                "OV" -> Transfer
-                "GT" -> OnlineTransfer
-                "GM" -> ATM
-                "VZ" -> TransferCollection
-                "ID" -> Ideal
-                "DV" -> Other
-                else -> throw IllegalArgumentException("Argument contained an unsupported transaction type")
-            }
-        }
+class TransactionRowMapper : RowMapper<Transaction> {
+    override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
+        return Transaction(
+            id = UUID.fromString(rs.getString("id")),
+            type = TransactionType.of(rs.getString("type")),
+            date = rs.getDate("date").toLocalDate(),
+            name = rs.getString("name"),
+            fromAccount = rs.getString("from_account"),
+            toAccount = rs.getString("to_account"),
+            amount = rs.getFloat("amount")
+        )
     }
-
-    override fun toProto(): ProtoTransactionType {
-        return when (this) {
-            WireTransfer -> ProtoTransactionType.WIRE_TRANSFER
-            DirectDebit -> ProtoTransactionType.DIRECT_DEBIT
-            PaymentTerminal -> ProtoTransactionType.PAYMENT_TERMINAL
-            Transfer -> ProtoTransactionType.TRANSFER
-            OnlineTransfer -> ProtoTransactionType.ONLINE_TRANSFER
-            ATM -> ProtoTransactionType.ATM
-            TransferCollection -> ProtoTransactionType.TRANSER_COLLECTION
-            Ideal -> ProtoTransactionType.ONLINE_TRANSFER
-            Other -> ProtoTransactionType.OTHER
-        }
-    }
-
-    override fun toString(): String = abbreviation
 }
+

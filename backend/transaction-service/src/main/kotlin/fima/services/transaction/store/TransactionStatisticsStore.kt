@@ -65,7 +65,7 @@ interface TransactionStatisticsStore {
         WHERE month = :month
         AND year = :year
     """)
-    @RegisterRowMapper(MonthlyTransactionStatistics.Companion::class)
+    @RegisterRowMapper(MonthlyTransactionStatisticsRowMapper::class)
     fun getStatistics(month: Int, year: Int): Optional<MonthlyTransactionStatistics>
 
     @SqlQuery("""
@@ -75,7 +75,7 @@ interface TransactionStatisticsStore {
         AND ((month <= :endMonth AND year <= :endYear) OR year < :endYear) 
         ORDER BY year, month
     """)
-    @RegisterRowMapper(MonthlyTransactionStatistics.Companion::class)
+    @RegisterRowMapper(MonthlyTransactionStatisticsRowMapper::class)
     fun getMonthlyStatistics(startMonth: Int, startYear: Int, endMonth: Int, endYear: Int): List<MonthlyTransactionStatistics>
 
     fun getPreviousMonthStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {

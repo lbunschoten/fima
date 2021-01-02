@@ -38,42 +38,5 @@ class TaggingRulesStoreImpl(
     override fun close() = handle.close()
 }
 
-class TaggingRuleMapper : RowMapper<TaggingRule> {
-    override fun map(rs: ResultSet, ctx: StatementContext): TaggingRule {
-        return TaggingRule(
-            id = UUID.fromString(rs.getString("id")),
-            regex = rs.getString("regex"),
-            tags = rs.getString("tags").split(',')
-        )
-    }
-}
 
-data class TaggingRule(
-    val id: UUID,
-    val regex: String,
-    val tags: List<String>
-) : ToProtoConvertable<ProtoTaggingRule> {
-    override fun toProto(): ProtoTaggingRule {
-        return ProtoTaggingRule
-            .newBuilder()
-            .setId(id.toString())
-            .setRegex(regex)
-            .addAllTags(tags)
-            .build()
-    }
-}
 
-interface ToProtoConvertable<P> {
-    fun toProto(): P
-}
-
-interface FromProtoConvertable<D> {
-    fun fromProto(): D
-}
-
-object ProtoUtils {
-
-    fun <D> Collection<FromProtoConvertable<D>>.fromProto() = this.map { it.fromProto() }
-    fun <P> Collection<ToProtoConvertable<P>>.toProto() = this.map { it.toProto() }
-
-}

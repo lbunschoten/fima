@@ -1,6 +1,5 @@
 package fima.services.transaction
 
-import fima.services.transaction.store.ProtoUtils.toProto
 import fima.services.transaction.store.TaggingRulesStoreImpl
 import fima.services.transaction.store.TransactionStatisticsStore
 import fima.services.transaction.store.TransactionsStore
@@ -8,6 +7,7 @@ import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.command.DepositMoneyCommand
 import fima.services.transaction.write.command.OpenBankAccountCommand
 import fima.services.transaction.write.command.WithdrawMoneyCommand
+import fima.services.utils.ProtoUtils.toProto
 import io.grpc.Status
 import io.grpc.StatusException
 import org.slf4j.LoggerFactory

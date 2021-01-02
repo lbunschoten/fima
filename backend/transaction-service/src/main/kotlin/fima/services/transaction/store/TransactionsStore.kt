@@ -8,11 +8,11 @@ import java.time.ZonedDateTime
 interface TransactionsStore {
 
     @SqlQuery("SELECT * FROM Transactions WHERE id = :id")
-    @RegisterRowMapper(Transaction.Companion::class)
+    @RegisterRowMapper(TransactionRowMapper::class)
     fun getById(id: String): Transaction
 
     @SqlQuery("SELECT * FROM Transactions ORDER BY `date` DESC LIMIT :limit OFFSET :offset")
-    @RegisterRowMapper(Transaction.Companion::class)
+    @RegisterRowMapper(TransactionRowMapper::class)
     fun getRecent(offset: Int, limit: Int): List<Transaction>
 
     @SqlUpdate("""
