@@ -15,7 +15,7 @@ interface TransactionsStore {
                 FROM TransactionTags tt WHERE transaction_id = t.id
             ) as tags
         FROM Transactions t
-    """")
+    """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getTransactions(): Set<Transaction>
 
@@ -28,7 +28,7 @@ interface TransactionsStore {
             ) as tags
         FROM Transactions t
         WHERE t.id = :id
-    """")
+    """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getById(id: String): Transaction
 
