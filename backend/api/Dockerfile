@@ -4,4 +4,4 @@ EXPOSE 80
 
 COPY ./target/api-1.0.0-SNAPSHOT.jar fima.jar
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=production", "-jar", "fima.jar", "--server.port=8080", "--spring.webflux.base-path=/transaction", ]
+ENTRYPOINT ["java", "-jar", "fima.jar", "--spring.profiles.active=production", "--server.port=8080", "--spring.webflux.base-path=/transaction", ]
