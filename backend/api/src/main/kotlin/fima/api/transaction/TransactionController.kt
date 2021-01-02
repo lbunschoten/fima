@@ -1,8 +1,8 @@
-package fima.transaction.transaction
+package fima.api.transaction
 
+import fima.domain.transaction.MonthInYear
 import fima.services.transaction.GetRecentTransactionsRequest
 import fima.services.transaction.GetTransactionRequest
-import fima.services.transaction.MonthInYear
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
@@ -54,7 +54,7 @@ class TransactionController @Autowired constructor(
 
     @CrossOrigin
     @GetMapping("/statistics")
-    suspend fun getStatistics(): List<TransactionStatistics> {
+    suspend fun getStatistics(): List<MonthlyTransactionStatistics> {
         val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
         val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
         return transactionService

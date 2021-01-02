@@ -6,18 +6,18 @@ import io.kotest.matchers.shouldBe
 
 class RawDateToDateConverterSpec : StringSpec() {
 
-  init {
-    val converter = RawDateToDateConverter()
+    init {
+        val converter = RawDateToDateConverter()
 
-    "it should convert a rawDate to a date" {
-      converter(20180719) shouldBe Date.newBuilder().run {
-        day = 19
-        month = 7
-        year = 2018
-        build()
-      }
+        "it should convert a rawDate to a date" {
+            converter(20180719) shouldBe Date.newBuilder().run {
+                day = 19
+                month = 7
+                year = 2018
+                build()
+            }
+        }
+
     }
-
-  }
 
 }

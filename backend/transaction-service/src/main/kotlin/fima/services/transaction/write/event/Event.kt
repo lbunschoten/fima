@@ -7,19 +7,19 @@ import java.time.Instant
 @Serializable
 abstract class Event : EventVersion {
 
-  abstract val version: Int
+    abstract val version: Int
 
-  @Suppress("unused")
-  val at: Long = Instant.now().toEpochMilli()
+    @Suppress("unused")
+    val at: Long = Instant.now().toEpochMilli()
 
 
-  abstract fun apply(aggregate: BankAccount): BankAccount
+    abstract fun apply(aggregate: BankAccount): BankAccount
 }
 
 interface EventVersion {
-  val eventVersion: Int
+    val eventVersion: Int
 }
 
 interface EventVersion1 : EventVersion {
-  override val eventVersion: Int get() = 1
+    override val eventVersion: Int get() = 1
 }

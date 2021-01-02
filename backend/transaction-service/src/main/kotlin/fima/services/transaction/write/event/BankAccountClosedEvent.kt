@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @SerialName("BankAccountClosedEvent")
 data class BankAccountClosedEvent(override val version: Int) : Event(), EventVersion1 {
 
-  override fun apply(aggregate: BankAccount): BankAccount {
-    return ClosedBankAccount(version, aggregate.accountNumber)
-  }
+    override fun apply(aggregate: BankAccount): BankAccount {
+        return ClosedBankAccount(version, aggregate.accountNumber)
+    }
 }

@@ -1,11 +1,12 @@
-package fima.services.transaction.write.store
+package fima.services.transaction.store
 
-import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.Jdbi
+import java.io.Closeable
 import java.util.UUID
 
-class TransactionTagsWritesStore(
-    private val handle: Handle
-) {
+class TransactionTagsStore(db: Jdbi) : Closeable {
+
+    private val handle = db.open()
 
     fun storeTags(transactionId: UUID, tags: Map<String, String>) {
         val insertTagsQuery = handle.prepareBatch("""
@@ -24,4 +25,6 @@ class TransactionTagsWritesStore(
         }
         insertTagsQuery.execute()
     }
+
+    override fun close() = handle.close()
 }

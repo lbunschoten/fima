@@ -11,32 +11,32 @@ import java.util.Properties
 
 class TransactionEventProducer : KafkaProducer<Long, TransactionAddedEvent>(producerProperties()) {
 
-  companion object {
-    private val logger = LoggerFactory.getLogger(TransactionEventProducer::class.java)
+    companion object {
+        private val logger = LoggerFactory.getLogger(TransactionEventProducer::class.java)
 
-    fun producerProperties(): Properties {
-      val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
-      val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
+        fun producerProperties(): Properties {
+            val kafkaHost: String = System.getenv("KAFKA_HOST") ?: "10.0.2.15"
+            val kafkaPort: String = System.getenv("KAFKA_PORT") ?: "9092"
 
-      logger.info("Connecting to kafka on $kafkaHost:$kafkaPort")
+            logger.info("Connecting to kafka on $kafkaHost:$kafkaPort")
 
-      val producerProps = Properties()
-      producerProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "$kafkaHost:$kafkaPort"
-      producerProps[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = LongSerializer::class.java.name
-      producerProps[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = TransactionAddedEventSerializer::class.java.name
-      return producerProps
+            val producerProps = Properties()
+            producerProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "$kafkaHost:$kafkaPort"
+            producerProps[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = LongSerializer::class.java.name
+            producerProps[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = TransactionAddedEventSerializer::class.java.name
+            return producerProps
+        }
     }
-  }
 
-  fun produce(event: TransactionAddedEvent) {
-    send(ProducerRecord("fima-added-transactions", event)) { metadata, exception ->
-      if (exception != null) {
-        logger.error("Could not produce event: ${exception.message}")
-      } else {
-        logger.info("Produced new `TransactionAddedEvent` to topic: ${metadata.topic()}")
-      }
+    fun produce(event: TransactionAddedEvent) {
+        send(ProducerRecord("fima-added-transactions", event)) { metadata, exception ->
+            if (exception != null) {
+                logger.error("Could not produce event: ${exception.message}")
+            } else {
+                logger.info("Produced new `TransactionAddedEvent` to topic: ${metadata.topic()}")
+            }
+        }
+        flush()
     }
-    flush()
-  }
 
 }

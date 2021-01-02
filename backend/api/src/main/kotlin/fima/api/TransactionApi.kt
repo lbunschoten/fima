@@ -1,4 +1,4 @@
-package fima.transaction
+package fima.api
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.WebApplicationType

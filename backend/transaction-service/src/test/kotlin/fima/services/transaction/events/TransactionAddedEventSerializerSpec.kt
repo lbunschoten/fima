@@ -6,13 +6,13 @@ import io.kotest.matchers.shouldBe
 
 class TransactionAddedEventSerializerSpec : StringSpec() {
 
-  init {
-    val serializer = TransactionAddedEventSerializer()
+    init {
+        val serializer = TransactionAddedEventSerializer()
 
-    "it should serialize the TransactionAddedEvent" {
-      val event = TransactionAddedEvent.getDefaultInstance()
-      serializer.serialize("topic", event) shouldBe event.toByteArray()
+        "it should serialize the TransactionAddedEvent" {
+            val event = TransactionAddedEvent.getDefaultInstance()
+            serializer.serialize("topic", event) shouldBe event.toByteArray()
+        }
+
     }
-
-  }
 }

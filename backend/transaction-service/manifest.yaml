@@ -19,10 +19,8 @@ spec:
         - name: transaction-service
           image: "$DOCKER_REGISTRY_PREFIX/transaction-service:$BUILD_ID"
           ports:
-            - name: http-reads
+            - name: http
               containerPort: 9997
-            - name: http-writes
-              containerPort: 9998
           env:
             - name: DB_PASSWORD
               valueFrom:
@@ -37,29 +35,14 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: transaction-service-reads
+  name: transaction-service
 spec:
   selector:
     app: fima
     tier: backend
     name: transaction-service
   ports:
-    - name: http-reads
+    - name: http
       protocol: TCP
       port: 9997
-      targetPort: http-reads
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: transaction-service-writes
-spec:
-  selector:
-    app: fima
-    tier: backend
-    name: transaction-service
-  ports:
-    - name: http-writes
-      protocol: TCP
-      port: 9998
-      targetPort: http-writes
+      targetPort: http

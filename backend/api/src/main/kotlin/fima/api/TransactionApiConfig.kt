@@ -1,4 +1,4 @@
-package fima.transaction
+package fima.api
 
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
@@ -13,10 +13,10 @@ open class TransactionApiConfig {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @Value("\${TRANSACTION_SERVICE_READS_SERVICE_HOST:localhost}")
+    @Value("\${TRANSACTION_SERVICE_SERVICE_HOST:localhost}")
     private var transactionServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_SERVICE_READS_SERVICE_PORT:9997}")
+    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT:9997}")
     private var transactionServicePort: Int = 9997
 
     @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_HOST:localhost}")
@@ -29,9 +29,9 @@ open class TransactionApiConfig {
     open fun getTransactionService(): TransactionServiceGrpcKt.TransactionServiceCoroutineStub {
         logger.info("Connecting to transaction-service at ${transactionServiceHost}:${transactionServicePort}")
         val channel = ManagedChannelBuilder
-                .forAddress(transactionServiceHost, transactionServicePort)
-                .usePlaintext()
-                .build()
+            .forAddress(transactionServiceHost, transactionServicePort)
+            .usePlaintext()
+            .build()
         return TransactionServiceGrpcKt.TransactionServiceCoroutineStub(channel)
     }
 
@@ -39,9 +39,9 @@ open class TransactionApiConfig {
     open fun getTransactionImportService(): TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub {
         logger.info("Connecting to transaction-import-service at ${transactionImportServiceHost}:${transactionImportServicePort}")
         val channel = ManagedChannelBuilder
-                .forAddress(transactionImportServiceHost, transactionImportServicePort)
-                .usePlaintext()
-                .build()
+            .forAddress(transactionImportServiceHost, transactionImportServicePort)
+            .usePlaintext()
+            .build()
         return TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub(channel)
     }
 }
