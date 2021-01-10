@@ -2,13 +2,12 @@ podTemplate(
         label: 'mypod',
         containers: [
                 containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
-                containerTemplate(name: 'maven', image: 'maven:3.6.3-openjdk-15-slim', command: 'cat', ttyEnabled: true),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
                 containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.20.1', command: 'cat', ttyEnabled: true)
         ],
         volumes: [
                 hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-                hostPathVolume(mountPath: '/root/.m2', hostPath: '/root/.m2'),
+                hostPathVolume(mountPath: '/root/.gradle', hostPath: '/root/.gradle'),
         ]
 ) {
     node('mypod') {
@@ -44,10 +43,8 @@ podTemplate(
         }
 
         stage('Build') {
-            container('maven') {
-                configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_GLOBAL_SETTINGS')]) {
-                    sh 'mvn -T4 -f backend -B -gs $MAVEN_GLOBAL_SETTINGS clean package'
-                }
+            configFileProvider([configFile(fileId: 'gradle-settings', variable: 'GRADLE_GLOBAL_SETTINGS')]) {
+                sh './gradlew build'
             }
         }
 
