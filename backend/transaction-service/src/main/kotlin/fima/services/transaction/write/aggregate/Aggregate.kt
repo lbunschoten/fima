@@ -1,7 +1,7 @@
 package fima.services.transaction.write.aggregate
 
 interface Aggregate {
-  val version: Int
+    val version: Int
 
-  fun validate(): Set<String>
+    fun validate(): Set<String>
 }

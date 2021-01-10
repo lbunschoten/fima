@@ -1,14 +1,16 @@
-podTemplate(label: 'mypod', containers: [
-    containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'maven', image: 'maven:3.6.3-openjdk-15-slim', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.20.1', command: 'cat', ttyEnabled: true)
-  ],
-  volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-    hostPathVolume(mountPath: '/root/.m2', hostPath: '/root/.m2'),
-  ]
-  ) {
+podTemplate(
+        label: 'mypod',
+        containers: [
+                containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
+                containerTemplate(name: 'maven', image: 'maven:3.6.3-openjdk-15-slim', command: 'cat', ttyEnabled: true),
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.20.1', command: 'cat', ttyEnabled: true)
+        ],
+        volumes: [
+                hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+                hostPathVolume(mountPath: '/root/.m2', hostPath: '/root/.m2'),
+        ]
+) {
     node('mypod') {
         def services = ['api', 'transaction-service', 'transaction-import-service']
         def buildImages = [:]
@@ -16,7 +18,7 @@ podTemplate(label: 'mypod', containers: [
 
         services.each { service ->
             deployments[service] = {
-                stage ("Deploy ${service}") {
+                stage("Deploy ${service}") {
                     dir("backend/${service}") {
                         sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
@@ -26,7 +28,7 @@ podTemplate(label: 'mypod', containers: [
             }
 
             buildImages[service] = {
-                stage ("Build docker image for ${service}") {
+                stage("Build docker image for ${service}") {
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"

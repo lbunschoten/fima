@@ -1,8 +1,9 @@
-package fima.transaction.transaction
+package fima.api.transaction
 
+import fima.domain.transaction.MonthInYear
 import fima.services.transaction.GetRecentTransactionsRequest
 import fima.services.transaction.GetTransactionRequest
-import fima.services.transaction.MonthInYear
+import fima.services.transaction.TagTransactionsRequest
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transaction.TransactionsStatisticsRequest
 import fima.services.transactionimport.ImportTransactionsRequest
@@ -33,15 +34,18 @@ class TransactionController @Autowired constructor(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @CrossOrigin
-    @GetMapping("/{id}")
+    @GetMapping("/transaction/{id}")
     suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
         val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
 
-        return transactionService.getTransaction(request).transaction.simple()
+        return transactionService
+            .getTransaction(request)
+            .transaction
+            .let(Transaction::fromProto)
     }
 
     @CrossOrigin
-    @GetMapping("/recent")
+    @GetMapping("/transaction/recent")
     suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
         val request = GetRecentTransactionsRequest
             .newBuilder()
@@ -49,21 +53,35 @@ class TransactionController @Autowired constructor(
             .setLimit(limit)
             .build()
 
-        return transactionService.getRecentTransactions(request).transactionsList.map { it.simple() }
+        return transactionService
+            .getRecentTransactions(request)
+            .transactionsList
+            .map(Transaction::fromProto)
     }
 
     @CrossOrigin
-    @GetMapping("/statistics")
-    suspend fun getStatistics(): List<TransactionStatistics> {
+    @GetMapping("/transaction/statistics")
+    suspend fun getStatistics(): List<MonthlyTransactionStatistics> {
         val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
         val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
         return transactionService
             .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
             .monthlyStatisticsList
-            .map { it.simple() }
+            .map(MonthlyTransactionStatistics::fromProto)
     }
 
-    @PutMapping("/import")
+    @GetMapping("/tag")
+    suspend fun tagTransactions(): ResponseEntity<String> {
+        logger.info("Received request for tagging all transactions")
+
+        val request = TagTransactionsRequest.newBuilder().build()
+
+        transactionService.tagTransactions(request)
+
+        return ResponseEntity.ok("Successfully tagged all transactions")
+    }
+
+    @PutMapping("/transaction/import")
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
 

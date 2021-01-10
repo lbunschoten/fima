@@ -9,5 +9,5 @@ option java_package = "fima.events.transaction";
 option java_outer_classname = "TransactionEventsProtos";
 
 message TransactionAddedEvent {
-    domain.Transaction transaction = 1;
+  domain.Transaction transaction = 1;
 }

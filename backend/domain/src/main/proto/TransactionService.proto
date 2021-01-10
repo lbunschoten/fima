@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package services;
+
+import "TransactionDomain.proto";
+
+option java_multiple_files = true;
+option java_package = "fima.services.transaction";
+option java_outer_classname = "TransactionServiceProtos";
+
+message GetTransactionRequest {
+  string id = 1;
+}
+
+message GetTransactionResponse {
+  domain.Transaction transaction = 1;
+}
+
+message GetRecentTransactionsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message GetRecentTransactionResponse {
+  repeated domain.Transaction transactions = 1;
+}
+
+message InsertTransactionRequest {
+  domain.RawTransaction transaction = 1;
+}
+
+message InsertTransactionResponse {
+  domain.RawTransaction transactions = 1;
+}
+
+message DeleteTransactionRequest {
+  string id = 1;
+}
+
+message DeleteTransactionResponse {
+}
+
+message TransactionsStatisticsRequest {
+  domain.MonthInYear startDate = 1;
+  domain.MonthInYear endDate = 2;
+}
+
+message TransactionStatisticsResponse {
+  repeated domain.MonthlyTransactionStatistics monthlyStatistics = 1;
+}
+
+message OpenBankAccountRequest {
+  string accountNumber = 1;
+  float initialBalance = 2;
+}
+
+message OpenBankAccountResponse {
+  repeated string errorMessages = 1;
+}
+
+message WithdrawRequest {
+  int32 date = 1;
+  string name = 2;
+  string from_account = 3;
+  string to_account = 4;
+  string type = 5;
+  int64 amountInCents = 6;
+  string details = 7;
+}
+
+message WithdrawResponse {
+  repeated string errorMessages = 1;
+}
+
+message DepositRequest {
+  int32 date = 1;
+  string name = 2;
+  string from_account = 3;
+  string to_account = 4;
+  string type = 5;
+  int64 amountInCents = 6;
+  string details = 7;
+}
+
+message DepositResponse {
+  repeated string errorMessages = 1;
+}
+
+message StoreTaggingRuleRequest {
+  repeated domain.TaggingRule taggingRules = 1;
+}
+
+message StoreTaggingRuleResponse {
+  repeated string errorMessages = 1;
+}
+
+message GetTaggingRulesRequest {
+}
+
+message TagTransactionsRequest {
+}
+
+message TagTransactionsResponse {
+}
+
+message GetTaggingRulesResponse {
+  repeated domain.TaggingRule taggingRules = 1;
+}
+
+service TransactionService {
+
+  rpc getTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
+
+  rpc getRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionResponse) {}
+
+  rpc getMonthlyStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
+
+
+  rpc getTaggingRules(GetTaggingRulesRequest) returns (GetTaggingRulesResponse) {}
+
+  rpc storeTaggingRule(StoreTaggingRuleRequest) returns (StoreTaggingRuleResponse) {}
+
+
+  rpc openBankAccount(OpenBankAccountRequest) returns (OpenBankAccountResponse) {}
+
+  rpc withdraw(WithdrawRequest) returns (WithdrawResponse) {}
+
+  rpc deposit(DepositRequest) returns (DepositResponse) {}
+
+  rpc tagTransactions(TagTransactionsRequest) returns (TagTransactionsResponse) {}
+
+}
