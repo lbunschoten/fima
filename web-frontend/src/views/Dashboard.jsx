@@ -646,13 +646,13 @@ class Dashboard extends React.Component {
                     </thead>
                     <tbody>
                       {
-                        this.state.transactions.map(t => (
-                          <tr>
+                        this.state.transactions.map(t =>
+                          <tr key={t.id}>
                             <td>{t.date}</td>
                             <td>{t.name}</td>
-                            <td className="text-center">&euro;{parseFloat(t.amount / 100).toFixed(2)}</td>
+                            <td className="text-center">&euro;{parseFloat((t.amount / 100).toString()).toFixed(2)}</td>
                           </tr>
-                        ))
+                        )
                       }
                     </tbody>
                   </Table>

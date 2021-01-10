@@ -15,6 +15,8 @@ import {
   Col
 } from "reactstrap";
 
+import emilyz from "../assets/img/emilyz.jpg";
+
 class UserProfile extends React.Component {
   render() {
     return (
@@ -158,7 +160,7 @@ class UserProfile extends React.Component {
                       <img
                         alt="..."
                         className="avatar"
-                        src={require("assets/img/emilyz.jpg")}
+                        src={emilyz}
                       />
                       <h5 className="title">Mike Andrew</h5>
                     </a>
