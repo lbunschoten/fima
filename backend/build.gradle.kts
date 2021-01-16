@@ -8,6 +8,7 @@ plugins {
 allprojects {
     repositories {
         maven {
+            println(properties["nexus_url"])
             credentials {
                 username = properties["nexus_username"].toString()
                 password = properties["nexus_password"].toString()
