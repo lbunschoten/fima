@@ -13,6 +13,7 @@ allprojects {
                 password = properties["nexus_password"].toString()
             }
             url = uri(properties["nexus_url"].toString())
+            isAllowInsecureProtocol = true
         }
     }
 

@@ -35,3 +35,8 @@ java {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    jvmArgs("-Xshare:off")
+}

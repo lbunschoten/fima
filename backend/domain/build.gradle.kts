@@ -3,6 +3,7 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.google.protobuf") version "0.8.13"
@@ -21,14 +22,13 @@ description = "domain"
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
-    sourceSets.main.get().resources.srcDir("src/main/proto")
     sourceSets.main.get().java.srcDirs(
         "build/generated/source/proto/main/grpckt",
         "build/generated/source/proto/main/java"
     )
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
 }
 
