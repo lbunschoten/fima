@@ -5,7 +5,7 @@ description = "api"
 
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow")
 }
 
 dependencies {
