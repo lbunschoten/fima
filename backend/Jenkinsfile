@@ -15,10 +15,6 @@ podTemplate(
         def buildImages = [:]
         def deployments = [:]
 
-        environment {
-            NEXUS = credentials("nexus")
-        }
-
         services.each { service ->
             deployments[service] = {
                 stage("Deploy ${service}") {
@@ -47,7 +43,7 @@ podTemplate(
         }
 
         stage('Build') {
-            configFileProvider([configFile(fileId: 'gradle-settings', variable: 'GRADLE_GLOBAL_SETTINGS')]) {
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                 sh './backend/gradlew build -p backend --warning-mode all'
             }
         }
