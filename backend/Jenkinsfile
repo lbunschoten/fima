@@ -23,7 +23,7 @@ podTemplate(
                     dir("backend/${service}") {
                         sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                        sh "export IMAGE_HASH=${service_hashes[service]}"
+                        sh "sed -i 's/\$IMAGE_HASH/${service_hashes[service]}/g' manifest.yaml"
                         sh "kubectl apply -f manifest.yaml --namespace=default"
                     }
                 }
