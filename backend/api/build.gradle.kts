@@ -7,6 +7,7 @@ description = "api"
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
+    id("org.springframework.boot") version "2.4.1"
 }
 
 dependencies {
@@ -54,3 +55,11 @@ tasks.withType<ShadowJar> {
     })
 }
 
+springBoot {
+    // Make the build repeatable by removing the time from the build-info.properties
+    buildInfo {
+        properties {
+            time = null
+        }
+    }
+}
