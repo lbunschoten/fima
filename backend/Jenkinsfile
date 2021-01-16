@@ -15,6 +15,7 @@ podTemplate(
         def services = ['api', 'transaction-service', 'transaction-import-service']
         def buildImages = [:]
         def deployments = [:]
+        def service_hashes = {}
 
         services.each { service ->
             deployments[service] = {
@@ -22,7 +23,7 @@ podTemplate(
                     dir("backend/${service}") {
                         sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
                         sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                        sh "kubectl apply -f manifest.yaml --namespace=default"
+                        sh "IMAGE_HASH=${service_hashes[service]} kubectl apply -f manifest.yaml --namespace=default"
                     }
                 }
             }
@@ -32,6 +33,7 @@ podTemplate(
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
+                        service_hashes[service] = sh(script: "docker images --no-trunc --quiet' ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}", returnStdout: true)
                     }
                 }
             }

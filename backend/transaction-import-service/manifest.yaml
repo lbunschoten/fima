@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: transaction-import-service
-          image: "$DOCKER_REGISTRY_PREFIX/transaction-import-service:$BUILD_ID"
+          image: "$DOCKER_REGISTRY_PREFIX/transaction-import-service:$IMAGE_HASH"
           ports:
             - name: http
               containerPort: 9997
