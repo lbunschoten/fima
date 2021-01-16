@@ -6,6 +6,19 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0" apply false
 }
 
+buildscript {
+    repositories {
+        maven {
+            credentials {
+                username = System.getenv("NEXUS_USERNAME")
+                password = System.getenv("NEXUS_PASSWORD")
+            }
+            url = uri(System.getenv("NEXUS_URL"))
+            isAllowInsecureProtocol = true
+        }
+    }
+}
+
 allprojects {
     repositories {
         maven {

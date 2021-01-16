@@ -6,6 +6,7 @@ description = "api"
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
+    id("org.springframework.boot") version "2.4.1"
 }
 
 dependencies {
