@@ -36,7 +36,7 @@ allprojects {
     }
 
     tasks.withType<AbstractArchiveTask> {
-        isPreserveFileTimestamps = true
+        isPreserveFileTimestamps = false
         isReproducibleFileOrder = true
     }
 }
