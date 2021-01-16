@@ -33,7 +33,7 @@ podTemplate(
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
-                        service_hashes[service] = sh(script: "docker images --no-trunc --quiet' ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}", returnStdout: true)
+                        service_hashes[service] = sh(script: "docker images --no-trunc --quiet ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}", returnStdout: true)
                     }
                 }
             }
