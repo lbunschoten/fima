@@ -12,7 +12,7 @@ data class MonthlyTransactionStatistics(
     val numTransactions: Int,
     val sum: Long,
     val balance: Long
-): ToProtoConvertable<ProtoMonthlyTransactionStatistics> {
+) : ToProtoConvertable<ProtoMonthlyTransactionStatistics> {
 
     override fun toProto(): ProtoMonthlyTransactionStatistics {
         return ProtoMonthlyTransactionStatistics
@@ -27,7 +27,7 @@ data class MonthlyTransactionStatistics(
 
 }
 
-class MonthlyTransactionStatisticsRowMapper: RowMapper<MonthlyTransactionStatistics> {
+class MonthlyTransactionStatisticsRowMapper : RowMapper<MonthlyTransactionStatistics> {
     override fun map(rs: ResultSet, ctx: StatementContext): MonthlyTransactionStatistics {
         return MonthlyTransactionStatistics(
             month = rs.getInt("month"),
