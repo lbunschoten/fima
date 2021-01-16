@@ -35,6 +35,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getRecentTransactions(request: GetRecentTransactionsRequest): GetRecentTransactionResponse {
+        logger.info("Received request for recent transactions")
+
         return try {
             GetRecentTransactionResponse
                 .newBuilder()
