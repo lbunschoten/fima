@@ -8,12 +8,11 @@ plugins {
 allprojects {
     repositories {
         maven {
-            println(System.getenv())
             credentials {
-                username = properties["nexus_username"].toString()
-                password = properties["nexus_password"].toString()
+                username = System.getenv("NEXUS_USERNAME")
+                password = System.getenv("NEXUS_PASSWORD")
             }
-            url = uri(properties["nexus_url"].toString())
+            url = uri(System.getenv("NEXUS_URL"))
             isAllowInsecureProtocol = true
         }
     }
