@@ -15,6 +15,10 @@ podTemplate(
         def buildImages = [:]
         def deployments = [:]
 
+        environment {
+            NEXUS = credentials("nexus")
+        }
+
         services.each { service ->
             deployments[service] = {
                 stage("Deploy ${service}") {
