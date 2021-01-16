@@ -1,12 +1,11 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "api"
 
 plugins {
+    application
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
-    id("org.springframework.boot") version "2.4.1"
 }
 
 dependencies {
@@ -36,6 +35,10 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
+}
+
+application {
+    mainClass.set("fima.api.TransactionApiKt")
 }
 
 //tasks.withType<ShadowJar> {
