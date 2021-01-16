@@ -44,7 +44,7 @@ podTemplate(
 
         stage('Build') {
             configFileProvider([configFile(fileId: 'gradle-settings', variable: 'GRADLE_GLOBAL_SETTINGS')]) {
-                sh './backend/gradlew build -p backend'
+                sh './backend/gradlew build -p backend --warning-mode all'
             }
         }
 
