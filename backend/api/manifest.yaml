@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: "$DOCKER_REGISTRY_PREFIX/api@$IMAGE_HASH"
+          image: "$DOCKER_IMAGE"
           ports:
             - name: http
               containerPort: 8080

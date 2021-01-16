@@ -15,15 +15,13 @@ podTemplate(
         def services = ['api', 'transaction-service', 'transaction-import-service']
         def buildImages = [:]
         def deployments = [:]
-        def service_hashes = {}
+        def docker_images = {}
 
         services.each { service ->
             deployments[service] = {
                 stage("Deploy ${service}") {
                     dir("backend/${service}") {
-                        sh "sed -i 's/\$DOCKER_REGISTRY_PREFIX/${env.DOCKER_REGISTRY_PREFIX}/g' manifest.yaml"
-                        sh "sed -i 's/\$BUILD_ID/${env.BUILD_ID}/g' manifest.yaml"
-                        sh "sed -i 's/\$IMAGE_HASH/${service_hashes[service]}/g' manifest.yaml"
+                        sh "sed -i 's/\$DOCKER_IMAGE/${docker_images[service].trim()}/g' manifest.yaml"
                         sh "kubectl apply -f manifest.yaml --namespace=default"
                     }
                 }
@@ -32,9 +30,9 @@ podTemplate(
             buildImages[service] = {
                 stage("Build docker image for ${service}") {
                     dir("backend/${service}") {
-                        sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID} -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
-                        sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}"
-                        service_hashes[service] = sh(script: "docker images --no-trunc --quiet ${env.DOCKER_REGISTRY_PREFIX}/${service}:${env.BUILD_ID}", returnStdout: true)
+                        sh "docker build ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
+                        sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest"
+                        docker_images[service] = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest", returnStdout: true)
                     }
                 }
             }
