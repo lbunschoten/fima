@@ -51,6 +51,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getMonthlyStatistics(request: TransactionsStatisticsRequest): TransactionStatisticsResponse {
+        logger.info("Received request for monthly transaction statistics")
+
         return TransactionStatisticsResponse
             .newBuilder()
             .addAllMonthlyStatistics(
