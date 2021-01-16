@@ -21,7 +21,7 @@ podTemplate(
             deployments[service] = {
                 stage("Deploy ${service}") {
                     dir("backend/${service}") {
-                        sh "sed -i 's/\$DOCKER_IMAGE/${docker_images[service].trim()}/g' manifest.yaml"
+                        sh "sed -i 's#\$DOCKER_IMAGE#${docker_images[service].trim()}#g' manifest.yaml"
                         sh "kubectl apply -f manifest.yaml --namespace=default"
                     }
                 }
