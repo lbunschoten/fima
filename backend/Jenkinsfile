@@ -30,7 +30,7 @@ podTemplate(
             buildImages[service] = {
                 stage("Build docker image for ${service}") {
                     dir("backend/${service}") {
-                        sh "docker build ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
+                        sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest"
                         docker_images[service] = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest", returnStdout: true)
                     }
