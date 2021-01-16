@@ -44,8 +44,10 @@ podTemplate(
         }
 
         stage('Build') {
-            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                sh './backend/gradlew build -p backend --warning-mode all'
+            container('jdk') {
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh './backend/gradlew build -p backend --warning-mode all --no-daemon'
+                }
             }
         }
 
