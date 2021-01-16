@@ -1,6 +1,6 @@
 FROM adoptopenjdk/openjdk15:jre15u-debianslim-nightly
 
-COPY ./target/transaction-import-service-1.0.0-SNAPSHOT-jar-with-dependencies.jar fima.jar
+COPY ./build/transaction-import-service-all.jar fima.jar
 
 EXPOSE 9997
 
