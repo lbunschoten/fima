@@ -5,7 +5,7 @@ description = "transaction-service"
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 dependencies {
@@ -40,4 +40,8 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-Xshare:off")
+}
+
+tasks.register("package") {
+    dependsOn("shadowJar")
 }

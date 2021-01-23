@@ -22,10 +22,10 @@ description = "domain"
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
-    sourceSets.main.get().java.srcDirs(
+    sourceSets.main.get().java.setSrcDirs(listOf(
         "build/generated/source/proto/main/grpckt",
         "build/generated/source/proto/main/java"
-    )
+    ))
 }
 
 tasks.withType<KotlinCompile> {

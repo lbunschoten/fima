@@ -35,3 +35,7 @@ java {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
 }
+
+tasks.register("package") {
+    dependsOn("bootJar")
+}

@@ -4,7 +4,7 @@ description = "transaction-import-service"
 
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 dependencies {
@@ -28,4 +28,8 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
+}
+
+tasks.register("package") {
+    dependsOn("shadowJar")
 }
