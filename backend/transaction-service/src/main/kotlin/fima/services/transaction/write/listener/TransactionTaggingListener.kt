@@ -13,7 +13,4 @@ class TransactionTaggingListener(
             taggingService.tagTransaction(event)
         }
     }
-
-
-
 }

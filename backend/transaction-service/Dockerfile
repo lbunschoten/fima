@@ -7,7 +7,7 @@ RUN apt-get update && \
     iputils-ping \
     telnet
 
-COPY ./target/transaction-service-1.0.0-SNAPSHOT-jar-with-dependencies.jar fima.jar
+COPY ./build/libs/transaction-service-all.jar fima.jar
 
 EXPOSE 9997
 

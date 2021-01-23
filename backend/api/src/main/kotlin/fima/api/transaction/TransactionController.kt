@@ -47,6 +47,8 @@ class TransactionController @Autowired constructor(
     @CrossOrigin
     @GetMapping("/transaction/recent")
     suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
+        logger.info("Received request for recent transactions")
+
         val request = GetRecentTransactionsRequest
             .newBuilder()
             .setOffset(offset)
@@ -62,6 +64,8 @@ class TransactionController @Autowired constructor(
     @CrossOrigin
     @GetMapping("/transaction/statistics")
     suspend fun getStatistics(): List<MonthlyTransactionStatistics> {
+        logger.info("Received request for transaction statistics")
+
         val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
         val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
         return transactionService

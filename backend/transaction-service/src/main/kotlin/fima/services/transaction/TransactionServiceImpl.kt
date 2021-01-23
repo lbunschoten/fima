@@ -24,6 +24,7 @@ class TransactionServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override suspend fun getTransaction(request: GetTransactionRequest): GetTransactionResponse {
+        logger.info("Received request for transaction ${request.id}")
         return GetTransactionResponse
             .newBuilder()
             .setTransaction(
@@ -35,6 +36,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getRecentTransactions(request: GetRecentTransactionsRequest): GetRecentTransactionResponse {
+        logger.info("Received request for recent transactions")
+
         return try {
             GetRecentTransactionResponse
                 .newBuilder()
@@ -51,6 +54,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getMonthlyStatistics(request: TransactionsStatisticsRequest): TransactionStatisticsResponse {
+        logger.info("Received request for monthly transaction statistics")
+
         return TransactionStatisticsResponse
             .newBuilder()
             .addAllMonthlyStatistics(
@@ -113,6 +118,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getTaggingRules(request: GetTaggingRulesRequest): GetTaggingRulesResponse {
+        logger.info("Received request for tagging rules")
+
         val taggingRules = try {
             taggingRuleStore.getTaggingRules()
         } catch (e: Exception) {
