@@ -1,12 +1,9 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 description = "api"
 
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
     id("org.springframework.boot") version "2.4.1"
 }
 
@@ -37,29 +34,4 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
-}
-
-tasks.withType<ShadowJar> {
-    manifest {
-        attributes["Main-Class"] = "fima.api.TransactionApiKt"
-    }
-
-    // Required for Spring
-    mergeServiceFiles()
-    append("META-INF/spring.handlers")
-    append("META-INF/spring.schemas")
-    append("META-INF/spring.tooling")
-    transform(PropertiesFileTransformer().apply {
-        paths = listOf("META-INF/spring.factories")
-        mergeStrategy = "append"
-    })
-}
-
-springBoot {
-    // Make the build repeatable by removing the time from the build-info.properties
-    buildInfo {
-        properties {
-            time = null
-        }
-    }
 }

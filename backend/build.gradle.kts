@@ -17,6 +17,11 @@ buildscript {
             isAllowInsecureProtocol = true
         }
     }
+
+    tasks.withType<AbstractArchiveTask> {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
 }
 
 allprojects {

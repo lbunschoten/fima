@@ -47,7 +47,7 @@ podTemplate(
         stage('Build') {
             container('jdk') {
                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh './backend/gradlew test shadowJar -p backend --warning-mode all --no-daemon'
+                    sh './backend/gradlew test bootJar -p backend --warning-mode all --no-daemon'
                 }
             }
         }
