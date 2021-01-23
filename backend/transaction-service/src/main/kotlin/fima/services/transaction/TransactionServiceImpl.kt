@@ -24,6 +24,7 @@ class TransactionServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override suspend fun getTransaction(request: GetTransactionRequest): GetTransactionResponse {
+        logger.info("Received request for transaction ${request.id}")
         return GetTransactionResponse
             .newBuilder()
             .setTransaction(
@@ -117,6 +118,8 @@ class TransactionServiceImpl(
     }
 
     override suspend fun getTaggingRules(request: GetTaggingRulesRequest): GetTaggingRulesResponse {
+        logger.info("Received request for tagging rules")
+
         val taggingRules = try {
             taggingRuleStore.getTaggingRules()
         } catch (e: Exception) {
