@@ -27,12 +27,31 @@ podTemplate(
                 }
             }
 
+            deployments["subscription-service"] = {
+                stage("Deploy subscription-service") {
+                    dir("backend/subscription-service") {
+                        sh "sed -i 's#\$DOCKER_IMAGE#${docker_images["subscription-service"].trim()}#g' manifest.yaml"
+                        sh "kubectl apply -f manifest.yaml --namespace=default"
+                    }
+                }
+            }
+
             buildImages[service] = {
                 stage("Build docker image for ${service}") {
                     dir("backend/${service}") {
                         sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest ."
                         sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest"
                         docker_images[service] = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${env.DOCKER_REGISTRY_PREFIX}/${service}:latest", returnStdout: true)
+                    }
+                }
+            }
+
+            buildImages["subscription-service"] = {
+                stage("Build docker image for subscription-service") {
+                    dir("backend/subscription-service") {
+                        sh "docker build -t ${env.DOCKER_REGISTRY_PREFIX}/subscription-service:latest ."
+                        sh "docker push ${env.DOCKER_REGISTRY_PREFIX}/subscription-service:latest"
+                        docker_images["subscription-service"] = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${env.DOCKER_REGISTRY_PREFIX}/subscription-service:latest", returnStdout: true)
                     }
                 }
             }
@@ -48,6 +67,9 @@ podTemplate(
             container('jdk') {
                 withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                     sh './backend/gradlew build package -p backend --warning-mode all --no-daemon --parallel'
+                    dir('./backend/subscription-service') {
+                        sh 'sbt assembly'
+                    }
                 }
             }
         }

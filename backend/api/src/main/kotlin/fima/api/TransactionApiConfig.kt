@@ -1,5 +1,6 @@
 package fima.api
 
+import fima.services.subscription.SubscriptionServiceGrpcKt
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
@@ -25,6 +26,12 @@ open class TransactionApiConfig {
     @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_PORT:9997}")
     private var transactionImportServicePort: Int = 9997
 
+    @Value("\${SUBSCRIPTION_SERVICE_SERVICE_HOST:localhost}")
+    private var subscriptionServiceHost: String = "localhost"
+
+    @Value("\${SUBSCRIPTION_SERVICE_SERVICE_PORT:9997}")
+    private var subscriptionServicePort: Int = 9997
+
     @Bean
     open fun getTransactionService(): TransactionServiceGrpcKt.TransactionServiceCoroutineStub {
         logger.info("Connecting to transaction-service at ${transactionServiceHost}:${transactionServicePort}")
@@ -43,5 +50,15 @@ open class TransactionApiConfig {
             .usePlaintext()
             .build()
         return TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub(channel)
+    }
+
+    @Bean
+    open fun getSubscriptionService(): SubscriptionServiceGrpcKt.SubscriptionServiceCoroutineStub {
+        logger.info("Connecting to subscription-service at ${subscriptionServiceHost}:${subscriptionServicePort}")
+        val channel = ManagedChannelBuilder
+            .forAddress(subscriptionServiceHost, subscriptionServicePort)
+            .usePlaintext()
+            .build()
+        return SubscriptionServiceGrpcKt.SubscriptionServiceCoroutineStub(channel)
     }
 }

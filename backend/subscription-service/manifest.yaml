@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscription-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: subscription-service
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: backend
+        track: stable
+        name: subscription-service
+    spec:
+      containers:
+        - name: subscription-service
+          image: "$DOCKER_IMAGE"
+          ports:
+            - name: http
+              containerPort: 9997
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fima-mysql-db-pass
+                  key: password
+            - name: KAFKA_HOST
+              value: 10.108.62.237
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: subscription-service
+spec:
+  selector:
+    app: fima
+    tier: backend
+    name: subscription-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9997
+      targetPort: http

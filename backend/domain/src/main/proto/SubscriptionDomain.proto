@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package domain;
+
+option java_multiple_files = true;
+option java_package = "fima.domain.subscription";
+option java_outer_classname = "SubscriptionServiceProtos";
+
+message Subscription {
+  string name = 1;
+}

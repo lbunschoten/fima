@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package services;
+
+import "SubscriptionDomain.proto";
+
+option java_multiple_files = true;
+option java_package = "fima.services.subscription";
+option java_outer_classname = "SubscriptionServiceProtos";
+
+message GetSubscriptionRequest {
+  string id = 1;
+}
+
+message GetSubscriptionResponse {
+  domain.Subscription subscription = 1;
+}
+
+service SubscriptionService {
+
+  rpc getSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse) {}
+
+}

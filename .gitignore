@@ -12,3 +12,4 @@ env.json
 .mvn
 *.kotlintest
 .gradle/
+target/
