@@ -20,7 +20,7 @@ message GetSubscriptionsRequest {
 }
 
 message GetSubscriptionsResponse {
-  repeated domain.Subscription subscription = 1;
+  repeated domain.Subscription subscriptions = 1;
 }
 
 service SubscriptionService {

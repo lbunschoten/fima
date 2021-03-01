@@ -40,7 +40,7 @@ class SubscriptionController @Autowired constructor(
 
         return subscriptionService
             .getSubscriptions(request)
-            .subscriptionList
+            .subscriptionsList
             .map(Subscription::fromProto)
     }
 
