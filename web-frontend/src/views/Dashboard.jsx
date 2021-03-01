@@ -413,7 +413,7 @@ class Dashboard extends React.Component {
                     <Table>
                       <tbody>
                       {
-                          this.state.subscriptions.map((s, index) =>
+                          this.state.subscriptions.map(s =>
                             <tr key={s.id}>
                               <td>
                                 <p className="title">{s.name}</p>
@@ -424,7 +424,7 @@ class Dashboard extends React.Component {
                               <td className="td-actions text-right">
                                 <Button
                                   color="link"
-                                  id={index}
+                                  id={s.id}
                                   title=""
                                   type="button"
                                 >
@@ -432,7 +432,7 @@ class Dashboard extends React.Component {
                                 </Button>
                                 <UncontrolledTooltip
                                   delay={0}
-                                  target={index}
+                                  target={s.id}
                                   placement="right"
                                 >
                                   View transactions
