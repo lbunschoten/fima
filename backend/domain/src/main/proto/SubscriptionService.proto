@@ -16,8 +16,17 @@ message GetSubscriptionResponse {
   domain.Subscription subscription = 1;
 }
 
+message GetSubscriptionsRequest {
+}
+
+message GetSubscriptionsResponse {
+  repeated domain.Subscription subscription = 1;
+}
+
 service SubscriptionService {
 
   rpc getSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse) {}
+
+  rpc getSubscriptions(GetSubscriptionsRequest) returns (GetSubscriptionsResponse) {}
 
 }

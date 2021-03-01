@@ -1,6 +1,7 @@
 package fima.api.subscription
 
 import fima.services.subscription.GetSubscriptionRequest
+import fima.services.subscription.GetSubscriptionsRequest
 import fima.services.subscription.SubscriptionServiceGrpcKt
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +19,7 @@ class SubscriptionController @Autowired constructor(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @CrossOrigin
-    @GetMapping("/subscription/{id}")
+    @GetMapping("/subscriptions/{id}")
     suspend fun getSubscription(@PathVariable("id") subscriptionId: UUID): Subscription {
         logger.info("Received request to get subscription $subscriptionId")
 
@@ -28,6 +29,19 @@ class SubscriptionController @Autowired constructor(
             .getSubscription(request)
             .subscription
             .let(Subscription::fromProto)
+    }
+
+    @CrossOrigin
+    @GetMapping("/subscriptions")
+    suspend fun getSubscriptions(): List<Subscription> {
+        logger.info("Received request to get subscriptions")
+
+        val request = GetSubscriptionsRequest.newBuilder().build()
+
+        return subscriptionService
+            .getSubscriptions(request)
+            .subscriptionList
+            .map(Subscription::fromProto)
     }
 
 }

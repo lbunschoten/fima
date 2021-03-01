@@ -23,7 +23,10 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
     private[this] var server: Server = null
 
     private def start(): Unit = {
-        server = ServerBuilder.forPort(SubscriptionServiceServer.port).addService(SubscriptionService.bindService(new SubscriptionServiceImpl, executionContext)).build.start
+        server = ServerBuilder
+          .forPort(SubscriptionServiceServer.port)
+          .addService(SubscriptionService.bindService(new SubscriptionServiceImpl, executionContext))
+          .build.start
         println("Server started, listening on " + SubscriptionServiceServer.port)
         sys.addShutdownHook {
             System.err.println("*** shutting down gRPC server since JVM is shutting down")
