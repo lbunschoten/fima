@@ -424,7 +424,7 @@ class Dashboard extends React.Component {
                               <td className="td-actions text-right">
                                 <Button
                                   color="link"
-                                  id="tooltip${s.id}"
+                                  id={s.id}
                                   title=""
                                   type="button"
                                 >
@@ -432,7 +432,7 @@ class Dashboard extends React.Component {
                                 </Button>
                                 <UncontrolledTooltip
                                   delay={0}
-                                  target="tooltip{s.id}"
+                                  target={s.id}
                                   placement="right"
                                 >
                                   View transactions
