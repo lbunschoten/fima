@@ -41,7 +41,7 @@ class Dashboard extends React.Component {
       data1: chartExample1.data1,
       data2: chartExample1.data2,
       data3: chartExample1.data3,
-      transactions: []
+      transactions: [],
       subscriptions: []
     };
   }
