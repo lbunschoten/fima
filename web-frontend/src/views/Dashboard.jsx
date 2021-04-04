@@ -432,7 +432,7 @@ class Dashboard extends React.Component {
                                 </Button>
                                 <UncontrolledTooltip
                                   delay={0}
-                                  target={`tooltip-${s.id}``}
+                                  target={`tooltip-${s.id}`}
                                   placement="right"
                                 >
                                   View transactions
