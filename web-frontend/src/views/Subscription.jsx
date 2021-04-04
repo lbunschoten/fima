@@ -1,17 +1,28 @@
 import React from "react";
 
 // reactstrap components
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  Table,
-  Row,
-  Col
-} from "reactstrap";
+import {Card, CardBody, CardHeader, CardTitle, Col, Row, Table} from "reactstrap";
 
-class Tables extends React.Component {
+class Subscription extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+        subscription: {}
+    }
+  }
+
+
+  componentDidMount(){
+    fetch(`http://api.fima.test/subscriptions/${this.props.match.params.id}`)
+      .then(res => res.json())
+      .then(result => {
+        this.setState({
+          subscription: result
+        });
+      });
+  }
+
   render() {
     return (
       <>
@@ -151,4 +162,4 @@ class Tables extends React.Component {
   }
 }
 
-export default Tables;
+export default Subscription;

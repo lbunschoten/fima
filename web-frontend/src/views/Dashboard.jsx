@@ -2,36 +2,14 @@ import React from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react plugin used to create charts
-import { Line, Bar } from "react-chartjs-2";
+import {Bar, Line} from "react-chartjs-2";
 
 // reactstrap components
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  Label,
-  FormGroup,
-  Input,
-  Table,
-  Row,
-  Col,
-  UncontrolledTooltip
-} from "reactstrap";
+import {Button, ButtonGroup, Card, CardBody, CardHeader, CardTitle, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, Table, UncontrolledDropdown, UncontrolledTooltip} from "reactstrap";
 
 // core components
-import {
-  chartExample1,
-  chartExample2,
-  chartExample3,
-  chartExample4
-} from "../variables/charts.jsx";
+import {chartExample1, chartExample2, chartExample3, chartExample4} from "../variables/charts.jsx";
+import {Link} from "react-router-dom";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -422,20 +400,22 @@ class Dashboard extends React.Component {
                                 </p>
                               </td>
                               <td className="td-actions text-right">
-                                <Button
-                                  color="link"
-                                  id={`tooltip-${s.id}`}
-                                  title=""
-                                  type="button"
-                                >
-                                  <i className="tim-icons icon-bullet-list-67" />
-                                </Button>
+                                <Link to={`/admin/subscription/${s.id}`}>
+                                    <Button
+                                      color="link"
+                                      id={`tooltip-${s.id}`}
+                                      title=""
+                                      type="button"
+                                    >
+                                      <i className="tim-icons icon-bullet-list-67" />
+                                    </Button>
+                                </Link>
                                 <UncontrolledTooltip
                                   delay={0}
                                   target={`tooltip-${s.id}`}
                                   placement="right"
                                 >
-                                  View transactions
+                                View transactions
                                 </UncontrolledTooltip>
                               </td>
                             </tr>
