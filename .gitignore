@@ -13,3 +13,4 @@ env.json
 *.kotlintest
 .gradle/
 target/
+sbt.json
