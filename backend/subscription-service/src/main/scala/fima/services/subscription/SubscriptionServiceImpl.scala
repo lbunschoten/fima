@@ -11,7 +11,7 @@ class SubscriptionServiceImpl extends SubscriptionService {
 
   private val subscriptions = Seq(
     Subscription("15300971-6e0c-4990-a2fc-2d718a113820", "Spotifiy"),
-    Subscription("125300971-6e0c-4990-a2fc-2d718a113820", "Netflix")
+    Subscription("25300971-6e0c-4990-a2fc-2d718a113820", "Netflix")
   )
 
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
