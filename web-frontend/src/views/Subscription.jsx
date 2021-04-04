@@ -14,7 +14,7 @@ class Subscription extends React.Component {
 
 
   componentDidMount(){
-    fetch(`http://api.fima.test/subscriptions/${this.props.match.params.id}`)
+    fetch(`http://api.fima.test/subscription/${this.props.match.params.id}`)
       .then(res => res.json())
       .then(result => {
         this.setState({
