@@ -43,7 +43,7 @@ interface TransactionsStore {
                WHERE transaction_id = t.id
             ) as tags
         FROM transactions t
-        ORDER BY t.`date` DESC LIMIT :limit OFFSET :offset
+        ORDER BY t.date DESC LIMIT :limit OFFSET :offset
     """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getRecent(offset: Int, limit: Int): List<Transaction>
