@@ -34,7 +34,11 @@ spec:
       - image: postgres:13.2
         name: postgres
         env:
-        - name: POSTGRES_ROOT_PASSWORD
+        - name: POSTGRES_DB
+          value: "fima"
+        - name: POSTGRES_USER
+          value: "root"
+        - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: fima-postgres-db-pass
