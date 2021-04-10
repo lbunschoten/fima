@@ -9,10 +9,11 @@ interface TransactionsStore {
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM transaction_tags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
         FROM transactions t
     """)
@@ -21,10 +22,11 @@ interface TransactionsStore {
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM transaction_tags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
         FROM transactions t
         WHERE t.id = :id
@@ -34,10 +36,11 @@ interface TransactionsStore {
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM transaction_tags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
         FROM transactions t
         ORDER BY t.`date` DESC LIMIT :limit OFFSET :offset
