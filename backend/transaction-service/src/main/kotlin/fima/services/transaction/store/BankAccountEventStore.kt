@@ -10,14 +10,14 @@ class BankAccountEventStore(db: Jdbi) : EventStore(), Closeable {
 
     override fun aggregates(): List<String> {
         return handle
-            .select("SELECT DISTINCT aggregate_id FROM BankAccountEvents")
+            .select("SELECT DISTINCT aggregate_id FROM bank_account_events")
             .mapTo(String::class.java)
             .list()
     }
 
     override fun readEvents(aggregateId: String): List<Event> {
         val serializedEvents = handle
-            .select("SELECT event FROM BankAccountEvents WHERE aggregate_id = ?", aggregateId)
+            .select("SELECT event FROM bank_account_events WHERE aggregate_id = ?", aggregateId)
             .mapTo(String::class.java)
             .list()
 
@@ -27,7 +27,7 @@ class BankAccountEventStore(db: Jdbi) : EventStore(), Closeable {
     override fun writeEvents(aggregateId: String, events: List<Event>) {
         events.forEach { event ->
             handle.execute("""
-          INSERT INTO BankAccountEvents(aggregate_id, at, version, event)
+          INSERT INTO bank_account_events(aggregate_id, at, version, event)
           VALUES (?, ?, ?, ?)
         """, aggregateId, event.at, event.version.toLong(), serializeEvent(event))
         }

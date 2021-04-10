@@ -36,16 +36,16 @@ class TransactionStatisticsStoreImpl(
 
     private fun insertStatistic(sum: Long, balance: Long, month: Int, year: Int) {
         handle.execute("""
-      INSERT INTO MonthlyTransactionStatistics (month, year, numTransactions, sum, balance)
+      INSERT INTO monthly_transaction_statistics (month, year, num_transactions, sum, balance)
       VALUES (?, ?, 1, ?, ?)
     """, month, year, sum, balance)
     }
 
     private fun updateStatistic(numTransactions: Int, sum: Long, balance: Long, month: Int, year: Int) {
         handle.execute("""
-        UPDATE MonthlyTransactionStatistics
+        UPDATE monthly_transaction_statistics
         SET 
-          numTransactions = ?,
+          num_transactions = ?,
           sum = ?,
           balance = ?
         WHERE month = ? AND year = ?
@@ -61,7 +61,7 @@ interface TransactionStatisticsStore {
 
     @SqlQuery("""
         SELECT *
-        FROM MonthlyTransactionStatistics
+        FROM monthly_transaction_statistics
         WHERE month = :month
         AND year = :year
     """)
@@ -70,7 +70,7 @@ interface TransactionStatisticsStore {
 
     @SqlQuery("""
         SELECT *
-        FROM MonthlyTransactionStatistics
+        FROM monthly_transaction_statistics
         WHERE ((month >= :startMonth AND year >= :startYear) OR year > :startYear)
         AND ((month <= :endMonth AND year <= :endYear) OR year < :endYear) 
         ORDER BY year, month

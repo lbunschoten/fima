@@ -9,7 +9,7 @@ import fima.domain.transaction.TaggingRule as ProtoTaggingRule
 
 interface TaggingRuleStore {
 
-    @SqlQuery("SELECT * FROM TransactionTaggingRule")
+    @SqlQuery("SELECT * FROM transaction_tagging_rule")
     @RegisterRowMapper(TaggingRuleMapper::class)
     fun getTaggingRules(): List<TaggingRule>
 }
@@ -23,7 +23,7 @@ class TaggingRulesStoreImpl(
     fun storeTaggingRule(taggingRule: ProtoTaggingRule) {
         handle
             .createUpdate("""
-                INSERT INTO TransactionTaggingRule (`id`, `regex`, `tags`) VALUES (:transaction_id, :regex, :tags)
+                INSERT INTO transaction_tagging_rule (`id`, `regex`, `tags`) VALUES (:transaction_id, :regex, :tags)
                 ON DUPLICATE KEY UPDATE `regex` = :regex, tags = :tags
             """)
             .bind("transaction_id", taggingRule.id?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString())
