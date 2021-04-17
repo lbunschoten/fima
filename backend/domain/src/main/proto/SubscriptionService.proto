@@ -3,6 +3,7 @@ syntax = "proto3";
 package services;
 
 import "SubscriptionDomain.proto";
+import "TransactionDomain.proto";
 
 option java_multiple_files = true;
 option java_package = "fima.services.subscription";
@@ -14,6 +15,7 @@ message GetSubscriptionRequest {
 
 message GetSubscriptionResponse {
   domain.Subscription subscription = 1;
+  repeated domain.Transaction transactions = 2;
 }
 
 message GetSubscriptionsRequest {
