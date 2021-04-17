@@ -395,9 +395,12 @@ class Dashboard extends React.Component {
                             <tr key={`subscription-${s.id}`}>
                               <td>
                                 <p className="title">{s.name}</p>
-                                <p className="text-muted">
-                                  {s.name}
+                                <p className="text-muted capatalize">
+                                  {s.recurrence}
                                 </p>
+                              </td>
+                              <td>
+                                <p className="title">{s.name}</p>
                               </td>
                               <td className="td-actions text-right">
                                 <Link to={`/admin/subscription/${s.id}`}>

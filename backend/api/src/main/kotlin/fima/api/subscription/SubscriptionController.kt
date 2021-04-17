@@ -1,5 +1,6 @@
 package fima.api.subscription
 
+import fima.api.transaction.Transaction
 import fima.services.subscription.GetSubscriptionRequest
 import fima.services.subscription.GetSubscriptionsRequest
 import fima.services.subscription.SubscriptionServiceGrpcKt
@@ -22,17 +23,20 @@ class SubscriptionController @Autowired constructor(
 
     @CrossOrigin
     @GetMapping("/subscription/{id}")
-    suspend fun getSubscription(@PathVariable("id") subscriptionId: UUID): Subscription {
+    suspend fun getSubscription(@PathVariable("id") subscriptionId: UUID): GetSubscriptionResponse {
         logger.info("Received request to get subscription $subscriptionId")
 
         val request = GetSubscriptionRequest.newBuilder().setId(subscriptionId.toString()).build()
+        val response = subscriptionService.getSubscription(request)
 
-        return subscriptionService
-            .getSubscription(request)
-            .takeIf { it.hasSubscription() }
-            ?.subscription
-            ?.let(Subscription::fromProto)
-            ?: throw HttpClientErrorException(HttpStatus.NOT_FOUND)
+        if (response.hasSubscription()) {
+            return GetSubscriptionResponse(
+                response.subscription.let(Subscription::fromProto),
+                response.transactionsList.map(Transaction::fromProto)
+            )
+        } else {
+            throw HttpClientErrorException(HttpStatus.NOT_FOUND)
+        }
     }
 
     @CrossOrigin
@@ -47,5 +51,10 @@ class SubscriptionController @Autowired constructor(
             .subscriptionsList
             .map(Subscription::fromProto)
     }
+
+    data class GetSubscriptionResponse(
+        val subscription: Subscription,
+        val transactions: List<Transaction>
+    )
 
 }
