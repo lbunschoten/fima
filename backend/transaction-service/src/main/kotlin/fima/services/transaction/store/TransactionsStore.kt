@@ -78,8 +78,8 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 WHERE 1=1
                 ${query?.isNotBlank()?.let { "AND t.name LIKE '%:query%'" } ?: ""}
                 ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
-                ${filters.map { filter ->
-                    "(1=1 ${filter.map { (k, v) -> "AND (tt.key='$k' AND tt.value='$v')"}} OR )"
+                ${filters.joinToString(" ") { filter ->
+                    "(1=1 ${filter.joinToString(" ") { (k, v) -> "AND (tt.key='$k' AND tt.value='$v')" }} OR )"
                 }}
                 ${filters.takeIf { it.isNotEmpty() }?.let { "1=2 )" } ?: ""}
                 ORDER BY t.date DESC

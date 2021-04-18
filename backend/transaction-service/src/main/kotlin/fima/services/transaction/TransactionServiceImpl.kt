@@ -24,6 +24,8 @@ class TransactionServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override suspend fun searchTransactions(request: SearchTransactionsRequest): SearchTransactionsResponse {
+        try {
+
         logger.info("Received search request for transactions: $request")
         val transactions = transactionsStore.searchTransactions(
             query = request.query.takeIf { it.isNullOrBlank() },
@@ -38,6 +40,10 @@ class TransactionServiceImpl(
             .newBuilder()
             .addAllTransactions(transactions.map { it.toProto() })
             .build()
+        } catch (e: Exception) {
+            logger.error("Failed to search for transactions: ${e.message}")
+            throw StatusException(Status.UNKNOWN.withCause(e))
+        }
     }
 
     override suspend fun getTransaction(request: GetTransactionRequest): GetTransactionResponse {
