@@ -8,8 +8,8 @@ class Subscription extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        subscription: {},
-        transactions: {}
+      subscription: {},
+      transactions: []
     }
   }
 
