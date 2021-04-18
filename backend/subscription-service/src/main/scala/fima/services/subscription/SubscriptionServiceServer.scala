@@ -5,8 +5,7 @@ import doobie._
 import doobie.hikari.HikariTransactor
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.transaction.TransactionService.TransactionServiceGrpc
-import io.grpc.Server
-import io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
+import io.grpc.{ManagedChannelBuilder, Server, ServerBuilder}
 
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
@@ -40,13 +39,18 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
 
     val transactor = startDbTransactor(dbHost, dbPort, dbPassword)
 
-    val channel = NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build()
+    val channel = ManagedChannelBuilder
+      .forAddress(transactionServiceHost, transactionServicePort)
+      .usePlaintext()
+      .asInstanceOf[ManagedChannelBuilder]
+      .build()
     val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub = TransactionServiceGrpc.blockingStub(channel)
 
     val subscriptionRepository = new SubscriptionRepository()
-    server = NettyServerBuilder
+    server = ServerBuilder
       .forPort(SubscriptionServiceServer.port)
       .addService(SubscriptionService.bindService(new SubscriptionServiceImpl(subscriptionRepository, transactionService, transactor), executionContext))
+      .asInstanceOf[ServerBuilder[SubscriptionService]]
       .build.start
 
     println("Server started, listening on " + SubscriptionServiceServer.port)
