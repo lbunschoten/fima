@@ -6,6 +6,7 @@ import fima.services.transaction.store.TaggingRulesStoreImpl
 import fima.services.transaction.store.TransactionStatisticsStoreImpl
 import fima.services.transaction.store.TransactionTagsStore
 import fima.services.transaction.store.TransactionsStore
+import fima.services.transaction.store.TransactionsStoreImpl
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
 import fima.services.transaction.write.TaggingService
@@ -29,7 +30,7 @@ fun main() {
         .installPlugin(KotlinSqlObjectPlugin())
 
     val bankAccountEventStore = BankAccountEventStore(db)
-    val transactionsStore = db.onDemand(TransactionsStore::class.java)
+    val transactionsStore = TransactionsStoreImpl(db, db.onDemand(TransactionsStore::class.java))
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
