@@ -15,7 +15,6 @@ lazy val root = project
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
 
       "org.tpolecat" %% "doobie-core" % "0.12.1",
-      "org.tpolecat" %% "doobie-h2" % "0.12.1", // H2 driver 1.4.200 + type mappings.
       "org.tpolecat" %% "doobie-hikari" % "0.12.1", // HikariCP transactor.
       "org.tpolecat" %% "doobie-postgres" % "0.12.1", // Postgres driver 42.2.19 + type mappings.
     ),
