@@ -25,7 +25,7 @@ lazy val root = project
       case x => (assemblyMergeStrategy in assembly).value(x)
     },
 
-    mainClass in assembly := Option("fima.services.subscription.start")
+    mainClass in assembly := Option("fima.services.subscription.SubscriptionServiceServer")
   )
 
 Compile / PB.protoSources := Seq(baseDirectory.value / "../domain/src/main/proto")
