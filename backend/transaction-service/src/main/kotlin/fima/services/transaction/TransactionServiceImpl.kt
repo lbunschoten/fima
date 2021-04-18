@@ -34,7 +34,7 @@ class TransactionServiceImpl(
 
         return SearchTransactionsResponse
             .newBuilder()
-            .addAllTransaction(transactions.map { it.toProto() })
+            .addAllTransactions(transactions.map { it.toProto() })
             .build()
     }
 

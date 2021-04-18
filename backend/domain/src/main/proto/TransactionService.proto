@@ -31,7 +31,7 @@ message SearchTransactionsRequest {
 }
 
 message SearchTransactionsResponse {
-  repeated domain.Transaction transaction = 1;
+  repeated domain.Transaction transactions = 1;
 }
 
 message GetRecentTransactionsRequest {
