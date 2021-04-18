@@ -28,7 +28,7 @@ class TransactionServiceImpl(
 
         logger.info("Received search request for transactions: $request")
         val transactions = transactionsStore.searchTransactions(
-            query = request.query.takeIf { it.isNullOrBlank() },
+            query = request.query?.takeIf { it.isNotBlank() },
             filters = request.filtersList.map { filter ->
                 filter.tagsList.map { t -> t.key to t.value }
             }

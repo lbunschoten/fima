@@ -86,8 +86,6 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 ORDER BY t.date DESC
             """.trimIndent()
 
-        println(searchQuery)
-
         val q = handle.select(searchQuery)
         if (query?.isNotBlank() == true) q.bind("query", query)
         return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
