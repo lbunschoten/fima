@@ -84,7 +84,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                     }
                 }
                 ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
-                ORDER BY t.date DESC""
+                ORDER BY t.date DESC
             """.trimIndent()
         )
         if (query?.isNotBlank() == true) q.bind("query", query)
