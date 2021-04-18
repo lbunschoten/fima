@@ -24,7 +24,7 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
 
     (for {
       s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }
-      t <- IO(Option(transactionService.getRecentTransactions(GetRecentTransactionsRequest().withLimit(10).withOffset(0)).transactions))
+      t <- IO.pure(Option(t.transactions))
     } yield GetSubscriptionResponse(
       subscription = s.map { ss => Subscription(ss.id.toString, ss.name, Recurrence.fromValue(ss.recurrence.id))},
       transactions = t.getOrElse(Seq.empty)
