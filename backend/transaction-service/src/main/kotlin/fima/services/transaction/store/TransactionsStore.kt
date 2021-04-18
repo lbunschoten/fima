@@ -88,6 +88,6 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
             """.trimIndent()
         )
         if (query?.isNotBlank() == true) q.bind("query", query)
-        return q.mapTo(Transaction::class.java).list()
+        return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
     }
 }
