@@ -41,7 +41,7 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
     val transactor = startDbTransactor(dbHost, dbPort, dbPassword)
 
     val channel = NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build()
-    val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub = TransactionServiceGrpc.blockingStub(channel)
+    val transactionService: TransactionServiceGrpc.TransactionServiceStub = TransactionServiceGrpc.stub(channel)
 
     val subscriptionRepository = new SubscriptionRepository()
     server = NettyServerBuilder
