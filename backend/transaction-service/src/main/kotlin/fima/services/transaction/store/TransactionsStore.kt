@@ -76,7 +76,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 FROM transaction.transactions t
                 INNER JOIN transaction.transaction_tags tt ON (t.id = tt.transaction_id)
                 WHERE 1=1
-                ${query?.isNotBlank()?.let { "AND t.name LIKE '%:query%'" } ?: ""}
+                ${query?.let { "AND t.name LIKE '%:query%'" } ?: ""}
                 ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
                 ${
                     filters.joinToString(" OR ") { filter ->
