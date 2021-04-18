@@ -33,7 +33,10 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
       t <- IO.fromFuture(IO(transactionService.searchTransactions(searchTransactionsRequest)))
     } yield GetSubscriptionResponse(
       subscription = Option(Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id))),
-      transactions = t.transactions
+      transactions = t.transactions.map {
+        println(_)
+        _
+      }
     )).unsafeToFuture()
   }
 
