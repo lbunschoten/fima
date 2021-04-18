@@ -16,6 +16,24 @@ message GetTransactionResponse {
   domain.Transaction transaction = 1;
 }
 
+message TransactionTagFilter {
+  string key = 1;
+  string value = 2;
+}
+
+message SearchFilter {
+  repeated TransactionTagFilter tags = 1;
+}
+
+message SearchTransactionsRequest {
+  string query = 1;
+  repeated SearchFilter filters = 2;
+}
+
+message SearchTransactionsResponse {
+  repeated domain.Transaction transaction = 1;
+}
+
 message GetRecentTransactionsRequest {
   int32 limit = 1;
   int32 offset = 2;
@@ -108,6 +126,8 @@ message GetTaggingRulesResponse {
 }
 
 service TransactionService {
+
+  rpc searchTransactions(SearchTransactionsRequest) returns (SearchTransactionsResponse) {}
 
   rpc getTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
 

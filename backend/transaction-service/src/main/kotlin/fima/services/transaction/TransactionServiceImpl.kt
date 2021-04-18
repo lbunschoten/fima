@@ -23,6 +23,21 @@ class TransactionServiceImpl(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    override suspend fun searchTransactions(request: SearchTransactionsRequest): SearchTransactionsResponse {
+        logger.info("Received search request for transactions: $request")
+        val transactions = transactionsStore.searchTransactions(
+            query = request.query.takeIf { it.isNullOrBlank() },
+            filters = request.filtersList.map { filter ->
+                filter.tagsList.map { t -> t.key to t.value }
+            }
+        )
+
+        return SearchTransactionsResponse
+            .newBuilder()
+            .addAllTransaction(transactions.map { it.toProto() })
+            .build()
+    }
+
     override suspend fun getTransaction(request: GetTransactionRequest): GetTransactionResponse {
         logger.info("Received request for transaction ${request.id}")
         return GetTransactionResponse
