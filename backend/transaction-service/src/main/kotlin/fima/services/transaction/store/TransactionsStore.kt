@@ -79,12 +79,12 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 ${query?.isNotBlank()?.let { "AND t.name LIKE '%:query%'" } ?: ""}
                 ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
                 ${
-                filters.joinToString(" OR ") { filter ->
-                    "(${filter.joinToString(" AND ") { (k, v) -> "(tt.key='$k' AND tt.value='$v')" }})"
+                    filters.joinToString(" OR ") { filter ->
+                        "(${filter.joinToString(" AND ") { (k, v) -> "(tt.key='$k' AND tt.value='$v')" }})"
+                    }
                 }
-            }
                 ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
-                ORDER BY t.date DESC""${'"'}
+                ORDER BY t.date DESC""
             """.trimIndent()
         )
         if (query?.isNotBlank() == true) q.bind("query", query)
