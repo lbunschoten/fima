@@ -7,7 +7,7 @@ RUN apt-get update && \
     iputils-ping \
     telnet
 
-COPY ./target/scala-3.0.0-M3/subscription-service-assembly-0.1.0.jar fima.jar
+COPY ./target/scala-2.13/subscription-service-assembly-0.1.0.jar fima.jar
 
 EXPOSE 9997
 
