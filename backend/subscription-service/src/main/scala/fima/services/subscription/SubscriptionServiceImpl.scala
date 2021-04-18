@@ -18,6 +18,10 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
                              (private implicit val ec: ExecutionContext) extends SubscriptionService {
 
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
+
+    val t = transactionService.getRecentTransactions(GetRecentTransactionsRequest().withLimit(10).withOffset(0))
+    println(t)
+
     (for {
       s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }
       t <- IO(Option(transactionService.getRecentTransactions(GetRecentTransactionsRequest().withLimit(10).withOffset(0)).transactions))
