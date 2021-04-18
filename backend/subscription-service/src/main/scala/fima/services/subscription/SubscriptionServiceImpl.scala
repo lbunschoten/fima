@@ -1,32 +1,38 @@
 package fima.services.subscription
 
-import fima.domain.subscription.SubscriptionDomain.Subscription
+import cats.effect.{IO, Resource}
+import doobie.Transactor
+import doobie.implicits._
+import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.subscription.SubscriptionService.{GetSubscriptionRequest, GetSubscriptionResponse, GetSubscriptionsRequest, GetSubscriptionsResponse}
 import fima.services.transaction.TransactionService.GetRecentTransactionsRequest
 import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceBlockingStub
 
-import scala.concurrent.Future
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionServiceImpl(transactionService: TransactionServiceBlockingStub) extends SubscriptionService {
-
-  private val subscriptions = Seq(
-    Subscription("15300971-6e0c-4990-a2fc-2d718a113820", "Spotifiy"),
-    Subscription("25300971-6e0c-4990-a2fc-2d718a113820", "Netflix")
-  )
+class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
+                              transactionService: TransactionServiceBlockingStub,
+                              transactor: Resource[IO, Transactor[IO]])
+                             (private implicit val ec: ExecutionContext) extends SubscriptionService {
 
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
-    val transactions = transactionService.getRecentTransactions(GetRecentTransactionsRequest().withLimit(10).withOffset(0)).transactions
-    Future.successful(
-      GetSubscriptionResponse(
-        subscription = subscriptions.find(request.id == _.id),
-        transactions = transactions
-      )
-    )
+    (for {
+      s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }
+      t <- IO(Option(transactionService.getRecentTransactions(GetRecentTransactionsRequest().withLimit(10).withOffset(0)).transactions))
+    } yield GetSubscriptionResponse(
+      subscription = s.map { ss => Subscription(ss.id.toString, ss.name, Recurrence.fromValue(ss.recurrence.id))},
+      transactions = t.getOrElse(Seq.empty)
+    )).unsafeToFuture()
   }
 
   override def getSubscriptions(request: GetSubscriptionsRequest): Future[GetSubscriptionsResponse] = {
-    Future.successful(GetSubscriptionsResponse(subscriptions))
+    (for {
+      s <- transactor.use { xa => subscriptionRepository.findAll().transact(xa) }
+    } yield GetSubscriptionsResponse(
+      subscriptions = s.map { ss => Subscription(ss.id.toString, ss.name, Recurrence.MONTHLY)},
+    )).unsafeToFuture()
   }
 
 }

@@ -1,59 +1,89 @@
 package fima.services.subscription
 
+import cats.effect._
+import doobie._
+import doobie.hikari.HikariTransactor
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.transaction.TransactionService.TransactionServiceGrpc
 import io.grpc.Server
 import io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 
-import scala.concurrent.ExecutionContext
+import java.util.concurrent.Executors
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.language.existentials
+
 
 object SubscriptionServiceServer {
 
-    private val port = 9997
+  private val port = 9997
 
   def main(args: Array[String]): Unit = {
-        val server = new SubscriptionServiceServer(ExecutionContext.global)
-        server.start()
-        server.blockUntilShutdown()
-    }
-    
+    val server = new SubscriptionServiceServer(ExecutionContext.global)
+    server.start()
+    server.blockUntilShutdown()
+  }
+
 }
 
 class SubscriptionServiceServer(executionContext: ExecutionContext) {
 
-    private[this] var server: Server = _
+  private[this] var server: Server = _
 
-    private def start(): Unit = {
-      val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")
-      val transactionServicePort = System.getenv("TRANSACTION_SERVICE_SERVICE_PORT").toInt
+  private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
-      val channel = NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build()
-      val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub = TransactionServiceGrpc.blockingStub(channel)
+  private def start(): Unit = {
+    val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
+    val dbPort: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
+    val dbPassword: String = Option(System.getenv("DB_PASSWORD")).getOrElse("root123")
+    val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")
+    val transactionServicePort = System.getenv("TRANSACTION_SERVICE_SERVICE_PORT").toInt
 
-      server = NettyServerBuilder
-          .forPort(SubscriptionServiceServer.port)
-          .addService(SubscriptionService.bindService(new SubscriptionServiceImpl(transactionService), executionContext))
-          .build.start
+    val transactor = startDbTransactor(dbHost, dbPort, dbPassword)
 
-      println("Server started, listening on " + SubscriptionServiceServer.port)
-        sys.addShutdownHook {
-            System.err.println("*** shutting down gRPC server since JVM is shutting down")
-            stop()
-            System.err.println("*** server shut down")
-        }
+    val channel = NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build()
+    val transactionService: TransactionServiceGrpc.TransactionServiceBlockingStub = TransactionServiceGrpc.blockingStub(channel)
+
+    val subscriptionRepository = new SubscriptionRepository()
+    server = NettyServerBuilder
+      .forPort(SubscriptionServiceServer.port)
+      .addService(SubscriptionService.bindService(new SubscriptionServiceImpl(subscriptionRepository, transactionService, transactor), executionContext))
+      .build.start
+
+    println("Server started, listening on " + SubscriptionServiceServer.port)
+    sys.addShutdownHook {
+      System.err.println("*** shutting down gRPC server since JVM is shutting down")
+      stop()
+      System.err.println("*** server shut down")
     }
+  }
 
-    private def stop(): Unit = {
-        if (server != null) {
-            server.shutdown()
-        }
-    }
+  private def startDbTransactor(dbHost: String, dbPort: String, dbPassword: String): Resource[IO, HikariTransactor[IO]] = {
+    implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContexts.synchronous)
 
-    private def blockUntilShutdown(): Unit = {
-        if (server != null) {
-            server.awaitTermination()
-        }
+    for {
+      connectExecutionContext <- ExecutionContexts.fixedThreadPool[IO](32)
+      blockingExecutionContext <- Blocker[IO]
+      transactor <- HikariTransactor.newHikariTransactor[IO](
+        driverClassName = "org.postgresql.Driver",
+        url = s"jdbc:postgresql://$dbHost:$dbPort/fima?createDatabaseIfNotExist=true&currentSchema=transaction",
+        user = "root",
+        pass = dbPassword,
+        connectEC = connectExecutionContext,
+        blocker = blockingExecutionContext
+      )
+    } yield transactor
+  }
+
+  private def stop(): Unit = {
+    if (server != null) {
+      server.shutdown()
     }
+  }
+
+  private def blockUntilShutdown(): Unit = {
+    if (server != null) {
+      server.awaitTermination()
+    }
+  }
 
 }
