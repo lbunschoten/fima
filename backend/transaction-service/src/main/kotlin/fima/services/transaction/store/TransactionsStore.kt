@@ -65,8 +65,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
     override fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> {
         if (query.isNullOrBlank() && filters.isEmpty()) return emptyList()
 
-        val q = handle.select(
-            """
+        val searchQuery = """
                 SELECT t.*,
                 (
                    SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
@@ -86,7 +85,10 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
                 ORDER BY t.date DESC
             """.trimIndent()
-        )
+
+        println(searchQuery)
+
+        val q = handle.select(searchQuery)
         if (query?.isNotBlank() == true) q.bind("query", query)
         return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
     }
