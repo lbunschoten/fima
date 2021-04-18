@@ -70,7 +70,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 SELECT t.*,
                 (
                    SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
-                   FROM transaction_tags tt
+                   FROM transaction.transaction_tags tt
                    WHERE transaction_id = t.id
                 ) as tags
                 FROM transaction.transactions t
@@ -78,11 +78,13 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 WHERE 1=1
                 ${query?.isNotBlank()?.let { "AND t.name LIKE '%:query%'" } ?: ""}
                 ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
-                ${filters.joinToString(" ") { filter ->
-                    "(1=1 ${filter.joinToString(" ") { (k, v) -> "AND (tt.key='$k' AND tt.value='$v')" }} OR )"
-                }}
-                ${filters.takeIf { it.isNotEmpty() }?.let { "1=2 )" } ?: ""}
-                ORDER BY t.date DESC
+                ${
+                filters.joinToString(" OR ") { filter ->
+                    "(${filter.joinToString(" AND ") { (k, v) -> "(tt.key='$k' AND tt.value='$v')" }})"
+                }
+            }
+                ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
+                ORDER BY t.date DESC""${'"'}
             """.trimIndent()
         )
         if (query?.isNotBlank() == true) q.bind("query", query)
