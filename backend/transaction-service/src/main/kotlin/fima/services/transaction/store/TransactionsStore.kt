@@ -75,7 +75,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 FROM transaction.transactions t
                 INNER JOIN transaction.transaction_tags tt ON (t.id = tt.transaction_id)
                 WHERE 1=1
-                ${query?.let { "AND t.name LIKE '%:query%'" } ?: ""}
+                ${query?.let { "AND t.name LIKE '%' || :query || '%'" } ?: ""}
                 ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
                 ${
                     filters.joinToString(" OR ") { filter ->
@@ -87,7 +87,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
             """.trimIndent()
 
         val q = handle.select(searchQuery)
-        if (query?.isNotBlank() == true) q.bind("query", query)
+        query?.let { q.bind("query", query) }
         return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
     }
 }
