@@ -4,6 +4,7 @@ import cats.effect.{ContextShift, IO, Resource}
 import doobie.implicits._
 import doobie.{ExecutionContexts, Transactor}
 import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
+import fima.domain.transaction.TransactionDomain.Transaction
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.subscription.SubscriptionService.{GetSubscriptionRequest, GetSubscriptionResponse, GetSubscriptionsRequest, GetSubscriptionsResponse}
 import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceStub
@@ -33,9 +34,9 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
       t <- IO.fromFuture(IO(transactionService.searchTransactions(searchTransactionsRequest)))
     } yield GetSubscriptionResponse(
       subscription = Option(Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id))),
-      transactions = t.transactions.map {
-        println(_)
-        _
+      transactions = t.transactions.map { tr: Transaction =>
+        println(tr)
+        tr
       }
     )).unsafeToFuture()
   }
