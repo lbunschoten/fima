@@ -55,7 +55,7 @@ interface TransactionsStore {
     """)
     fun insertTransaction(id: String, date: ZonedDateTime, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)
 
-    fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction>
+    fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> = emptyList()
 }
 
 class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : TransactionsStore by transactionsStore {
