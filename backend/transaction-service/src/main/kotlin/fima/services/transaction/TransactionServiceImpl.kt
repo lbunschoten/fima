@@ -32,6 +32,8 @@ class TransactionServiceImpl(
             }
         )
 
+        logger.info("Found ${transactions.size} after search request")
+
         return SearchTransactionsResponse
             .newBuilder()
             .addAllTransactions(transactions.map { it.toProto() })

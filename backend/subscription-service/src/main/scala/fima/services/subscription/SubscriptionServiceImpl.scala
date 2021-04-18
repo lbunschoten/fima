@@ -29,16 +29,22 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
         ))
       ))
 
-    (for {
-      s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa).map { _.getOrElse(throw new Exception(""))} }
-      t <- IO.fromFuture(IO(transactionService.searchTransactions(searchTransactionsRequest)))
-    } yield GetSubscriptionResponse(
-      subscription = Option(Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id))),
-      transactions = t.transactions.map { tr: Transaction =>
-        println(tr)
-        tr
-      }
-    )).unsafeToFuture()
+    try {
+      (for {
+        s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa).map { _.getOrElse(throw new Exception(""))} }
+        t <- IO.fromFuture(IO(transactionService.searchTransactions(searchTransactionsRequest)))
+      } yield GetSubscriptionResponse(
+        subscription = Option(Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id))),
+        transactions = t.transactions.map { tr: Transaction =>
+          println(tr)
+          tr
+        }
+      )).unsafeToFuture()
+    } catch {
+      case e: Exception =>
+        println(e.getMessage)
+        throw e
+    }
   }
 
   override def getSubscriptions(request: GetSubscriptionsRequest): Future[GetSubscriptionsResponse] = {
