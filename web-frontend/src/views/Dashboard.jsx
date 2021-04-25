@@ -1,27 +1,86 @@
 import React from "react";
-// nodejs library that concatenates classes
 import classNames from "classnames";
-// react plugin used to create charts
-import {Bar, Line} from "react-chartjs-2";
+import ChartComponent from "react-chartjs-2";
 
-// reactstrap components
-import {Button, ButtonGroup, Card, CardBody, CardHeader, CardTitle, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, Table, UncontrolledDropdown, UncontrolledTooltip} from "reactstrap";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+  Table,
+  UncontrolledDropdown,
+  UncontrolledTooltip
+} from "reactstrap";
 
-// core components
-import {chartExample1, chartExample2, chartExample3, chartExample4} from "../variables/charts.jsx";
+import {transactionsChart} from "../variables/charts.jsx";
 import {Link} from "react-router-dom";
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      bigChartData: "data1",
-      data1: chartExample1.data1,
-      data2: chartExample1.data2,
-      data3: chartExample1.data3,
+      selectedChart: "count",
+      count: () => ({}),
+      sum: () => ({}),
+      balance: () => ({}),
       transactions: [],
       subscriptions: []
     };
+  }
+
+  transactionsChartData(label, results) {
+    return canvas => {
+      let ctx = canvas.getContext("2d");
+
+      let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+      gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
+      gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
+      gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
+
+      return {
+        labels: [
+          "JAN",
+          "FEB",
+          "MAR",
+          "APR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AUG",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DEC"
+        ],
+        datasets: [
+          {
+            label: label,
+            fill: true,
+            backgroundColor: gradientStroke,
+            borderColor: "#1f8ef1",
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            pointBackgroundColor: "#1f8ef1",
+            pointBorderColor: "rgba(255,255,255,0)",
+            pointHoverBackgroundColor: "#1f8ef1",
+            pointBorderWidth: 20,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 15,
+            pointRadius: 4,
+            data: results
+          }
+        ]
+      }
+    }
   }
 
   componentDidMount() {
@@ -29,140 +88,17 @@ class Dashboard extends React.Component {
       .then(res => res.json())
       .then(results => {
         this.setState({
-            data1: canvas => {
-              let ctx = canvas.getContext("2d");
-
-              let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-              gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
-              gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
-              gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
-
-              return {
-                labels: [
-                  "JAN",
-                  "FEB",
-                  "MAR",
-                  "APR",
-                  "MAY",
-                  "JUN",
-                  "JUL",
-                  "AUG",
-                  "SEP",
-                  "OCT",
-                  "NOV",
-                  "DEC"
-                ],
-                datasets: [
-                  {
-                    label: "# of transactions",
-                    fill: true,
-                    backgroundColor: gradientStroke,
-                    borderColor: "#1f8ef1",
-                    borderWidth: 2,
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    pointBackgroundColor: "#1f8ef1",
-                    pointBorderColor: "rgba(255,255,255,0)",
-                    pointHoverBackgroundColor: "#1f8ef1",
-                    pointBorderWidth: 20,
-                    pointHoverRadius: 4,
-                    pointHoverBorderWidth: 15,
-                    pointRadius: 4,
-                    data: results.map(r => r.transactions)
-                  }
-                ]
-              };
+            count: {
+              data: this.transactionsChartData("# of transactions", results.map(stats => stats.transactions)),
+              options: transactionsChart.defaultChartOptions
             },
-            data2: canvas => {
-              let ctx = canvas.getContext("2d");
-
-              let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-              gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
-              gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
-              gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
-
-              return {
-                labels: [
-                  "JAN",
-                  "FEB",
-                  "MAR",
-                  "APR",
-                  "MAY",
-                  "JUN",
-                  "JUL",
-                  "AUG",
-                  "SEP",
-                  "OCT",
-                  "NOV",
-                  "DEC"
-                ],
-                datasets: [
-                  {
-                    label: "Sum of all transactions",
-                    fill: true,
-                    backgroundColor: gradientStroke,
-                    borderColor: "#1f8ef1",
-                    borderWidth: 2,
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    pointBackgroundColor: "#1f8ef1",
-                    pointBorderColor: "rgba(255,255,255,0)",
-                    pointHoverBackgroundColor: "#1f8ef1",
-                    pointBorderWidth: 20,
-                    pointHoverRadius: 4,
-                    pointHoverBorderWidth: 15,
-                    pointRadius: 4,
-                    data: results.map(r => r.sum)
-                  }
-                ]
-              };
+            sum: {
+              data: this.transactionsChartData("Sum of all transactions", results.map(stats => stats.sum)),
+              options: transactionsChart.currencyChartOptions
             },
-            data3: canvas => {
-              let ctx = canvas.getContext("2d");
-
-              let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-              gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
-              gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
-              gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
-
-              return {
-                labels: [
-                  "JAN",
-                  "FEB",
-                  "MAR",
-                  "APR",
-                  "MAY",
-                  "JUN",
-                  "JUL",
-                  "AUG",
-                  "SEP",
-                  "OCT",
-                  "NOV",
-                  "DEC"
-                ],
-                datasets: [
-                  {
-                    label: "Balance",
-                    fill: true,
-                    backgroundColor: gradientStroke,
-                    borderColor: "#1f8ef1",
-                    borderWidth: 2,
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    pointBackgroundColor: "#1f8ef1",
-                    pointBorderColor: "rgba(255,255,255,0)",
-                    pointHoverBackgroundColor: "#1f8ef1",
-                    pointBorderWidth: 20,
-                    pointHoverRadius: 4,
-                    pointHoverBorderWidth: 15,
-                    pointRadius: 4,
-                    data: results.map(r => r.balance)
-                  }
-                ]
-              };
+            balance: {
+              data: this.transactionsChartData("Balance", results.map(stats => stats.balance)),
+              options: transactionsChart.currencyChartOptions
             }
           }
         );
@@ -185,9 +121,9 @@ class Dashboard extends React.Component {
       });
   }
 
-  setBgChartData = name => {
+  setSelectedChart = name => {
     this.setState({
-      bigChartData: name
+      selectedChart: name
     });
   };
 
@@ -212,12 +148,12 @@ class Dashboard extends React.Component {
                         <Button
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data1"
+                            active: this.state.selectedChart === "count"
                           })}
                           color="info"
                           id="0"
                           size="sm"
-                          onClick={() => this.setBgChartData("data1")}
+                          onClick={() => this.setSelectedChart("count")}
                         >
                           <input
                             defaultChecked
@@ -238,9 +174,9 @@ class Dashboard extends React.Component {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data2"
+                            active: this.state.selectedChart === "sum"
                           })}
-                          onClick={() => this.setBgChartData("data2")}
+                          onClick={() => this.setSelectedChart("sum")}
                         >
                           <input
                             className="d-none"
@@ -260,9 +196,9 @@ class Dashboard extends React.Component {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data3"
+                            active: this.state.selectedChart === "balance"
                           })}
-                          onClick={() => this.setBgChartData("data3")}
+                          onClick={() => this.setSelectedChart("balance")}
                         >
                           <input
                             className="d-none"
@@ -282,68 +218,10 @@ class Dashboard extends React.Component {
                 </CardHeader>
                 <CardBody>
                   <div className="chart-area">
-                    <Line
-                      data={this.state[this.state.bigChartData]}
-                      options={chartExample1.options}
-                    />
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col lg="4">
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Total Shipments</h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-bell-55 text-info" />{" "}
-                    763,215
-                  </CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Line
-                      data={chartExample2.data}
-                      options={chartExample2.options}
-                    />
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col lg="4">
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Daily Sales</h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-delivery-fast text-primary" />{" "}
-                    3,500€
-                  </CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Bar
-                      data={chartExample3.data}
-                      options={chartExample3.options}
-                    />
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col lg="4">
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Completed Tasks</h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-send text-success" /> 12,100K
-                  </CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Line
-                      data={chartExample4.data}
-                      options={chartExample4.options}
-                    />
+                    <ChartComponent
+                      data={this.state[this.state.selectedChart].data}
+                      options={this.state[this.state.selectedChart].options}
+                      type='line' />
                   </div>
                 </CardBody>
               </Card>
@@ -390,7 +268,7 @@ class Dashboard extends React.Component {
                   <div className="table-full-width table-responsive">
                     <Table>
                       <tbody>
-                      {
+                        {
                           this.state.subscriptions.map(s =>
                             <tr key={`subscription-${s.id}`}>
                               <td>
@@ -404,26 +282,26 @@ class Dashboard extends React.Component {
                               </td>
                               <td className="td-actions text-right">
                                 <Link to={`/admin/subscription/${s.id}`}>
-                                    <Button
-                                      color="link"
-                                      id={`tooltip-${s.id}`}
-                                      title=""
-                                      type="button"
-                                    >
-                                      <i className="tim-icons icon-bullet-list-67" />
-                                    </Button>
+                                  <Button
+                                    color="link"
+                                    id={`tooltip-${s.id}`}
+                                    title=""
+                                    type="button"
+                                  >
+                                    <i className="tim-icons icon-bullet-list-67" />
+                                  </Button>
                                 </Link>
                                 <UncontrolledTooltip
                                   delay={0}
                                   target={`tooltip-${s.id}`}
                                   placement="right"
                                 >
-                                View transactions
+                                  View transactions
                                 </UncontrolledTooltip>
                               </td>
                             </tr>
                           )
-                      }
+                        }
                       </tbody>
                     </Table>
                   </div>

@@ -1,278 +1,92 @@
-// ##############################
-// // // Chart variables
-// #############################
+/**
+ * Performs a deep merge of objects and returns new object. Does not modify
+ * objects (immutable) and merges arrays via concatenation.
+ *
+ * @param {...object} objects - Objects to merge
+ * @returns {object} New object with merged key/values
+ */
+function mergeDeep(...objects) {
+    const isObject = obj => obj && typeof obj === 'object';
 
-// chartExample1 and chartExample2 options
-let chart1_2_options = {
-  maintainAspectRatio: false,
-  legend: {
-    display: false
-  },
-  tooltips: {
-    backgroundColor: "#f5f5f5",
-    titleFontColor: "#333",
-    bodyFontColor: "#666",
-    bodySpacing: 4,
-    xPadding: 12,
-    mode: "nearest",
-    intersect: 0,
-    position: "nearest"
-  },
-  responsive: true,
-  scales: {
-    yAxes: [
-      {
-        barPercentage: 1.6,
-        gridLines: {
-          drawBorder: false,
-          color: "rgba(29,140,248,0.0)",
-          zeroLineColor: "transparent"
-        },
-        ticks: {
-          suggestedMin: 60,
-          suggestedMax: 125,
-          padding: 20,
-          fontColor: "#9a9a9a"
-        }
-      }
-    ],
-    xAxes: [
-      {
-        barPercentage: 1.6,
-        gridLines: {
-          drawBorder: false,
-          color: "rgba(29,140,248,0.1)",
-          zeroLineColor: "transparent"
-        },
-        ticks: {
-          padding: 20,
-          fontColor: "#9a9a9a"
-        }
-      }
-    ]
-  }
-};
+    return objects.reduce((prev, obj) => {
+        Object.keys(obj).forEach(key => {
+            const pVal = prev[key];
+            const oVal = obj[key];
 
-// #########################################
-// // // used inside src/views/Dashboard.jsx
-// #########################################
-let chartExample1 = {
-  data1: () => ({}),
-  data2: () => ({}),
-  data3: () => ({}),
-  options: chart1_2_options
-};
+            if (Array.isArray(pVal) && Array.isArray(oVal)) {
+                prev[key] = pVal.concat(...oVal);
+            }
+            else if (isObject(pVal) && isObject(oVal)) {
+                prev[key] = mergeDeep(pVal, oVal);
+            }
+            else {
+                prev[key] = oVal;
+            }
+        });
 
-// #########################################
-// // // used inside src/views/Dashboard.jsx
-// #########################################
-let chartExample2 = {
-  data: canvas => {
-    let ctx = canvas.getContext("2d");
-
-    let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, "rgba(29,140,248,0.2)");
-    gradientStroke.addColorStop(0.4, "rgba(29,140,248,0.0)");
-    gradientStroke.addColorStop(0, "rgba(29,140,248,0)"); //blue colors
-
-    return {
-      labels: ["JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
-      datasets: [
-        {
-          label: "Data",
-          fill: true,
-          backgroundColor: gradientStroke,
-          borderColor: "#1f8ef1",
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          pointBackgroundColor: "#1f8ef1",
-          pointBorderColor: "rgba(255,255,255,0)",
-          pointHoverBackgroundColor: "#1f8ef1",
-          pointBorderWidth: 20,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 15,
-          pointRadius: 4,
-          data: [80, 100, 70, 80, 120, 80]
-        }
-      ]
-    };
-  },
-  options: chart1_2_options
-};
-
-// #########################################
-// // // used inside src/views/Dashboard.jsx
-// #########################################
-let chartExample3 = {
-  data: canvas => {
-    let ctx = canvas.getContext("2d");
-
-    let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, "rgba(72,72,176,0.1)");
-    gradientStroke.addColorStop(0.4, "rgba(72,72,176,0.0)");
-    gradientStroke.addColorStop(0, "rgba(119,52,169,0)"); //purple colors
-
-    return {
-      labels: ["USA", "GER", "AUS", "UK", "RO", "BR"],
-      datasets: [
-        {
-          label: "Countries",
-          fill: true,
-          backgroundColor: gradientStroke,
-          hoverBackgroundColor: gradientStroke,
-          borderColor: "#d048b6",
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          data: [53, 20, 10, 80, 100, 45]
-        }
-      ]
-    };
-  },
-  options: {
+        return prev;
+    }, {});
+}
+let chart_defaults = {
     maintainAspectRatio: false,
-    legend: {
-      display: false
-    },
-    tooltips: {
-      backgroundColor: "#f5f5f5",
-      titleFontColor: "#333",
-      bodyFontColor: "#666",
-      bodySpacing: 4,
-      xPadding: 12,
-      mode: "nearest",
-      intersect: 0,
-      position: "nearest"
+    plugins: {
+        legend: {
+            display: false
+        },
+        tooltip: {
+            backgroundColor: "#f5f5f5",
+            titleColor: "#333",
+            bodyColor: "#666",
+            bodySpacing: 4,
+            xPadding: 12,
+            mode: "nearest",
+            intersect: 0,
+            position: "nearest"
+        },
     },
     responsive: true,
     scales: {
-      yAxes: [
-        {
-          gridLines: {
-            drawBorder: false,
-            color: "rgba(225,78,202,0.1)",
-            zeroLineColor: "transparent"
-          },
-          ticks: {
-            suggestedMin: 60,
-            suggestedMax: 120,
-            padding: 20,
-            fontColor: "#9e9e9e"
-          }
+        y: {
+            barPercentage: 1.6,
+            grid: {
+                color: "rgba(29,140,248,0.0)",
+                zeroLineColor: "transparent"
+            },
+            ticks: {
+                padding: 20,
+                color: "#9a9a9a"
+            }
+        },
+        x: {
+            grid: {
+                drawBorder: false,
+                color: "rgba(29,140,248,0.1)",
+            },
+            ticks: {
+                padding: 20,
+                color: "#9a9a9a"
+            }
         }
-      ],
-      xAxes: [
-        {
-          gridLines: {
-            drawBorder: false,
-            color: "rgba(225,78,202,0.1)",
-            zeroLineColor: "transparent"
-          },
-          ticks: {
-            padding: 20,
-            fontColor: "#9e9e9e"
-          }
-        }
-      ]
     }
-  }
 };
 
-// #########################################
-// // // used inside src/views/Dashboard.jsx
-// #########################################
-const chartExample4 = {
-  data: canvas => {
-    let ctx = canvas.getContext("2d");
-
-    let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, "rgba(66,134,121,0.15)");
-    gradientStroke.addColorStop(0.4, "rgba(66,134,121,0.0)"); //green colors
-    gradientStroke.addColorStop(0, "rgba(66,134,121,0)"); //green colors
-
-    return {
-      labels: ["JUL", "AUG", "SEP", "OCT", "NOV"],
-      datasets: [
-        {
-          label: "My First dataset",
-          fill: true,
-          backgroundColor: gradientStroke,
-          borderColor: "#00d6b4",
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          pointBackgroundColor: "#00d6b4",
-          pointBorderColor: "rgba(255,255,255,0)",
-          pointHoverBackgroundColor: "#00d6b4",
-          pointBorderWidth: 20,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 15,
-          pointRadius: 4,
-          data: [90, 27, 60, 12, 80]
-        }
-      ]
-    };
-  },
-  options: {
-    maintainAspectRatio: false,
-    legend: {
-      display: false
-    },
-
-    tooltips: {
-      backgroundColor: "#f5f5f5",
-      titleFontColor: "#333",
-      bodyFontColor: "#666",
-      bodySpacing: 4,
-      xPadding: 12,
-      mode: "nearest",
-      intersect: 0,
-      position: "nearest"
-    },
-    responsive: true,
+let chart_with_currency_legend = {
     scales: {
-      yAxes: [
-        {
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: "rgba(29,140,248,0.0)",
-            zeroLineColor: "transparent"
-          },
-          ticks: {
-            suggestedMin: 50,
-            suggestedMax: 125,
-            padding: 20,
-            fontColor: "#9e9e9e"
-          }
+        y: {
+            ticks: {
+                callback: function (value) {
+                    return new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0}).format(value / 100);
+                }
+            }
         }
-      ],
-
-      xAxes: [
-        {
-          barPercentage: 1.6,
-          gridLines: {
-            drawBorder: false,
-            color: "rgba(0,242,195,0.1)",
-            zeroLineColor: "transparent"
-          },
-          ticks: {
-            padding: 20,
-            fontColor: "#9e9e9e"
-          }
-        }
-      ]
     }
-  }
 };
 
-module.exports = {
-  chartExample1, // in src/views/Dashboard.jsx
-  chartExample2, // in src/views/Dashboard.jsx
-  chartExample3, // in src/views/Dashboard.jsx
-  chartExample4 // in src/views/Dashboard.jsx
+let transactionsChart = {
+    defaultChartOptions: chart_defaults,
+    currencyChartOptions: mergeDeep(chart_defaults, chart_with_currency_legend),
+};
+
+export {
+    transactionsChart,
 };
