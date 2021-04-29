@@ -25,21 +25,22 @@ class TransactionServiceImpl(
 
     override suspend fun searchTransactions(request: SearchTransactionsRequest): SearchTransactionsResponse {
         try {
+            logger.info("Received search request for transactions: $request")
+            val transactions = transactionsStore.searchTransactions(
+                request.filtersList.map { f ->
+                    TransactionsStore.SearchFilters(
+                        queryFilter = f?.query?.queryString?.takeIf { it.isNotBlank() },
+                        tagFilters = f.tagsList.associate { filter -> filter.key to filter.value }
+                    )
+                }
+            )
 
-        logger.info("Received search request for transactions: $request")
-        val transactions = transactionsStore.searchTransactions(
-            query = request.query?.takeIf { it.isNotBlank() },
-            filters = request.filtersList.map { filter ->
-                filter.tagsList.map { t -> t.key to t.value }
-            }
-        )
+            logger.info("Found ${transactions.size} after search request")
 
-        logger.info("Found ${transactions.size} after search request")
-
-        return SearchTransactionsResponse
-            .newBuilder()
-            .addAllTransactions(transactions.map { it.toProto() })
-            .build()
+            return SearchTransactionsResponse
+                .newBuilder()
+                .addAllTransactions(transactions.map { it.toProto() })
+                .build()
         } catch (e: Exception) {
             logger.error("Failed to search for transactions: ${e.message}")
             throw StatusException(Status.UNKNOWN.withCause(e))

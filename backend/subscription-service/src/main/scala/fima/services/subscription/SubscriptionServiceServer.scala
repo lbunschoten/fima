@@ -3,8 +3,10 @@ package fima.services.subscription
 import cats.effect._
 import doobie._
 import doobie.hikari.HikariTransactor
+import fima.services.subscription.SubscriptionSearchQuery.subscriptionSearchQueryEncoder
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.transaction.TransactionService.TransactionServiceGrpc
+import io.circe.syntax.EncoderOps
 import io.grpc.Server
 import io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 

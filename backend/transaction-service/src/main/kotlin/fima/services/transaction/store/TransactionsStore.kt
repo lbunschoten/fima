@@ -8,6 +8,11 @@ import java.time.ZonedDateTime
 
 interface TransactionsStore {
 
+    data class SearchFilters(
+        val queryFilter: String?,
+        val tagFilters: Map<String, String>
+    )
+
     @SqlQuery("""
         SELECT 
             t.*,
@@ -55,15 +60,15 @@ interface TransactionsStore {
     """)
     fun insertTransaction(id: String, date: ZonedDateTime, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)
 
-    fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> = emptyList()
+    fun searchTransactions(filters: List<SearchFilters>): List<Transaction> = emptyList()
 }
 
 class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : TransactionsStore by transactionsStore {
 
     private val handle = db.open()
 
-    override fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> {
-        if (query.isNullOrBlank() && filters.isEmpty()) return emptyList()
+    override fun searchTransactions(filters: List<TransactionsStore.SearchFilters>): List<Transaction> {
+        if (filters.isEmpty()) return emptyList()
 
         val searchQuery = """
                 SELECT t.*,
@@ -75,19 +80,19 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 FROM transaction.transactions t
                 INNER JOIN transaction.transaction_tags tt ON (t.id = tt.transaction_id)
                 WHERE 1=1
-                ${query?.let { "AND t.name LIKE '%' || :query || '%'" } ?: ""}
-                ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
                 ${
                     filters.joinToString(" OR ") { filter ->
-                        "(${filter.joinToString(" AND ") { (k, v) -> "(tt.key='$k' AND tt.value='$v')" }})"
+                        val f: List<String?> = 
+                            filter.tagFilters.map { (k, v) -> "(tt.key='$k' AND tt.value='$v')" } +
+                            (filter.queryFilter?.let { q -> "t.name LIKE '%' || '$q' || '%'" })
+                        
+                        "(${f.filterNotNull().joinToString(" AND ")})"
                     }
                 }
-                ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
                 ORDER BY t.date DESC
             """.trimIndent()
 
         val q = handle.select(searchQuery)
-        query?.let { q.bind("query", query) }
         return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
     }
 }
