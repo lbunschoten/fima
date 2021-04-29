@@ -6,6 +6,7 @@ import fima.services.transaction.store.TaggingRulesStoreImpl
 import fima.services.transaction.store.TransactionStatisticsStoreImpl
 import fima.services.transaction.store.TransactionTagsStore
 import fima.services.transaction.store.TransactionsStore
+import fima.services.transaction.store.TransactionsStoreImpl
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
 import fima.services.transaction.write.TaggingService
@@ -21,15 +22,15 @@ import org.slf4j.LoggerFactory
 
 
 fun main() {
-    val dbHost: String = System.getenv("FIMA_MYSQL_DB_SERVICE_HOST") ?: "localhost"
-    val dbPort: String = System.getenv("FIMA_MYSQL_DB_SERVICE_PORT") ?: "3306"
+    val dbHost: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST") ?: "localhost"
+    val dbPort: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
-    val db = Jdbi.create("jdbc:mysql://$dbHost:$dbPort/transaction?createDatabaseIfNotExist=true", "root", dbPassword)
+    val db = Jdbi.create("jdbc:postgresql://$dbHost:$dbPort/fima?createDatabaseIfNotExist=true&currentSchema=transaction", "root", dbPassword)
         .installPlugin(KotlinPlugin())
         .installPlugin(KotlinSqlObjectPlugin())
 
     val bankAccountEventStore = BankAccountEventStore(db)
-    val transactionsStore = db.onDemand(TransactionsStore::class.java)
+    val transactionsStore = TransactionsStoreImpl(db, db.onDemand(TransactionsStore::class.java))
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)

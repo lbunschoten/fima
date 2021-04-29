@@ -10,15 +10,15 @@ class TransactionTagsStore(db: Jdbi) : Closeable {
 
     fun deleteTags() {
         handle
-            .createUpdate("""DELETE FROM TransactionTags""")
+            .createUpdate("""DELETE FROM transaction_tags""")
             .execute()
     }
 
     fun storeTags(transactionId: UUID, tags: Map<String, String>) {
         val insertTagsQuery = handle.prepareBatch("""
-          INSERT INTO TransactionTags (`id`, `transaction_id`, `key`, `value`)
+          INSERT INTO transaction_tags (id, transaction_id, key, value)
           VALUES (:id, :transaction_id, :key, :value)
-          ON DUPLICATE KEY UPDATE `value` = :value
+          ON DUPLICATE KEY UPDATE value = :value
         """)
 
         tags.forEach { (key, value) ->

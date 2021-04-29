@@ -32,7 +32,7 @@ class MonthlyTransactionStatisticsRowMapper : RowMapper<MonthlyTransactionStatis
         return MonthlyTransactionStatistics(
             month = rs.getInt("month"),
             year = rs.getInt("year"),
-            numTransactions = rs.getInt("numTransactions"),
+            numTransactions = rs.getInt("num_transactions"),
             sum = rs.getLong("sum"),
             balance = rs.getLong("balance")
         )

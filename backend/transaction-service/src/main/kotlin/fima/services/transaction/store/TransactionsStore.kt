@@ -1,5 +1,6 @@
 package fima.services.transaction.store
 
+import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
@@ -9,24 +10,26 @@ interface TransactionsStore {
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM TransactionTags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
-        FROM Transactions t
+        FROM transactions t
     """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getTransactions(): Set<Transaction>
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM TransactionTags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
-        FROM Transactions t
+        FROM transactions t
         WHERE t.id = :id
     """)
     @RegisterRowMapper(TransactionRowMapper::class)
@@ -34,21 +37,57 @@ interface TransactionsStore {
 
     @SqlQuery("""
         SELECT 
-            t.*, 
+            t.*,
             (
-                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(':', `key`, `value`) ORDER BY `key` SEPARATOR ',') 
-                FROM TransactionTags tt WHERE transaction_id = t.id
+               SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+               FROM transaction_tags tt
+               WHERE transaction_id = t.id
             ) as tags
-        FROM Transactions t
-        ORDER BY t.`date` DESC LIMIT :limit OFFSET :offset
+        FROM transactions t
+        ORDER BY t.date DESC LIMIT :limit OFFSET :offset
     """)
     @RegisterRowMapper(TransactionRowMapper::class)
     fun getRecent(offset: Int, limit: Int): List<Transaction>
 
     @SqlUpdate("""
-        INSERT INTO Transactions(id, date, name, from_account, to_account, type, amount)
+        INSERT INTO transactions(id, date, name, from_account, to_account, type, amount)
         VALUES (:id, :date, :name, :fromAccount, :toAccount, :type, :amountInCents)
     """)
     fun insertTransaction(id: String, date: ZonedDateTime, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)
 
+    fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> = emptyList()
+}
+
+class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : TransactionsStore by transactionsStore {
+
+    private val handle = db.open()
+
+    override fun searchTransactions(query: String?, filters: List<List<Pair<String, String>>>): List<Transaction> {
+        if (query.isNullOrBlank() && filters.isEmpty()) return emptyList()
+
+        val searchQuery = """
+                SELECT t.*,
+                (
+                   SELECT string_agg(DISTINCT CONCAT_WS(':', key, value), ',' ORDER BY CONCAT_WS(':', key, value))
+                   FROM transaction.transaction_tags tt
+                   WHERE transaction_id = t.id
+                ) as tags
+                FROM transaction.transactions t
+                INNER JOIN transaction.transaction_tags tt ON (t.id = tt.transaction_id)
+                WHERE 1=1
+                ${query?.let { "AND t.name LIKE '%' || :query || '%'" } ?: ""}
+                ${filters.takeIf { it.isNotEmpty() }?.let { " AND (" } ?: ""}
+                ${
+                    filters.joinToString(" OR ") { filter ->
+                        "(${filter.joinToString(" AND ") { (k, v) -> "(tt.key='$k' AND tt.value='$v')" }})"
+                    }
+                }
+                ${filters.takeIf { it.isNotEmpty() }?.let { ")" } ?: ""}
+                ORDER BY t.date DESC
+            """.trimIndent()
+
+        val q = handle.select(searchQuery)
+        query?.let { q.bind("query", query) }
+        return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
+    }
 }

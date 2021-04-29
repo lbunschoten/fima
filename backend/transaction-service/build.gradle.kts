@@ -21,7 +21,7 @@ dependencies {
     implementation("org.jdbi:jdbi3-core:3.18.0")
     implementation("org.jdbi:jdbi3-kotlin:3.18.0")
     implementation("org.jdbi:jdbi3-kotlin-sqlobject:3.18.0")
-    implementation("mysql:mysql-connector-java:8.0.22")
+    implementation("org.postgresql:postgresql:42.2.19")
     implementation(project(":domain"))
     runtimeOnly("io.netty:netty-handler-proxy:4.1.55.Final")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:4.3.2")

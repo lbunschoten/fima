@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-db-volume-claim
+  labels:
+    app: fima
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fima-postgres-db
+  labels:
+    app: fima
+spec:
+  selector:
+    matchLabels:
+      app: fima
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: postgres
+    spec:
+      containers:
+      - image: postgres:13.2
+        name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: "fima"
+        - name: POSTGRES_USER
+          value: "root"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fima-postgres-db-pass
+              key: password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-persistent-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgres-db-volume-claim
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: fima-postgres-db
+spec:
+  type: NodePort
+  selector:
+    app: fima
+    tier: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: postgres
+      nodePort: 31236

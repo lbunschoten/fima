@@ -1,7 +1,8 @@
 import Dashboard from "./views/Dashboard.jsx";
 import Icons from "./views/Icons.jsx";
 import Notifications from "./views/Notifications.jsx";
-import TableList from "./views/TableList.jsx";
+import Subscription from "./views/Subscription.jsx";
+import Subscriptions from "./views/Subscriptions.jsx";
 import Typography from "./views/Typography.jsx";
 import UserProfile from "./views/UserProfile.jsx";
 
@@ -35,10 +36,17 @@ let routes = [
     layout: "/admin"
   },
   {
-    path: "/tables",
-    name: "Table List",
+    path: "/subscriptions",
+    name: "Subscriptions",
     icon: "tim-icons icon-puzzle-10",
-    component: TableList,
+    component: Subscriptions,
+    layout: "/admin",
+  },
+  {
+    hidden: true,
+    path: "/subscription/:id",
+    name: "Subscription",
+    component: Subscription,
     layout: "/admin"
   },
   {

@@ -12,3 +12,5 @@ env.json
 .mvn
 *.kotlintest
 .gradle/
+target/
+sbt.json
