@@ -79,7 +79,7 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 ) as tags
                 FROM transaction.transactions t
                 INNER JOIN transaction.transaction_tags tt ON (t.id = tt.transaction_id)
-                WHERE 1=1
+                WHERE 
                 ${
                     filters.joinToString(" OR ") { filter ->
                         val f: List<String?> = 
