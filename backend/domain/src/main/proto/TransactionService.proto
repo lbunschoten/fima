@@ -16,18 +16,22 @@ message GetTransactionResponse {
   domain.Transaction transaction = 1;
 }
 
+message QueryStringFilter {
+  string queryString = 1;
+}
+
 message TransactionTagFilter {
   string key = 1;
   string value = 2;
 }
 
 message SearchFilter {
-  repeated TransactionTagFilter tags = 1;
+  QueryStringFilter query = 1;
+  repeated TransactionTagFilter tags = 2;
 }
 
 message SearchTransactionsRequest {
-  string query = 1;
-  repeated SearchFilter filters = 2;
+  repeated SearchFilter filters = 1;
 }
 
 message SearchTransactionsResponse {

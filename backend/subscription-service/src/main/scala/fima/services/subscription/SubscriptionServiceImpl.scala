@@ -4,11 +4,10 @@ import cats.effect.{ContextShift, IO, Resource}
 import doobie.implicits._
 import doobie.{ExecutionContexts, Transactor}
 import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
-import fima.domain.transaction.TransactionDomain.Transaction
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.subscription.SubscriptionService.{GetSubscriptionRequest, GetSubscriptionResponse, GetSubscriptionsRequest, GetSubscriptionsResponse}
 import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceStub
-import fima.services.transaction.TransactionService.{SearchFilter, SearchTransactionsRequest, TransactionTagFilter}
+import fima.services.transaction.TransactionService.{QueryStringFilter, SearchFilter, SearchTransactionsRequest, TransactionTagFilter}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,38 +20,40 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
     implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContexts.synchronous)
 
-    val searchTransactionsRequest = SearchTransactionsRequest()
-      .withQuery("SPOTIFY")
-      .withFilters(Seq(
-        SearchFilter(Seq(
-          TransactionTagFilter("recurring", "monthly")
-        ))
-      ))
+    import implicits.SubscriptionSearchQueryExt
 
-    try {
-      (for {
-        s <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa).map { _.getOrElse(throw new Exception(""))} }
-        t <- IO.fromFuture(IO(transactionService.searchTransactions(searchTransactionsRequest)))
-      } yield GetSubscriptionResponse(
-        subscription = Option(Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id))),
-        transactions = t.transactions.map { tr: Transaction =>
-          println(tr)
-          tr
-        }
-      )).unsafeToFuture()
-    } catch {
-      case e: Exception =>
-        println(e.getMessage)
-        throw e
-    }
+    (for {
+      subscription <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }
+      searchTransactionsResponse <- subscription.map { s =>
+        IO.fromFuture(IO(transactionService.searchTransactions(s.query.asSearchRequest).map { _.transactions }))
+      }.getOrElse(IO.fromFuture(IO(Future.successful(Seq.empty))))
+    } yield GetSubscriptionResponse(
+      subscription = subscription.map { s => Subscription(s.id.toString, s.name, Recurrence.fromValue(s.recurrence.id)) },
+      transactions = searchTransactionsResponse
+    )).unsafeToFuture()
   }
 
   override def getSubscriptions(request: GetSubscriptionsRequest): Future[GetSubscriptionsResponse] = {
     (for {
-      s <- transactor.use { xa => subscriptionRepository.findAll().transact(xa) }
+      subscriptions <- transactor.use { xa => subscriptionRepository.findAll().transact(xa) }
     } yield GetSubscriptionsResponse(
-      subscriptions = s.map { ss => Subscription(ss.id.toString, ss.name, Recurrence.MONTHLY)},
+      subscriptions = subscriptions.map { s => Subscription(s.id.toString, s.name, Recurrence.MONTHLY) },
     )).unsafeToFuture()
   }
+}
 
+object implicits {
+  implicit class SubscriptionSearchQueryExt(val subscriptionSearchQuery: SubscriptionSearchQuery) {
+    def asSearchRequest: SearchTransactionsRequest = {
+      SearchTransactionsRequest()
+        .withFilters(
+          subscriptionSearchQuery.filters.map { f =>
+            SearchFilter(
+              f.query.map { q => QueryStringFilter(q.queryString) },
+              f.tags.map { t => TransactionTagFilter(t.key, t.value) }
+            )
+          }
+        )
+    }
+  }
 }
