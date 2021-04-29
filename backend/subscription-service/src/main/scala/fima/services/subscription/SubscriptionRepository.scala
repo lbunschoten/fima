@@ -94,13 +94,13 @@ class SubscriptionRepository {
   }
 
   def findById(id: UUID): ConnectionIO[Option[Subscription]] = {
-    sql"SELECT id, name, recurrence from transaction.subscription WHERE id = $id"
+    sql"SELECT id, name, query, recurrence from transaction.subscription WHERE id = $id"
       .query[Subscription]
       .option
   }
 
   def findAll(): ConnectionIO[List[Subscription]] = {
-    sql"SELECT id, name, recurrence from transaction.subscription"
+    sql"SELECT id, name, query, recurrence from transaction.subscription"
       .query[Subscription]
       .to[List]
   }
