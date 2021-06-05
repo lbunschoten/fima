@@ -1,6 +1,6 @@
 package fima.api
 
-import fima.services.subscription.InvestmentServiceGrpcKt
+import fima.services.investment.InvestmentServiceGrpcKt
 import fima.services.subscription.SubscriptionServiceGrpcKt
 import fima.services.transaction.TransactionServiceGrpcKt
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
