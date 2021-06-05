@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 class StockController @Autowired constructor(
@@ -30,13 +30,13 @@ class StockController @Autowired constructor(
         if (response.hasStock()) {
             return Stock.fromProto(response.stock)
         } else {
-            throw HttpClientErrorException(HttpStatus.NOT_FOUND)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
     }
 
     @CrossOrigin
-    @GetMapping("/investments")
-    suspend fun getInvestments(): List<Stock> {
+    @GetMapping("/stocks")
+    suspend fun getStocks(): List<Stock> {
         logger.info("Received request to get investments")
 
         val request = GetStocksRequest.newBuilder().build()
