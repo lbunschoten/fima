@@ -20,7 +20,7 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
     implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContexts.synchronous)
 
-    import implicits.SubscriptionSearchQueryExt
+    import implicits.SubscriptionSearchQueryExT
 
     (for {
       subscription <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }

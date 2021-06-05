@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package domain;
+
+option java_multiple_files = true;
+option java_package = "fima.domain.investment";
+option java_outer_classname = "InvestmentServiceProtos";
+
+enum Sector {
+  ENERGY = 0;
+  MATERIALS = 1;
+  UTILITIES = 2;
+  INDUSTRIALS = 3;
+  HEALTHCARE = 4;
+  FINANCIALS = 5;
+  CONSUMER_DISCREDITIONARY = 6;
+  CONSUMER_STAPLES = 7;
+  INFORMATION_TECHNOLOGY = 8;
+  COMMUNICATION_SERVICES = 9;
+  REAL_ESTATE = 10;
+}
+
+enum InvestmentType {
+  VALUE = 0;
+  DIVIDENT = 1;
+  GROWTH = 2;
+}
+
+enum MarketIndex {
+  NYSE = 0;
+  NASDAQ = 1;
+  AMS = 2;
+}
+
+message Stock {
+  string symbol = 1;
+  string name = 2;
+  MarketIndex index = 3;
+  Sector sector = 4;
+  InvestmentType investmentType = 5;
+}
