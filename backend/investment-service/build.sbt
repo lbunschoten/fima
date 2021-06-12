@@ -21,6 +21,9 @@ lazy val root = project
       "org.tpolecat" %% "doobie-hikari" % "0.12.1", // HikariCP transactor.
       "org.tpolecat" %% "doobie-postgres" % "0.12.1", // Postgres driver 42.2.19 + type mappings.
 
+      // HTTP
+      "com.softwaremill.sttp.client3" %% "core" % "3.3.6",
+
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,

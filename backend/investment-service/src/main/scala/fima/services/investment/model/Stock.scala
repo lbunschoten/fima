@@ -1,17 +1,23 @@
 package fima.services.investment.model
 
-import fima.services.investment.model.Stock.StockSymbol
 import fima.domain.investment.InvestmentDomain.{Stock => PStock}
+import fima.services.investment.model.Stock.StockSymbol
+
+import java.time.Instant
 
 object Stock {
   type StockSymbol = String
 }
 
-case class Stock(symbol: StockSymbol,
-                 name: String,
-                 index: MarketIndex,
-                 sector: Sector,
-                 investmentType: InvestmentType) {
+case class Stock(
+  symbol: StockSymbol,
+  name: String,
+  index: MarketIndex,
+  sector: Sector,
+  investmentType: InvestmentType,
+  marketValue: BigDecimal,
+  updatedAt: Instant
+) {
 
   def stockToProto: PStock = {
     import implicits._

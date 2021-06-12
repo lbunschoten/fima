@@ -16,7 +16,7 @@ spec:
         name: investment-service
     spec:
       containers:
-        - name: subscription-service
+        - name: investment-service
           image: "$DOCKER_IMAGE"
           ports:
             - name: http
@@ -27,6 +27,16 @@ spec:
                 secretKeyRef:
                   name: fima-postgres-db-pass
                   key: password
+            - name: ALPHA_VANTAGE_API_BASE_URL
+                valueFrom:
+                  secretKeyRef:
+                    name: fima-alpha-vantage-api
+                    key: base_url
+            - name: ALPHA_VANTAGE_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: fima-alpha-vantage-api
+                    key: api_key
       imagePullSecrets:
         - name: regcred
 ---
