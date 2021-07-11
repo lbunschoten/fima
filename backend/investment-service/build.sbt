@@ -11,7 +11,8 @@ lazy val root = project
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
     excludeDependencies ++= Seq(
-      ExclusionRule("org.scala-lang.modules", s"scala-collection-compat_$scalaVersionStr")
+      ExclusionRule("org.scala-lang.modules", s"scala-collection-compat_$scalaVersionStr"),
+      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13")
     ),
     libraryDependencies ++= Seq(
       // GRPC
@@ -38,7 +39,6 @@ lazy val root = project
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-//      "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.37.0",
 
     ),
