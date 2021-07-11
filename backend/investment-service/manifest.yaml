@@ -74,5 +74,5 @@ spec:
         paths:
           - path: /investment
             backend:
-              serviceName: api
+              serviceName: investment-service
               servicePort: 8080
