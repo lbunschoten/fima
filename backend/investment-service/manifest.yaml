@@ -58,7 +58,7 @@ spec:
       targetPort: grpc
     - name: http
       protocol: TCP
-      port: 8080
+      port: 80
       targetPort: http
 ---
 apiVersion: extensions/v1beta1
@@ -75,4 +75,4 @@ spec:
           - path: /investment
             backend:
               serviceName: investment-service
-              servicePort: 8080
+              servicePort: 80
