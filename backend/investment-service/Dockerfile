@@ -10,5 +10,6 @@ RUN apt-get update && \
 COPY ./target/scala-2.13/investment-service-assembly-0.1.0.jar fima.jar
 
 EXPOSE 9997
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "fima.jar"]

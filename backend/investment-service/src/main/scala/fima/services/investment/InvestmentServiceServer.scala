@@ -1,5 +1,8 @@
 package fima.services.investment
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
 import cats.effect._
 import doobie._
 import doobie.hikari.HikariTransactor
@@ -34,6 +37,9 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
   private def start(): Unit = {
+    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "api-system")
+    val actorExcutionContext = system.executionContext
+
     val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
     val dbPort: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
     val dbPassword: String = Option(System.getenv("DB_PASSWORD")).getOrElse("root123")
@@ -43,13 +49,18 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
     val transactor = startDbTransactor(dbHost, dbPort, dbPassword)
 
     val stockRepository = new StockRepository()
+    val api = new InvestmentServiceApi(stockRepository, transactor)
     val stockApi = new AlphaVantageApi(alphaVantageApiBaseUrl, alphaVantageApiKey)
-    val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
+    val apiServer = Http()
+      .newServerAt("localhost", 8080)
+      .bind(api.routes)
+
     server = NettyServerBuilder
       .forPort(InvestmentServiceServer.port)
       .addService(InvestmentService.bindService(new InvestmentServiceImpl(stockRepository, transactor), executionContext))
       .build.start
 
+    val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
     val executor = new ScheduledThreadPoolExecutor(1)
     executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
 
@@ -58,6 +69,9 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
       System.err.println("*** shutting down gRPC server since JVM is shutting down")
       stop()
       System.err.println("*** server shut down")
+      apiServer
+        .flatMap(_.unbind())(actorExcutionContext) // trigger unbinding from the port
+        .onComplete(_ => system.terminate())(actorExcutionContext)
     }
   }
 
