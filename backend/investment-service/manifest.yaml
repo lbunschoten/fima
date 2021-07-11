@@ -19,8 +19,10 @@ spec:
         - name: investment-service
           image: "$DOCKER_IMAGE"
           ports:
-            - name: http
+            - name: grpc
               containerPort: 9997
+            - name: http
+              containerPort: 8080
           env:
             - name: DB_PASSWORD
               valueFrom:
@@ -50,11 +52,12 @@ spec:
     tier: backend
     name: investment-service
   ports:
-    - name: http
+    - name: grpc
       protocol: TCP
       port: 9997
-      targetPort: http
-    - protocol: TCP
+      targetPort: grpc
+    - name: http
+      protocol: TCP
       port: 8080
       targetPort: http
 ---
