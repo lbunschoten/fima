@@ -16,6 +16,7 @@ import io.grpc.netty.NettyServerBuilder
 import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.language.existentials
+import scala.util.{Failure, Success}
 
 
 object InvestmentServiceServer {
@@ -54,6 +55,11 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
     val apiServer = Http()
       .newServerAt("localhost", 8080)
       .bind(api.routes)
+
+    apiServer.onComplete {
+      case Success(v) => println(s"HTTP Server started at ${v.localAddress}")
+      case Failure(e) => println(s"Failed to start HTTP server: ${e.getMessage}")
+    }
 
     server = NettyServerBuilder
       .forPort(InvestmentServiceServer.port)
