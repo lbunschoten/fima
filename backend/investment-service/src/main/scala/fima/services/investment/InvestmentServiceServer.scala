@@ -53,7 +53,7 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
     val api = new InvestmentServiceApi(stockRepository, transactor)
     val stockApi = new AlphaVantageApi(alphaVantageApiBaseUrl, alphaVantageApiKey)
     val apiServer = Http()
-      .newServerAt("localhost", 8080)
+      .newServerAt("0.0.0.0", 8080)
       .bind(api.routes)
 
     apiServer.onComplete {
@@ -68,7 +68,7 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
 
     val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
     val executor = new ScheduledThreadPoolExecutor(1)
-    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
+//    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
 
     println("Server started, listening on " + InvestmentServiceServer.port)
     sys.addShutdownHook {
