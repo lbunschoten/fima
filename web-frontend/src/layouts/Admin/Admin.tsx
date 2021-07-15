@@ -1,25 +1,40 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 
-// core components
-import AdminNavbar from "../../components/Navbars/AdminNavbar.jsx";
-import Sidebar from "../../components/Sidebar/Sidebar.jsx";
+import AdminNavbar from "../../components/Navbars/AdminNavbar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 
-import routes from "../../routes.js";
+import routes, {route} from "../../routes";
+import {BrowserHistory} from "history";
 
-class Admin extends React.Component {
-  constructor(props) {
+export interface AdminProps {
+  location: Location,
+  history: BrowserHistory
+}
+interface AdminState {
+  sidebarOpened: boolean,
+}
+
+class Admin extends React.Component<AdminProps, AdminState> {
+  mainPanelRef: React.RefObject<HTMLDivElement> = React.createRef()
+  
+  constructor(props: AdminProps) {
     super(props);
+
     this.state = {
-      sidebarOpened: document.documentElement.className.indexOf("nav-open") !== -1
+      sidebarOpened: document.documentElement.className.indexOf("nav-open") !== -1,
     };
-    this.mainPanelRef = React.createRef();
   }
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate<P extends AdminProps, S extends AdminState, SS>(prevProps: P, prevState: S, snapshot: SS) {
     if (prevProps.history.action === "PUSH") {
       document.documentElement.scrollTop = 0;
-      document.scrollingElement.scrollTop = 0;
-      this.mainPanelRef.current.scrollTop = 0;
+      if (document.scrollingElement) {
+        document.scrollingElement.scrollTop = 0;
+      }
+
+      if (this.mainPanelRef.current) {
+        this.mainPanelRef.current.scrollTop = 0
+      }
     }
   }
   // this function opens and closes the sidebar on small devices
@@ -27,7 +42,7 @@ class Admin extends React.Component {
     document.documentElement.classList.toggle("nav-open");
     this.setState({ sidebarOpened: !this.state.sidebarOpened });
   };
-  getRoutes = routes => {
+  getRoutes = (routes: route[]) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
@@ -42,7 +57,7 @@ class Admin extends React.Component {
       }
     });
   };
-  brandText = path => {
+  brandText = (path: string) => {
     for (let i = 0; i < routes.length; i++) {
       if (
         path.indexOf(
