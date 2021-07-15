@@ -67,6 +67,7 @@ metadata:
   name: investment-api
   annotations:
     kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
     - host: api.fima.test
