@@ -1,17 +1,16 @@
-import Dashboard from "./views/Dashboard";
-import Icons from "./views/Icons";
-import Notifications from "./views/Notifications";
-import Subscription from "./views/Subscription";
-import Subscriptions from "./views/Subscriptions";
-import Typography from "./views/Typography";
-import UserProfile from "./views/UserProfile";
-import React from "react";
+import DashboardContainer from "./views/DashboardContainer";
+import IconsContainer from "./views/IconsContainer";
+import NotificationsContainer from "./views/NotificationsContainer";
+import SubscriptionContainer from "./views/SubscriptionContainer";
+import SubscriptionsContainer from "./views/SubscriptionsContainer";
+import TypographyContainer from "./views/TypographyContainer";
+import UserProfileContainer from "./views/UserProfileContainer";
 
 export type route = {
     path: string,
     name: string,
     icon?: string,
-    component: typeof React.Component
+    component: (props: any) => JSX.Element
     layout: string,
     hidden?: boolean,
 }
@@ -21,49 +20,49 @@ let routes: route[] = [
         path: "/dashboard",
         name: "Dashboard",
         icon: "tim-icons icon-chart-pie-36",
-        component: Dashboard,
+        component: DashboardContainer,
         layout: "/admin"
     },
     {
         path: "/icons",
         name: "Icons",
         icon: "tim-icons icon-atom",
-        component: Icons,
+        component: IconsContainer,
         layout: "/admin"
     },
     {
         path: "/notifications",
         name: "Notifications",
         icon: "tim-icons icon-bell-55",
-        component: Notifications,
+        component: NotificationsContainer,
         layout: "/admin"
     },
     {
         path: "/user-profile",
         name: "User Profile",
         icon: "tim-icons icon-single-02",
-        component: UserProfile,
+        component: UserProfileContainer,
         layout: "/admin"
     },
     {
         path: "/subscriptions",
         name: "Subscriptions",
         icon: "tim-icons icon-puzzle-10",
-        component: Subscriptions,
+        component: SubscriptionsContainer,
         layout: "/admin",
     },
     {
         hidden: true,
         path: "/subscription/:id",
         name: "Subscription",
-        component: Subscription,
+        component: SubscriptionContainer,
         layout: "/admin"
     },
     {
         path: "/typography",
         name: "Typography",
         icon: "tim-icons icon-align-center",
-        component: Typography,
+        component: TypographyContainer,
         layout: "/admin"
     }
 ];

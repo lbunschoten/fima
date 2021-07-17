@@ -29,7 +29,7 @@ function mergeDeep(...objects: any[]) {
         return prev;
     }, {});
 }
-let chart_defaults: ChartOptions = {
+let chart_defaults: ChartOptions<any> = {
     maintainAspectRatio: false,
     plugins: {
         legend: {
