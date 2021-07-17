@@ -45,7 +45,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: traefik
+  name: traefik-ingress-service
 spec:
   type: LoadBalancer
   selector:
