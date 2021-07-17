@@ -7,7 +7,7 @@ metadata:
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: traefik
+  name: traefik-ingress-controller
   labels:
     app: traefik
 
@@ -21,6 +21,7 @@ spec:
         app: traefik
     spec:
       serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
       containers:
         - name: traefik
           image: traefik:v2.4
@@ -34,6 +35,7 @@ spec:
           ports:
             - name: web
               containerPort: 80
+              hostPort: 80
             - name: admin
               containerPort: 8080
           securityContext:
