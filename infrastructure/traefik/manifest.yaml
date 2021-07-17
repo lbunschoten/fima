@@ -29,6 +29,7 @@ spec:
             - --providers.kubernetesingress
             - --api.dashboard=true
             - --api.insecure=true
+            - --accesslog
           ports:
             - name: web
               containerPort: 80
