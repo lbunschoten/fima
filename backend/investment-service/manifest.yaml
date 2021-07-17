@@ -61,19 +61,27 @@ spec:
       port: 80
       targetPort: http
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: investment-api
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.frontend.rule.type: PathPrefixStrip
+  name: api
 spec:
-  rules:
-    - host: api.fima.test
-      http:
-        paths:
-          - path: /investment
-            backend:
-              serviceName: investment-service
-              servicePort: 80
+  entryPoints:
+    - http
+  routes:
+    - match: Host(`api.fima.test`) && PathPrefix(`/investment`)
+      kind: Rule
+      services:
+        - name: investment-service
+          port: 80
+      middlewares:
+        - name: strip-investment-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-investment-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /investment
