@@ -27,6 +27,7 @@ spec:
           args:
             - --entrypoints.web.address=:80
             - --providers.kubernetesingress
+            - --providers.kubernetescrd
             - --api.dashboard=true
             - --api.insecure=true
             - --accesslog
