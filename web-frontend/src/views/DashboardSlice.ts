@@ -69,13 +69,13 @@ export const dashboardSlice = createSlice({
 export const {setSelectedChart, setTransactions, setSubscriptions, setCountChartData, setSumChart, setBalanceChart} = dashboardSlice.actions
 
 export const fetchTransactions = (): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch("http://api.fima.test/transaction/recent?offset=0&limit=10") // FIXME: Don't use hardcoded domain name
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/transaction/recent?offset=0&limit=10`)
     const transactions: TransactionData[] = await asyncResp.json()
     dispatch(setTransactions(transactions))
 }
 
 export const fetchSubscriptions = (): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch("http://api.fima.test/subscriptions") // FIXME: Don't use hardcoded domain name
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/subscriptions`)
     const subscriptions: SubscriptionData[] = await asyncResp.json()
     dispatch(setSubscriptions(subscriptions))
 }
@@ -87,7 +87,7 @@ interface TransactionStatistics {
 }
 
 export const fetchTransactionStatistics = (): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch("http://api.fima.test/transaction/statistics") // FIXME: Don't use hardcoded domain name
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/transaction/statistics`)
     const results: TransactionStatistics[] = await asyncResp.json()
     dispatch(setCountChartData(results.map(stats => stats.transactions)))
     dispatch(setSumChart(results.map(stats => stats.sum)))

@@ -36,7 +36,7 @@ interface SubscriptionTransactionsResponse {
 export const {setSubscriptionTransactions} = subscriptionSlice.actions
 
 export const fetchTransactions = (subscriptionId: string): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch(`http://api.fima.test/subscription/${subscriptionId}`) // FIXME: Don't use hardcoded domain name
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/subscription/${subscriptionId}`)
     const response: SubscriptionTransactionsResponse = await asyncResp.json()
     dispatch(setSubscriptionTransactions(response))
 }

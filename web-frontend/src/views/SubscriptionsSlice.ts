@@ -25,7 +25,7 @@ export const subscriptionsSlice = createSlice({
 export const {setSubscriptions} = subscriptionsSlice.actions
 
 export const fetchSubscriptions = (): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch("http://api.fima.test/subscriptions") // FIXME: Don't use hardcoded domain name
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/subscriptions`)
     const subscriptions: SubscriptionData[] = await asyncResp.json()
     dispatch(setSubscriptions(subscriptions))
 }
