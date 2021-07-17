@@ -67,7 +67,7 @@ metadata:
   name: api
 spec:
   entryPoints:
-    - http
+    - web
   routes:
     - match: Host(`api.fima.test`) && PathPrefix(`/investment`)
       kind: Rule
