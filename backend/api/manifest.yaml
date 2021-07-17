@@ -47,7 +47,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`api.fima.test`) && PathPrefix(`/`)
+    - match: Host(`api.fima.test`)
       kind: Rule
       services:
         - name: api
