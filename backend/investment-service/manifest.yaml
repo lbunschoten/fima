@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: investment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: investment-service
+  template:
+    metadata:
+      labels:
+        app: fima
+        tier: backend
+        track: stable
+        name: investment-service
+    spec:
+      containers:
+        - name: investment-service
+          image: "$DOCKER_IMAGE"
+          ports:
+            - name: grpc
+              containerPort: 9997
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fima-postgres-db-pass
+                  key: password
+            - name: ALPHA_VANTAGE_API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fima-alpha-vantage-api
+                  key: base_url
+            - name: ALPHA_VANTAGE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fima-alpha-vantage-api
+                  key: api_key
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: investment-service
+spec:
+  selector:
+    app: fima
+    tier: backend
+    name: investment-service
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 9997
+      targetPort: grpc
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.fima.test`) && PathPrefix(`/investment`)
+      kind: Rule
+      services:
+        - name: investment-service
+          port: 80
+      middlewares:
+        - name: strip-investment-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-investment-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /investment

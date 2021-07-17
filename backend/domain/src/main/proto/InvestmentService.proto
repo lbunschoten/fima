@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package services;
+
+import "InvestmentDomain.proto";
+
+option java_multiple_files = true;
+option java_package = "fima.services.investment";
+option java_outer_classname = "StockServiceProtos";
+
+message GetStockRequest {
+  string symbol = 1;
+}
+
+message GetStockResponse {
+  domain.Stock stock = 1;
+}
+
+message GetStocksRequest {
+}
+
+message GetStocksResponse {
+  repeated domain.Stock stocks = 1;
+}
+
+service InvestmentService {
+
+  rpc getStock(GetStockRequest) returns (GetStockResponse) {}
+
+  rpc getStocks(GetStocksRequest) returns (GetStocksResponse) {}
+
+}

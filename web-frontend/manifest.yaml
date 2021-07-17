@@ -21,6 +21,12 @@ spec:
           ports:
             - name: http
               containerPort: 80
+          env:
+            - name: API_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: fima-api
+                  key: host
       imagePullSecrets:
         - name: regcred
 ---
