@@ -58,8 +58,7 @@ metadata:
   name: traefik-web-ui
 spec:
   selector:
-    matchLabels:
-      app: traefik
+    app: traefik
   ports:
     - port: 80
       targetPort: 8080
