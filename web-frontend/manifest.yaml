@@ -44,19 +44,16 @@ spec:
       port: 80
       targetPort: 80
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: web-fronted
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.frontend.rule.type: PathPrefixStrip
+  name: web-frontend-route
 spec:
-  rules:
-  - host: fima.test
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: web-frontend
-          servicePort: 80
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`fima.test`)
+      kind: Rule
+      services:
+        - name: web-frontend
+          port: 80
