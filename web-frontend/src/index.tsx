@@ -12,6 +12,7 @@ import {dashboardSlice} from "./views/DashboardSlice";
 import {subscriptionsSlice} from "./views/SubscriptionsSlice";
 import {subscriptionSlice} from "./views/SubscriptionSlice";
 import {layoutSlice} from "./layouts/LayoutSlice";
+import {investmentsSlice} from "./views/InvestmentsSlice";
 
 
 const store = configureStore({
@@ -20,6 +21,7 @@ const store = configureStore({
         subscription: subscriptionSlice.reducer,
         subscriptions: subscriptionsSlice.reducer,
         layout: layoutSlice.reducer,
+        investments: investmentsSlice.reducer
     },
     middleware: getDefaultMiddleware({
         serializableCheck: false,

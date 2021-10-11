@@ -2,17 +2,12 @@ package fima.services.investment.repository
 
 import doobie.Meta
 import doobie.postgres.implicits.pgEnumStringOpt
+import enumeratum.values.{StringCirceEnum, StringEnum, StringEnumEntry}
 
-trait EnumSerializer[T <: StringSerializable] {
-  val values: Seq[T]
+trait EnumSerializer[T <: StringEnumEntry] extends StringEnum[T] with StringCirceEnum[T] {
+  def toEnum(t: T): String = t.value
 
-  def toEnum(t: T): String = t.serializeToString
-
-  def fromEnum(serializedEnum: String): Option[T] = values.find(_.serializeToString == serializedEnum)
+  def fromEnum(serializedEnum: String): Option[T] = values.find(_.value == serializedEnum)
 
   implicit val meta: Meta[T] = pgEnumStringOpt(getClass.getSimpleName, fromEnum, toEnum)
-}
-
-trait StringSerializable {
-  def serializeToString: String
 }

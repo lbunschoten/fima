@@ -3,6 +3,7 @@
 
 .DS_Store
 .eslintcache
+.env.local
 node_modules/
 npm-debug.log
 node/

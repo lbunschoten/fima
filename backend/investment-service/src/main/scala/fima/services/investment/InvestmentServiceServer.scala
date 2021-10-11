@@ -9,11 +9,11 @@ import doobie.hikari.HikariTransactor
 import fima.services.investment.InvestmentService.InvestmentServiceGrpc.InvestmentService
 import fima.services.investment.market.MarketValueUpdater
 import fima.services.investment.market.alpha_vantage.AlphaVantageApi
-import fima.services.investment.repository.StockRepository
+import fima.services.investment.repository.{StockRepository, TransactionRepository}
 import io.grpc.Server
 import io.grpc.netty.NettyServerBuilder
 
-import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor}
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.language.existentials
 import scala.util.{Failure, Success}
@@ -50,7 +50,8 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
     val transactor = startDbTransactor(dbHost, dbPort, dbPassword)
 
     val stockRepository = new StockRepository()
-    val api = new InvestmentServiceApi(stockRepository, transactor)
+    val transactionRepository = new TransactionRepository()
+    val api = new InvestmentServiceApi(stockRepository, transactionRepository, transactor)
     val stockApi = new AlphaVantageApi(alphaVantageApiBaseUrl, alphaVantageApiKey)
     val apiServer = Http()
       .newServerAt("0.0.0.0", 8080)
@@ -68,7 +69,7 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
 
     val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
     val executor = new ScheduledThreadPoolExecutor(1)
-    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
+//    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
 
     println("Server started, listening on " + InvestmentServiceServer.port)
     sys.addShutdownHook {

@@ -5,6 +5,7 @@ import SubscriptionContainer from "./views/SubscriptionContainer";
 import SubscriptionsContainer from "./views/SubscriptionsContainer";
 import TypographyContainer from "./views/TypographyContainer";
 import UserProfileContainer from "./views/UserProfileContainer";
+import InvestmentsContainer from "./views/InvestmentsContainer";
 
 export type route = {
     path: string,
@@ -21,6 +22,13 @@ let routes: route[] = [
         name: "Dashboard",
         icon: "tim-icons icon-chart-pie-36",
         component: DashboardContainer,
+        layout: "/admin"
+    },
+    {
+        path: "/investments",
+        name: "Investments",
+        icon: "tim-icons icon-atom",
+        component: InvestmentsContainer,
         layout: "/admin"
     },
     {

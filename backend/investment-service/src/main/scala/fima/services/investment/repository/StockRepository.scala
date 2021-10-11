@@ -6,6 +6,7 @@ import doobie.util.log.LogHandler
 import fima.services.investment.model.Stock
 import fima.services.investment.model.Stock.StockSymbol
 import doobie.postgres.implicits.JavaTimeInstantMeta
+import doobie.postgres.implicits.JavaTimeLocalDateMeta
 
 class StockRepository {
 

@@ -34,6 +34,7 @@ lazy val root = project
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
       "io.circe" %% "circe-generic-extras" % "0.14.1",
+      "com.beachape" %% "enumeratum-circe" % "1.7.0",
 
       // Akka
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,

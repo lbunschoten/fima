@@ -13,8 +13,8 @@ case class Stock(
   symbol: StockSymbol,
   name: String,
   index: MarketIndex,
-  sector: Sector,
-  investmentType: InvestmentType,
+  sector: SectorType,
+  investmentType: InvestmentMethod,
   marketValue: BigDecimal,
   updatedAt: Instant
 ) {
@@ -26,3 +26,8 @@ case class Stock(
   }
 
 }
+
+case class Position(
+  stock: Stock,
+  shares: Int
+)
