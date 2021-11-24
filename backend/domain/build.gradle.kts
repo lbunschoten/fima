@@ -6,15 +6,18 @@ import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.google.protobuf") version "0.8.13"
+    id("com.google.protobuf") version "0.8.17"
     kotlin("jvm")
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.21")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
-    api("io.grpc:grpc-kotlin-stub:1.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    api("io.grpc:grpc-stub:1.41.0")
+    api("io.grpc:grpc-protobuf:1.41.0")
+    api("com.google.protobuf:protobuf-java-util:3.19.1")
+    api("com.google.protobuf:protobuf-kotlin:3.19.1")
+    api("io.grpc:grpc-kotlin-stub:1.2.0")
 }
 
 description = "domain"
@@ -30,18 +33,19 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
+    kotlinOptions.freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.14.0"
+        artifact = "com.google.protobuf:protoc:3.19.1"
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.34.1"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.41.0"
         }
         id("grpckt") {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.0.0:jdk7@jar"
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.2.0:jdk7@jar"
         }
     }
     generateProtoTasks {
@@ -49,6 +53,9 @@ protobuf {
             it.plugins {
                 id("grpc")
                 id("grpckt")
+            }
+            it.builtins {
+                id("kotlin")
             }
         }
     }

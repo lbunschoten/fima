@@ -8,7 +8,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
     implementation("io.netty:netty-codec-http2:4.1.55.Final")
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-simple:1.7.30")

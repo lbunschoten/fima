@@ -16,7 +16,7 @@ class CommandHandler(private val eventStore: EventStore,
             val newEvents: List<Event> = command.events(aggregateId).mapIndexed { idx, buildEvent ->
                 buildEvent(1 + idx + inputAggregate.version)
             }
-            val outputAggregate = newEvents.fold(inputAggregate, { agg, e -> e.apply(agg) })
+            val outputAggregate = newEvents.fold(inputAggregate) { agg, e -> e.apply(agg) }
 
             val validationErrors = outputAggregate.validate()
             if (validationErrors.isEmpty()) {

@@ -11,7 +11,7 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation("io.netty:netty-codec-http2:4.1.55.Final")
     implementation("io.grpc:grpc-netty:1.34.1")
     implementation("io.grpc:grpc-protobuf:1.34.1")
@@ -24,8 +24,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.2.19")
     implementation(project(":domain"))
     runtimeOnly("io.netty:netty-handler-proxy:4.1.55.Final")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.3.2")
-    testImplementation("io.mockk:mockk:1.10.3")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.3")
+    testImplementation("io.mockk:mockk:1.12.0")
 }
 
 java {
