@@ -18,7 +18,7 @@ class TransactionTagsStore(db: Jdbi) : Closeable {
         val insertTagsQuery = handle.prepareBatch("""
           INSERT INTO transaction_tags (id, transaction_id, key, value)
           VALUES (:id, :transaction_id, :key, :value)
-          ON DUPLICATE KEY UPDATE value = :value
+          ON CONFLICT DO UPDATE SET value = :value
         """)
 
         tags.forEach { (key, value) ->
