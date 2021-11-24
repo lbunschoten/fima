@@ -24,7 +24,7 @@ class TaggingRulesStoreImpl(
         handle
             .createUpdate("""
                 INSERT INTO transaction_tagging_rule (id, regex, tags) VALUES (:transaction_id, :regex, :tags)
-                ON CONFLICT DO UPDATE SET 
+                ON CONFLICT(id) DO UPDATE SET 
                     regex = :regex, 
                     tags = :tags
             """)
