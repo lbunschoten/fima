@@ -45,10 +45,10 @@ class TaggingService(
             } else {
                 emptyList()
             }
-        }.map {
+        }.associate {
             val (key, value) = it.split(":", limit = 2)
             Pair(key, value)
-        }.toMap()
+        }
 
         if (tags.isNotEmpty()) {
             transactionTagsStore.storeTags(event.id, tags)

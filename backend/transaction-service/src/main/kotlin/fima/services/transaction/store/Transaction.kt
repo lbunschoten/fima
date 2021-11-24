@@ -39,15 +39,14 @@ data class Transaction(
 class TransactionRowMapper : RowMapper<Transaction> {
     override fun map(rs: ResultSet, ctx: StatementContext): Transaction {
         val tags = rs
-            .getString("tags")
-            ?.takeIf { it.isNotBlank() }
-            ?.split(",")
-            ?.map { tag ->
-                val (key, value) = tag.split(":")
-                Pair(key, value)
-            }
-            ?.toMap()
-            ?: emptyMap()
+                .getString("tags")
+                ?.takeIf { it.isNotBlank() }
+                ?.split(",")
+                ?.associate { tag ->
+                    val (key, value) = tag.split(":")
+                    Pair(key, value)
+                }
+                ?: emptyMap()
 
         return Transaction(
             id = UUID.fromString(rs.getString("id")),

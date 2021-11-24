@@ -177,7 +177,11 @@ class TransactionServiceImpl(
     override suspend fun tagTransactions(request: TagTransactionsRequest): TagTransactionsResponse {
         logger.info("Received request to tag all transactions")
 
-        taggingService.tagTransactions()
+        try {
+            taggingService.tagTransactions()
+        } catch (e: Exception) {
+            logger.error("Could not tag transactions: ${e.message}")
+        }
 
         return TagTransactionsResponse.newBuilder().build()
     }

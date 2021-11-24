@@ -27,7 +27,7 @@ class TransactionStatisticsStoreImpl(
             val previousMonthStatistics = getPreviousMonthStatistics(month, year)
             insertStatistic(
                 sum = amountInCents,
-                balance = previousMonthStatistics?.balance ?: initialBalanceInCents + amountInCents,
+                balance = previousMonthStatistics?.balance ?: (initialBalanceInCents + amountInCents),
                 month = month,
                 year = year
             )
