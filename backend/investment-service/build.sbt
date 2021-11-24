@@ -1,8 +1,8 @@
 val scalaVersionStr = "2.13.5"
 val doobieVersion = "0.12.1"
-val circeVersion = "0.12.3"
-val AkkaVersion = "2.6.8"
-val AkkaHttpVersion = "10.2.4"
+val circeVersion = "0.14.1"
+val AkkaVersion = "2.6.17"
+val AkkaHttpVersion = "10.2.6"
 
 lazy val root = project
   .in(file("."))
@@ -20,14 +20,14 @@ lazy val root = project
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
 
       // DB
-      "org.tpolecat" %% "doobie-core" % "0.12.1",
-      "org.tpolecat" %% "doobie-hikari" % "0.12.1", // HikariCP transactor.
-      "org.tpolecat" %% "doobie-postgres" % "0.12.1", // Postgres driver 42.2.19 + type mappings.
+      "org.tpolecat" %% "doobie-core" % "0.13.4",
+      "org.tpolecat" %% "doobie-hikari" % "0.13.4", // HikariCP transactor.
+      "org.tpolecat" %% "doobie-postgres" % "0.13.4", // Postgres driver 42.2.19 + type mappings.
 
       "org.typelevel" %% "cats-effect" % "2.5.1",
 
       // HTTP
-      "com.softwaremill.sttp.client3" %% "core" % "3.3.6",
+      "com.softwaremill.sttp.client3" %% "core" % "3.3.16",
 
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
@@ -40,16 +40,16 @@ lazy val root = project
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-      "de.heikoseeberger" %% "akka-http-circe" % "1.37.0",
+      "de.heikoseeberger" %% "akka-http-circe" % "1.38.2",
 
     ),
 
-    assemblyMergeStrategy in assembly := {
+    assembly / assemblyMergeStrategy := {
       case PathList(ps@_*) if ps.last contains "netty" => MergeStrategy.first
-      case x => (assemblyMergeStrategy in assembly).value(x)
+      case x => (assembly / assemblyMergeStrategy).value(x)
     },
 
-    mainClass in assembly := Option("fima.services.investment.InvestmentServiceServer")
+    assembly / mainClass := Option("fima.services.investment.InvestmentServiceServer")
   )
 
 Compile / PB.protoSources := Seq(baseDirectory.value / "../domain/src/main/proto")
