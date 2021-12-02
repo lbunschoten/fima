@@ -2,7 +2,7 @@ package fima.services.investment.market.alpha_vantage
 
 import io.circe.{Decoder, KeyDecoder}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import scala.util.Try
 
 object DailyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
@@ -16,7 +16,7 @@ object DailyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
     case class MetaData(
       information: String,
       symbol: String,
-      lastRefreshed: LocalDate,
+      lastRefreshed: LocalDateTime,
       outputSize: String,
       timezone: String
     )
@@ -34,6 +34,10 @@ object DailyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
 
     implicit val localDateDecoder: Decoder[LocalDate] = Decoder.decodeString.emapTry { str =>
       Try(LocalDate.parse(str))
+    }
+
+    implicit val localDateTimeDecoder: Decoder[LocalDateTime] = Decoder.decodeString.emapTry { str =>
+      Try(LocalDateTime.parse(str))
     }
 
     implicit val timeSeriesDecoder: Decoder[TimeSeries] = Decoder.forProduct8(
