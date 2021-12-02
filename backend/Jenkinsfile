@@ -53,10 +53,10 @@ podTemplate(
             }
             container('sbt') {
                 dir('./backend/subscription-service') {
-                    sh 'sbt assembly; scalafixAll --check'
+                    sh 'sbt ";assembly;scalafixAll --check"'
                 }
                 dir('./backend/investment-service') {
-                    sh 'sbt assembly; scalafixAll --check'
+                    sh 'sbt ";assembly;scalafixAll --check"'
                 }
             }
         }
