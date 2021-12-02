@@ -1,7 +1,7 @@
 import sbt.Keys.semanticdbEnabled
 
 val scalaVersionStr = "2.13.5"
-val doobieVersion = "0.13.4"
+val doobieVersion = "1.0.0-RC1"
 val circeVersion = "0.14.1"
 
 lazy val root = project
@@ -10,13 +10,10 @@ lazy val root = project
     name := "subscription-service",
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
-    excludeDependencies ++= Seq(
-      ExclusionRule("org.scala-lang.modules", s"scala-collection-compat_$scalaVersionStr")
-    ),
     libraryDependencies ++= Seq(
       // GRPC
-      "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
+      "io.grpc" % "grpc-netty-shaded" % scalapb.compiler.Version.grpcJavaVersion,
 
       // DB
       "org.tpolecat" %% "doobie-core" % doobieVersion,
@@ -36,12 +33,17 @@ lazy val root = project
 
     assembly / mainClass := Option("fima.services.subscription.SubscriptionServiceServer"),
   )
+  .dependsOn(protobuf)
 
-Compile / PB.protoSources := Seq(baseDirectory.value / "../domain/src/main/proto")
 
-Compile / PB.targets := Seq(
-  scalapb.gen() -> (Compile / sourceManaged).value / "scalapb"
-)
+lazy val protobuf = (project in file("./protobuf"))
+  .enablePlugins(Fs2Grpc)
+  .settings(
+    name := "protobuf",
+    scalapbCodeGeneratorOptions += CodeGeneratorOption.Fs2Grpc,
+    Compile / PB.protoSources ++= Seq(baseDirectory.value / "../../domain/src/main/proto"),
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "protobuf"
+  )
 
 inThisBuild(
   List(
