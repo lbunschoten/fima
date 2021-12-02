@@ -36,7 +36,7 @@ object SubscriptionServiceServer extends IOApp.Simple {
 
     serviceDefition.use(service => {
       NettyServerBuilder
-        .forPort(SubscriptionServiceServer.port)
+        .forPort(port)
         .addService(service)
         .resource[IO]
         .evalMap(server => IO(server.start()))

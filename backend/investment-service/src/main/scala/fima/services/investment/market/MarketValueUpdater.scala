@@ -1,6 +1,7 @@
 package fima.services.investment.market
 
-import cats.effect.{IO, Resource}
+import cats.effect.IO
+import cats.effect.unsafe.IORuntime
 import cats.implicits._
 import doobie.Transactor
 import doobie.implicits._
@@ -12,13 +13,14 @@ import fima.services.investment.repository.StockRepository
 class MarketValueUpdater(
   private val stockApi: StockApi,
   private val stockRepository: StockRepository,
-  private val transactor: Resource[IO, Transactor[IO]]
-) {
+  private val transactor: Transactor[IO]
+)(private implicit val ioRuntime: IORuntime) {
 
   def updateMarketValues(): Unit = {
     println("Updating all market values")
-    transactor
-      .use { xa => stockRepository.findAll().transact(xa) }
+    stockRepository
+      .findAll()
+      .transact(transactor)
       .flatMap { stocks =>
         stocks
           .map(_.symbol)
@@ -29,15 +31,14 @@ class MarketValueUpdater(
               None
             case Right(v) => Option(v)
           }.sequence
-      }
-      .unsafeRunAsyncAndForget()
+      }.unsafeRunAndForget()
   }
 
   def updateMarketValue(symbol: StockSymbol): Either[ApiError, IO[Int]] = {
     println(s"Updating market value for symbol: $symbol")
     stockApi.getTimeseries(symbol).map { timeseries: decoders.DailyAdjustedTimeSeries =>
       val (_, latestTimeseries) = timeseries.timeseries.maxBy(_._1)
-      transactor.use { xa => stockRepository.updateMarketValue(symbol, latestTimeseries.adjustedClose).transact(xa) }
+      stockRepository.updateMarketValue(symbol, latestTimeseries.adjustedClose).transact(transactor)
     }
   }
 

@@ -2,7 +2,8 @@ package fima.services.investment
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directives, Route}
-import cats.effect.{IO, Resource}
+import cats.effect.IO
+import cats.effect.unsafe.IORuntime
 import cats.implicits._
 import doobie.Transactor
 import doobie.implicits._
@@ -18,8 +19,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class InvestmentServiceApi(
   private val stockRepository: StockRepository,
   private val transactionRepository: TransactionRepository,
-  transactor: Resource[IO, Transactor[IO]]
-)(private implicit val ec: ExecutionContext) extends CORSHandler {
+  transactor: Transactor[IO]
+)(
+  private implicit val ec: ExecutionContext,
+  private implicit val iORuntime: IORuntime
+) extends CORSHandler {
 
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import io.circe.generic.extras.semiauto.deriveConfiguredEncoder
@@ -44,13 +48,13 @@ class InvestmentServiceApi(
     )
 
   private def getStocksFromDb: IO[List[Stock]] = {
-    transactor
-      .use { xa => stockRepository.findAll().transact(xa) }
+    stockRepository.findAll().transact(transactor)
   }
 
   private def getTransactionsFromDb(symbol: StockSymbol): IO[Int] = {
-    transactor
-      .use { xa => transactionRepository.findBySymbol(symbol).transact(xa) }
+    transactionRepository
+      .findBySymbol(symbol)
+      .transact(transactor)
       .map { transactions => transactions.map(_.shares).sum }
   }
 
@@ -61,12 +65,10 @@ class InvestmentServiceApi(
 
           val stocks: Future[List[Position]] = getStocksFromDb
             .flatMap { stocks =>
-              stocks
-                .map { stock =>
-                  getTransactionsFromDb(stock.symbol)
-                    .map { shares => Position(stock, shares) }
-                }
-                .sequence
+              stocks.map { stock =>
+                getTransactionsFromDb(stock.symbol)
+                  .map { shares => Position(stock, shares) }
+              }.sequence
             }.unsafeToFuture()
 
           Directives.onSuccess(stocks)(i => complete(i))
@@ -82,8 +84,9 @@ class InvestmentServiceApi(
   private def getStockBySymbol(symbol: StockSymbol): Route = {
     corsHandler(
       get {
-        val stocks = transactor
-          .use { xa => stockRepository.findBySymbol(symbol).transact(xa) }
+        val stocks = stockRepository
+          .findBySymbol(symbol)
+          .transact(transactor)
           .unsafeToFuture()
 
         Directives.onSuccess(stocks)(i => complete(i))
@@ -118,8 +121,9 @@ class InvestmentServiceApi(
   private def getTransactions: Route = {
     corsHandler(
       get {
-        val transactions = transactor
-          .use { xa => transactionRepository.findAll().transact(xa) }
+        val transactions = transactionRepository
+          .findAll()
+          .transact(transactor)
           .unsafeToFuture()
 
         Directives.onSuccess(transactions)(i => complete(i))
