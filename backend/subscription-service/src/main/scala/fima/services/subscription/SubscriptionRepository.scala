@@ -1,6 +1,6 @@
 package fima.services.subscription
 
-import cats.implicits.toBifunctorOps
+import cats.implicits.{catsSyntaxEq, toBifunctorOps}
 import doobie.implicits.toSqlInterpolator
 import doobie.postgres.implicits._
 import doobie.util.log.LogHandler
@@ -20,7 +20,7 @@ sealed trait Recurrence {
 
 object Recurrence {
 
-  val values = Seq(Monthly, Yearly)
+  val values: Seq[Recurrence] = Seq(Monthly, Yearly)
 
   case object Monthly extends Recurrence {
     override val id: Int = 0
@@ -34,7 +34,7 @@ object Recurrence {
 
   def toEnum(e: Recurrence): String = e.name
 
-  def fromEnum(name: String): Option[Recurrence] = values.find(_.name == name)
+  def fromEnum(name: String): Option[Recurrence] = values.find(_.name === name)
 
 }
 
@@ -60,6 +60,7 @@ object SubscriptionSearchQuery {
 
   val empty: SubscriptionSearchQuery = SubscriptionSearchQuery(Seq.empty)
 
+  @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
   val decode: PGobject => SubscriptionSearchQuery = pGobject =>
     parse(pGobject.getValue)
       .leftMap(parsingFailure => throw parsingFailure)

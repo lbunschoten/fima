@@ -2,8 +2,11 @@ package fima.services.subscription
 
 import cats.effect.{ContextShift, IO, Resource}
 import doobie.implicits._
+import cats.implicits._
 import doobie.{ExecutionContexts, Transactor}
 import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
+import fima.domain.transaction.TransactionDomain.Transaction
+import fima.services.subscription
 import fima.services.subscription.SubscriptionService.SubscriptionServiceGrpc.SubscriptionService
 import fima.services.subscription.SubscriptionService.{GetSubscriptionRequest, GetSubscriptionResponse, GetSubscriptionsRequest, GetSubscriptionsResponse}
 import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceStub
@@ -11,6 +14,7 @@ import fima.services.transaction.TransactionService.{QueryStringFilter, SearchFi
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import implicits.SubscriptionSearchQueryExt
 
 class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
                               transactionService: TransactionServiceStub,
@@ -19,8 +23,6 @@ class SubscriptionServiceImpl(subscriptionRepository: SubscriptionRepository,
 
   override def getSubscription(request: GetSubscriptionRequest): Future[GetSubscriptionResponse] = {
     implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContexts.synchronous)
-
-    import implicits.SubscriptionSearchQueryExt
 
     (for {
       subscription <- transactor.use { xa => subscriptionRepository.findById(UUID.fromString(request.id)).transact(xa) }

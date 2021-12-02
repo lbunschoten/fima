@@ -1,3 +1,5 @@
+import sbtassembly.AssemblyKeys.assembly
+
 val scalaVersionStr = "2.13.5"
 val doobieVersion = "0.12.1"
 val circeVersion = "0.14.1"
@@ -43,7 +45,6 @@ lazy val root = project
       "de.heikoseeberger" %% "akka-http-circe" % "1.38.2",
 
     ),
-
     assembly / assemblyMergeStrategy := {
       case PathList(ps@_*) if ps.last contains "netty" => MergeStrategy.first
       case x => (assembly / assemblyMergeStrategy).value(x)
@@ -56,4 +57,13 @@ Compile / PB.protoSources := Seq(baseDirectory.value / "../domain/src/main/proto
 
 Compile / PB.targets := Seq(
   scalapb.gen() -> (Compile / sourceManaged).value / "scalapb"
+)
+
+inThisBuild(
+  List(
+    scalaVersion := scalaVersionStr,
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision,
+    scalafixScalaBinaryVersion := "2.13",
+  )
 )

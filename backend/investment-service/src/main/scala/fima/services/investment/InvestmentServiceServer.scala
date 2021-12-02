@@ -13,6 +13,7 @@ import fima.services.investment.repository.{StockRepository, TransactionReposito
 import io.grpc.Server
 import io.grpc.netty.NettyServerBuilder
 
+import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor}
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.language.existentials
@@ -24,20 +25,18 @@ object InvestmentServiceServer {
   private val port = 9997
 
   def main(args: Array[String]): Unit = {
-    val server = new InvestmentServiceServer(ExecutionContext.global)
-    server.start()
-    server.blockUntilShutdown()
+    new InvestmentServiceServer(ExecutionContext.global).blockUntilShutdown()
   }
 
 }
 
 class InvestmentServiceServer(executionContext: ExecutionContext) {
 
-  private[this] var server: Server = _
+  private val server: Server = start()
 
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
-  private def start(): Unit = {
+  private def start(): Server = {
     implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "api-system")
     val actorExcutionContext = system.executionContext
 
@@ -62,10 +61,11 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
       case Failure(e) => println(s"Failed to start HTTP server: ${e.getMessage}")
     }
 
-    server = NettyServerBuilder
+    val server = NettyServerBuilder
       .forPort(InvestmentServiceServer.port)
       .addService(InvestmentService.bindService(new InvestmentServiceImpl(stockRepository, transactor), executionContext))
-      .build.start
+      .build
+      .start
 
     val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
     val executor = new ScheduledThreadPoolExecutor(1)
@@ -80,6 +80,8 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
         .flatMap(_.unbind())(actorExcutionContext) // trigger unbinding from the port
         .onComplete(_ => system.terminate())(actorExcutionContext)
     }
+
+    server
   }
 
   private def startDbTransactor(dbHost: String, dbPort: String, dbPassword: String): Resource[IO, HikariTransactor[IO]] = {
@@ -100,15 +102,11 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
   }
 
   private def stop(): Unit = {
-    if (server != null) {
-      server.shutdown()
-    }
+    server.shutdown()
   }
 
   private def blockUntilShutdown(): Unit = {
-    if (server != null) {
-      server.awaitTermination()
-    }
+    server.awaitTermination()
   }
 
 }

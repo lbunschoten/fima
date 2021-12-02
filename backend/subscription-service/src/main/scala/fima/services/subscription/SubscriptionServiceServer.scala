@@ -18,20 +18,18 @@ object SubscriptionServiceServer {
   private val port = 9997
 
   def main(args: Array[String]): Unit = {
-    val server = new SubscriptionServiceServer(ExecutionContext.global)
-    server.start()
-    server.blockUntilShutdown()
+    new SubscriptionServiceServer(ExecutionContext.global).blockUntilShutdown()
   }
 
 }
 
 class SubscriptionServiceServer(executionContext: ExecutionContext) {
 
-  private[this] var server: Server = _
+  private val server: Server = start()
 
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
-  private def start(): Unit = {
+  private def start(): Server = {
     val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
     val dbPort: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
     val dbPassword: String = Option(System.getenv("DB_PASSWORD")).getOrElse("root123")
@@ -44,7 +42,7 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
     val transactionService: TransactionServiceGrpc.TransactionServiceStub = TransactionServiceGrpc.stub(channel)
 
     val subscriptionRepository = new SubscriptionRepository()
-    server = NettyServerBuilder
+    val server = NettyServerBuilder
       .forPort(SubscriptionServiceServer.port)
       .addService(SubscriptionService.bindService(new SubscriptionServiceImpl(subscriptionRepository, transactionService, transactor), executionContext))
       .build.start
@@ -55,6 +53,8 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
       stop()
       System.err.println("*** server shut down")
     }
+
+    server
   }
 
   private def startDbTransactor(dbHost: String, dbPort: String, dbPassword: String): Resource[IO, HikariTransactor[IO]] = {
@@ -75,15 +75,11 @@ class SubscriptionServiceServer(executionContext: ExecutionContext) {
   }
 
   private def stop(): Unit = {
-    if (server != null) {
-      server.shutdown()
-    }
+    server.shutdown()
   }
 
   private def blockUntilShutdown(): Unit = {
-    if (server != null) {
-      server.awaitTermination()
-    }
+    server.awaitTermination()
   }
 
 }
