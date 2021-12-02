@@ -46,9 +46,9 @@ fun main() {
     commandHandler.processCommand(aggregateId, close)
 
     val newBankAccount: BankAccount = UniniatilizedAccount
-    println(eventStore.readEvents(aggregateId).fold(newBankAccount, { agg, e ->
+    println(eventStore.readEvents(aggregateId).fold(newBankAccount) { agg, e ->
         eventProcessor.process(agg, listOf(e)).also {
             EventLoggingListener().invoke(e)
         }
-    }))
+    })
 }

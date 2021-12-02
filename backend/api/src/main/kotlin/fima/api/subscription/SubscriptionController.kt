@@ -1,9 +1,7 @@
 package fima.api.subscription
 
 import fima.api.transaction.Transaction
-import fima.services.subscription.GetSubscriptionRequest
-import fima.services.subscription.GetSubscriptionsRequest
-import fima.services.subscription.SubscriptionServiceGrpcKt
+import fima.services.subscription.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -26,7 +24,7 @@ class SubscriptionController @Autowired constructor(
     suspend fun getSubscription(@PathVariable("id") subscriptionId: UUID): GetSubscriptionResponse {
         logger.info("Received request to get subscription $subscriptionId")
 
-        val request = GetSubscriptionRequest.newBuilder().setId(subscriptionId.toString()).build()
+        val request = getSubscriptionRequest { id = subscriptionId.toString() }
         val response = subscriptionService.getSubscription(request)
 
         if (response.hasSubscription()) {
@@ -44,10 +42,8 @@ class SubscriptionController @Autowired constructor(
     suspend fun getSubscriptions(): List<Subscription> {
         logger.info("Received request to get subscriptions")
 
-        val request = GetSubscriptionsRequest.newBuilder().build()
-
         return subscriptionService
-            .getSubscriptions(request)
+            .getSubscriptions(getSubscriptionsRequest {})
             .subscriptionsList
             .map(Subscription::fromProto)
     }

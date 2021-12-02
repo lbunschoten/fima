@@ -2,7 +2,8 @@ package fima.api.tagging
 
 import fima.api.utils.FromProtoConvertable
 import fima.api.utils.ToProtoConvertable
-import java.util.UUID
+import fima.domain.transaction.taggingRule
+import java.util.*
 import fima.domain.transaction.TaggingRule as ProtoTaggingRule
 
 data class TaggingRule(
@@ -18,11 +19,11 @@ data class TaggingRule(
     }
 
     override fun toProto(): ProtoTaggingRule {
-        return ProtoTaggingRule
-            .newBuilder()
-            .setId(id?.toString() ?: "")
-            .setRegex(regex)
-            .addAllTags(tags)
-            .build()
+        val original = this
+        return taggingRule {
+            id = original.id?.toString() ?: ""
+            regex = original.regex
+            this.tags.addAll(tags)
+        }
     }
 }

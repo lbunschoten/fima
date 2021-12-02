@@ -1,29 +1,19 @@
 package fima.api.transaction
 
-import fima.domain.transaction.MonthInYear
-import fima.services.transaction.GetRecentTransactionsRequest
-import fima.services.transaction.GetTransactionRequest
-import fima.services.transaction.TagTransactionsRequest
-import fima.services.transaction.TransactionServiceGrpcKt
-import fima.services.transaction.TransactionsStatisticsRequest
-import fima.services.transactionimport.ImportTransactionsRequest
+import fima.domain.transaction.monthInYear
+import fima.services.transaction.*
 import fima.services.transactionimport.TransactionImportServiceGrpcKt
+import fima.services.transactionimport.importTransactionsRequest
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RequestPart
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 import java.nio.charset.Charset
-import java.util.UUID
+import java.util.*
 
 @RestController
 class TransactionController @Autowired constructor(
@@ -36,7 +26,7 @@ class TransactionController @Autowired constructor(
     @CrossOrigin
     @GetMapping("/transaction/{id}")
     suspend fun getTransaction(@PathVariable("id") transactionId: UUID): Transaction {
-        val request = GetTransactionRequest.newBuilder().setId(transactionId.toString()).build()
+        val request = getTransactionRequest { id = transactionId.toString() }
 
         return transactionService
             .getTransaction(request)
@@ -49,11 +39,7 @@ class TransactionController @Autowired constructor(
     suspend fun getRecentTransactions(@RequestParam("offset") offset: Int, @RequestParam("limit") limit: Int): List<Transaction> {
         logger.info("Received request for recent transactions")
 
-        val request = GetRecentTransactionsRequest
-            .newBuilder()
-            .setOffset(offset)
-            .setLimit(limit)
-            .build()
+        val request = getRecentTransactionsRequest { this.offset = offset; this.limit = limit }
 
         return transactionService
             .getRecentTransactions(request)
@@ -66,10 +52,13 @@ class TransactionController @Autowired constructor(
     suspend fun getStatistics(): List<MonthlyTransactionStatistics> {
         logger.info("Received request for transaction statistics")
 
-        val startOfYear = MonthInYear.newBuilder().setMonth(1).setYear(2020)
-        val endOfYear = MonthInYear.newBuilder().setMonth(12).setYear(2020)
+        val startOfYear = monthInYear { month = 1; year = 2020 }
+        val endOfYear = monthInYear { month = 12; year = 2020 }
         return transactionService
-            .getMonthlyStatistics(TransactionsStatisticsRequest.newBuilder().setStartDate(startOfYear).setEndDate(endOfYear).build())
+            .getMonthlyStatistics(transactionsStatisticsRequest {
+                startDate = startOfYear
+                endDate = endOfYear
+            })
             .monthlyStatisticsList
             .map(MonthlyTransactionStatistics::fromProto)
     }
@@ -78,9 +67,7 @@ class TransactionController @Autowired constructor(
     suspend fun tagTransactions(): ResponseEntity<String> {
         logger.info("Received request for tagging all transactions")
 
-        val request = TagTransactionsRequest.newBuilder().build()
-
-        transactionService.tagTransactions(request)
+        transactionService.tagTransactions(tagTransactionsRequest { })
 
         return ResponseEntity.ok("Successfully tagged all transactions")
     }
@@ -93,10 +80,9 @@ class TransactionController @Autowired constructor(
             .flatMap {
                 DataBufferUtils.join(it.content()).map { dataBuffer ->
                     dataBuffer.asInputStream().use { input ->
-                        val request = ImportTransactionsRequest
-                            .newBuilder()
-                            .setTransactions(String(input.readAllBytes(), Charset.forName("UTF-8")))
-                            .build()
+                        val request = importTransactionsRequest {
+                            this.transactions = String(input.readAllBytes(), Charset.forName("UTF-8"))
+                        }
 
                         suspend {
                             transactionImportService.importTransactions(request)

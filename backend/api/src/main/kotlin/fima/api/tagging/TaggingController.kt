@@ -1,8 +1,8 @@
 package fima.api.tagging
 
-import fima.services.transaction.GetTaggingRulesRequest
-import fima.services.transaction.StoreTaggingRuleRequest
 import fima.services.transaction.TransactionServiceGrpcKt
+import fima.services.transaction.getTaggingRulesRequest
+import fima.services.transaction.storeTaggingRuleRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -23,7 +23,7 @@ class TaggingController @Autowired constructor(
     suspend fun getTaggingRules(): Set<TaggingRule> {
         logger.info("Received request for retrieving tagging rules")
 
-        val request = GetTaggingRulesRequest.newBuilder().build()
+        val request = getTaggingRulesRequest { }
 
         return transactionService
             .getTaggingRules(request)
@@ -36,10 +36,9 @@ class TaggingController @Autowired constructor(
     suspend fun putTaggingRule(@RequestBody(required = true) taggingRule: TaggingRule): ResponseEntity<String> {
         logger.info("Received request for storing a tagging rule")
 
-        val request = StoreTaggingRuleRequest
-            .newBuilder()
-            .addTaggingRules(taggingRule.toProto())
-            .build()
+        val request = storeTaggingRuleRequest {
+            taggingRule.toProto()
+        }
 
         transactionService.storeTaggingRule(request)
 

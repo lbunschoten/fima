@@ -37,10 +37,9 @@ class TransactionServiceImpl(
 
             logger.info("Found ${transactions.size} after search request")
 
-            return SearchTransactionsResponse
-                .newBuilder()
-                .addAllTransactions(transactions.map { it.toProto() })
-                .build()
+            return searchTransactionsResponse {
+                this.transactions.addAll(transactions.map { it.toProto() })
+            }
         } catch (e: Exception) {
             logger.error("Failed to search for transactions: ${e.message}")
             throw StatusException(Status.UNKNOWN.withCause(e))
@@ -49,28 +48,22 @@ class TransactionServiceImpl(
 
     override suspend fun getTransaction(request: GetTransactionRequest): GetTransactionResponse {
         logger.info("Received request for transaction ${request.id}")
-        return GetTransactionResponse
-            .newBuilder()
-            .setTransaction(
-                transactionsStore
-                    .getById(request.id)
-                    .toProto()
-            )
-            .build()
+        return getTransactionResponse {
+            transaction = transactionsStore.getById(request.id).toProto()
+        }
     }
 
     override suspend fun getRecentTransactions(request: GetRecentTransactionsRequest): GetRecentTransactionResponse {
         logger.info("Received request for recent transactions")
 
         return try {
-            GetRecentTransactionResponse
-                .newBuilder()
-                .addAllTransactions(
+            getRecentTransactionResponse {
+                this.transactions.addAll(
                     transactionsStore
                         .getRecent(request.offset, request.limit)
                         .map { it.toProto() }
                 )
-                .build()
+            }
         } catch (e: Exception) {
             logger.error("Failed retrieving getting recent transactions: ${e.message}")
             throw StatusException(Status.UNKNOWN.withCause(e))
@@ -80,24 +73,22 @@ class TransactionServiceImpl(
     override suspend fun getMonthlyStatistics(request: TransactionsStatisticsRequest): TransactionStatisticsResponse {
         logger.info("Received request for monthly transaction statistics")
 
-        return TransactionStatisticsResponse
-            .newBuilder()
-            .addAllMonthlyStatistics(
+        return transactionStatisticsResponse {
+            this.monthlyStatistics.addAll(
                 transactionStatisticsStore
                     .getMonthlyStatistics(request.startDate.month, request.startDate.year, request.endDate.month, request.endDate.year)
                     .map { it.toProto() }
             )
-            .build()
+        }
     }
 
     override suspend fun openBankAccount(request: OpenBankAccountRequest): OpenBankAccountResponse {
         logger.info("Received request for opening bank account ${request.accountNumber}")
         val errorMessages = commandHandler.processCommand(request.accountNumber, OpenBankAccountCommand(request.accountNumber, (request.initialBalance * 100).toLong()))
 
-        return OpenBankAccountResponse
-            .newBuilder()
-            .addAllErrorMessages(errorMessages)
-            .build()
+        return openBankAccountResponse {
+            this.errorMessages.addAll(errorMessages)
+        }
     }
 
     override suspend fun withdraw(request: WithdrawRequest): WithdrawResponse {
@@ -114,10 +105,9 @@ class TransactionServiceImpl(
             )
         )
 
-        return WithdrawResponse
-            .newBuilder()
-            .addAllErrorMessages(errorMessages)
-            .build()
+        return withdrawResponse {
+            this.errorMessages.addAll(errorMessages)
+        }
     }
 
     override suspend fun deposit(request: DepositRequest): DepositResponse {
@@ -135,10 +125,9 @@ class TransactionServiceImpl(
             )
         )
 
-        return DepositResponse
-            .newBuilder()
-            .addAllErrorMessages(errorMessages)
-            .build()
+        return depositResponse {
+            this.errorMessages.addAll(errorMessages)
+        }
     }
 
     override suspend fun getTaggingRules(request: GetTaggingRulesRequest): GetTaggingRulesResponse {
@@ -151,10 +140,9 @@ class TransactionServiceImpl(
             emptyList()
         }
 
-        return GetTaggingRulesResponse
-            .newBuilder()
-            .addAllTaggingRules(taggingRules.toProto())
-            .build()
+        return getTaggingRulesResponse {
+            this.taggingRules.addAll(taggingRules.toProto())
+        }
     }
 
     override suspend fun storeTaggingRule(request: StoreTaggingRuleRequest): StoreTaggingRuleResponse {
@@ -183,6 +171,6 @@ class TransactionServiceImpl(
             logger.error("Could not tag transactions: ${e.message}")
         }
 
-        return TagTransactionsResponse.newBuilder().build()
+        return tagTransactionsResponse {}
     }
 }

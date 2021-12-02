@@ -27,6 +27,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_14
     sourceSets.main.get().java.setSrcDirs(listOf(
         "build/generated/source/proto/main/grpckt",
+        "build/generated/source/proto/main/kotlin",
         "build/generated/source/proto/main/java"
     ))
 }

@@ -2,8 +2,6 @@ package fima.api.subscription
 
 import fima.api.utils.FromProtoConvertable
 import fima.domain.subscription.Recurrence
-import fima.domain.transaction.Transaction
-import java.util.TreeSet
 import java.util.UUID
 import fima.domain.subscription.Subscription as ProtoSubscription
 

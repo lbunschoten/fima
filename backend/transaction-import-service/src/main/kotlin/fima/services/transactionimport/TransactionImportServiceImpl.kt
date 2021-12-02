@@ -2,10 +2,7 @@ package fima.services.transactionimport
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvToBeanBuilder
-import fima.services.transaction.DepositRequest
-import fima.services.transaction.OpenBankAccountRequest
-import fima.services.transaction.TransactionServiceGrpcKt
-import fima.services.transaction.WithdrawRequest
+import fima.services.transaction.*
 import org.slf4j.LoggerFactory
 import java.io.StringReader
 
@@ -29,46 +26,43 @@ class TransactionImportServiceImpl(private val transactionService: TransactionSe
             transactions.forEachIndexed { index, transaction ->
                 if (index == 0) {
                     transactionService.openBankAccount(
-                        OpenBankAccountRequest
-                            .newBuilder()
-                            .setAccountNumber(if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount)
-                            .setInitialBalance(5000F) // FIXME: Make configurable
-                            .build()
+                        openBankAccountRequest {
+                            accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
+                            initialBalance = 5000F // FIXME: Make configurable
+                        }
                     )
                 }
 
                 if (transaction.direction == "Af") {
                     transactionService.withdraw(
-                        WithdrawRequest
-                            .newBuilder()
-                            .setAmountInCents((transaction.amount.replace(',', '.').toFloat() * 100).toLong())
-                            .setDate(transaction.date)
-                            .setDetails(transaction.details)
-                            .setName(transaction.name)
-                            .setFromAccount(transaction.firstAccount)
-                            .setToAccount(transaction.secondAccount)
-                            .setType(transaction.type)
-                            .build()
+                        withdrawRequest {
+                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
+                            date = transaction.date
+                            details = transaction.details
+                            name = transaction.name
+                            fromAccount = transaction.firstAccount
+                            toAccount = transaction.secondAccount
+                            type = transaction.type
+                        }
                     )
                 } else {
                     transactionService.deposit(
-                        DepositRequest
-                            .newBuilder()
-                            .setAmountInCents((transaction.amount.replace(',', '.').toFloat() * 100).toLong())
-                            .setDate(transaction.date)
-                            .setDetails(transaction.details)
-                            .setName(transaction.name)
-                            .setFromAccount(transaction.secondAccount)
-                            .setToAccount(transaction.firstAccount)
-                            .setType(transaction.type)
-                            .build()
+                        depositRequest {
+                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
+                            date = transaction.date
+                            details = transaction.details
+                            name = transaction.name
+                            fromAccount = transaction.secondAccount
+                            toAccount = transaction.firstAccount
+                            type = transaction.type
+                        }
                     )
                 }
 
             }
         }
 
-        return ImportTransactionsResponse.newBuilder().build()
+        return importTransactionsResponse {}
     }
 }
 

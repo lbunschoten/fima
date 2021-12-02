@@ -1,8 +1,8 @@
 package fima.api.investment
 
-import fima.services.investment.GetStockRequest
-import fima.services.investment.GetStocksRequest
 import fima.services.investment.InvestmentServiceGrpcKt
+import fima.services.investment.getStockRequest
+import fima.services.investment.getStocksRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -24,7 +24,7 @@ class StockController @Autowired constructor(
     suspend fun getStock(@PathVariable("symbol") symbol: String): Stock {
         logger.info("Received request to get stock for symbol $symbol")
 
-        val request = GetStockRequest.newBuilder().setSymbol(symbol).build()
+        val request = getStockRequest { this.symbol = symbol }
         val response = investmentService.getStock(request)
 
         if (response.hasStock()) {
@@ -39,7 +39,7 @@ class StockController @Autowired constructor(
     suspend fun getStocks(): List<Stock> {
         logger.info("Received request to get investments")
 
-        val request = GetStocksRequest.newBuilder().build()
+        val request = getStocksRequest { }
 
         return investmentService
             .getStocks(request)
