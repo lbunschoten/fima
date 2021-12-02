@@ -23,11 +23,10 @@ object SubscriptionServiceServer {
 
 }
 
-class SubscriptionServiceServer(executionContext: ExecutionContext) {
-
-  private val server: Server = start()
+class SubscriptionServiceServer(private val executionContext: ExecutionContext) {
 
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
+  private val server: Server = start()
 
   private def start(): Server = {
     val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")

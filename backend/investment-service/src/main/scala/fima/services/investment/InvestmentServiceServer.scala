@@ -13,8 +13,7 @@ import fima.services.investment.repository.{StockRepository, TransactionReposito
 import io.grpc.Server
 import io.grpc.netty.NettyServerBuilder
 
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor}
+import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.language.existentials
 import scala.util.{Failure, Success}
@@ -30,11 +29,10 @@ object InvestmentServiceServer {
 
 }
 
-class InvestmentServiceServer(executionContext: ExecutionContext) {
-
-  private val server: Server = start()
+class InvestmentServiceServer(private val executionContext: ExecutionContext) {
 
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
+  private val server: Server = start()
 
   private def start(): Server = {
     implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "api-system")
@@ -69,7 +67,7 @@ class InvestmentServiceServer(executionContext: ExecutionContext) {
 
     val stockPriceCollector = new MarketValueUpdater(stockApi, stockRepository, transactor)
     val executor = new ScheduledThreadPoolExecutor(1)
-//    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
+    executor.scheduleWithFixedDelay(() => stockPriceCollector.updateMarketValues(), 0L, 1, TimeUnit.HOURS)
 
     println("Server started, listening on " + InvestmentServiceServer.port)
     sys.addShutdownHook {
