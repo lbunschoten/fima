@@ -1,19 +1,22 @@
 package fima.services.investment.repository
 
-import doobie.ConnectionIO
+import doobie.{ConnectionIO, Meta}
 import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler
-import fima.services.investment.model.Stock
-import fima.services.investment.model.Stock.StockSymbol
+import fima.services.investment.domain.{InvestmentMethod, MarketIndex, SectorType, Stock}
+import fima.services.investment.domain.Stock.StockSymbol
 import doobie.postgres.implicits.JavaTimeInstantMeta
 import doobie.postgres.implicits.JavaTimeLocalDateMeta
+import doobie.util.Get
+import doobie.util.meta.Meta
+import fima.services.investment.domain.implicits._
 
 class StockRepository {
 
   private implicit val logHandler: LogHandler = LogHandler(println)
 
   def insert(stock: Stock): ConnectionIO[Int] = {
-    sql"INSERT INTO investment.stock (symbol, name, index, sector, investment_type, market_value, updated_at) VALUES (${stock.symbol}, ${stock.name}, ${stock.index}, ${stock.sector}, ${stock.investmentType}, 0, CURRENT_TIMESTAMP)"
+    sql"INSERT INTO investment.stock (symbol, name, index, sector, investment_type, market_value, updated_at) VALUES (${stock.symbol}, ${stock.name}, ${stock.index.value}, ${stock.sector.value}, ${stock.investmentType.value}, 0, CURRENT_TIMESTAMP)"
       .update
       .run
   }

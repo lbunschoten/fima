@@ -26,15 +26,15 @@ object SubscriptionServiceServer extends IOApp.Simple {
 
   override def run: IO[Unit] = {
     val subscriptionRepository = new SubscriptionRepository()
-    val serviceDefition = for {
+    val serviceDefinition = for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
       channel <- NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().resource[IO]
       transactionService <- TransactionServiceFs2Grpc.stubResource(channel)(Async[IO])
       subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, transactionService, transactor)(ec, runtime)
-      serviceDefition <- SubscriptionServiceFs2Grpc.bindServiceResource(subscriptionService)
-    } yield serviceDefition
+      serviceDefinition <- SubscriptionServiceFs2Grpc.bindServiceResource(subscriptionService)
+    } yield serviceDefinition
 
-    serviceDefition.use(service => {
+    serviceDefinition.use(service => {
       NettyServerBuilder
         .forPort(port)
         .addService(service)
@@ -59,6 +59,5 @@ object SubscriptionServiceServer extends IOApp.Simple {
     } yield transactor
   }
 
-  case class Resources(serviceDefinition: ServerServiceDefinition
-  )
+  case class Resources(serviceDefinition: ServerServiceDefinition)
 }

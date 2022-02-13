@@ -1,7 +1,7 @@
 import sbt.Keys.semanticdbEnabled
 
-val scalaVersionStr = "2.13.5"
-val doobieVersion = "1.0.0-RC1"
+val scalaVersionStr = "3.1.1"
+val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
 
 lazy val root = project
@@ -31,7 +31,7 @@ lazy val root = project
       case x => (assembly / assemblyMergeStrategy).value(x)
     },
 
-    assembly / mainClass := Option("fima.services.subscription.SubscriptionServiceServer"),
+    assembly / mainClass := Option("fima.services.subscription.SubscriptionServiceServer")
   )
   .dependsOn(protobuf)
 
@@ -49,7 +49,6 @@ inThisBuild(
   List(
     scalaVersion := scalaVersionStr,
     semanticdbEnabled := true,
-    semanticdbVersion := scalafixSemanticdb.revision,
-    scalafixScalaBinaryVersion := "2.13",
+    scalafixScalaBinaryVersion := "3"
   )
 )

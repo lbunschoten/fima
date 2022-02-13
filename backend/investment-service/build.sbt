@@ -1,10 +1,10 @@
 import sbtassembly.AssemblyKeys.assembly
 
-val scalaVersionStr = "2.13.5"
-val doobieVersion = "1.0.0-RC1"
+val scalaVersionStr = "3.1.1"
+val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
-val AkkaVersion = "2.6.17"
-val AkkaHttpVersion = "10.2.6"
+val AkkaVersion = "2.6.18"
+val AkkaHttpVersion = "10.2.7"
 
 lazy val root = project
   .in(file("."))
@@ -13,8 +13,7 @@ lazy val root = project
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
     excludeDependencies ++= Seq(
-//      ExclusionRule("org.scala-lang.modules", s"scala-collection-compat_$scalaVersionStr"),
-      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13")
+      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13"),
     ),
     libraryDependencies ++= Seq(
       // GRPC
@@ -33,15 +32,11 @@ lazy val root = project
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
-      "io.circe" %% "circe-generic-extras" % circeVersion,
-      "com.beachape" %% "enumeratum-circe" % "1.7.0",
 
       // Akka
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
-      "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-      "de.heikoseeberger" %% "akka-http-circe" % "1.38.2",
-
+      ("com.typesafe.akka" %% "akka-http" % AkkaHttpVersion).cross(CrossVersion.for3Use2_13)
     ),
     assembly / assemblyMergeStrategy := {
       case PathList(ps@_*) if ps.last contains "netty" => MergeStrategy.first

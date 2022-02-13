@@ -1,6 +1,6 @@
-package fima.services.investment.model
+package fima.services.investment.domain
 
-import fima.services.investment.model.Stock.StockSymbol
+import fima.services.investment.domain.Stock.StockSymbol
 
 import java.time.LocalDate
 import java.util.UUID
