@@ -61,6 +61,5 @@ inThisBuild(
     scalaVersion := scalaVersionStr,
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalafixScalaBinaryVersion := "2.13",
   )
 )

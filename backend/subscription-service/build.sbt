@@ -49,6 +49,5 @@ inThisBuild(
   List(
     scalaVersion := scalaVersionStr,
     semanticdbEnabled := true,
-    scalafixScalaBinaryVersion := "3"
   )
 )
