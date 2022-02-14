@@ -14,3 +14,8 @@ env.json
 .gradle/
 target/
 sbt.json
+.bloop/
+.bsp/
+.metals/
+.vscode/
+metals.sbt
