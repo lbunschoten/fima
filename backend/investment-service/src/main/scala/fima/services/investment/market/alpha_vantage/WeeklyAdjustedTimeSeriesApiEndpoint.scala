@@ -8,7 +8,7 @@ import scala.util.Try
 
 object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
 
-  override val functionName: String = "TIME_SERIES_DAILY_ADJUSTED"
+  override val functionName: String = "TIME_SERIES_WEEKLY_ADJUSTED"
 
   object decoders {
 
@@ -66,9 +66,9 @@ object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
 
     implicit val timeSeriesMapDecoder: Decoder[Map[LocalDate, TimeSeries]] = Decoder.decodeMap[LocalDate, TimeSeries]
 
-    implicit val dailyAdjustedTimeSeriesDecoder: Decoder[WeeklyAdjustedTimeSeries] = Decoder.forProduct2(
+    implicit val weeklyAdjustedTimeSeriesDecoder: Decoder[WeeklyAdjustedTimeSeries] = Decoder.forProduct2(
       "Meta Data",
-      "Time Series (Daily)"
+      "Weekly Adjusted Time Series"
     )(WeeklyAdjustedTimeSeries.apply)
   }
 }
