@@ -13,7 +13,7 @@ lazy val root = project
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
     excludeDependencies ++= Seq(
-      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13"),
+      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_3"),
     ),
     libraryDependencies ++= Seq(
       // GRPC
