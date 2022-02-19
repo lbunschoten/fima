@@ -18,7 +18,6 @@ object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
       information: String,
       symbol: String,
       lastRefreshed: LocalDateTime,
-      outputSize: String,
       timezone: String
     )
 
@@ -29,8 +28,7 @@ object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
       close: BigDecimal,
       adjustedClose: BigDecimal,
       volume: Int,
-      dividentAmount: BigDecimal,
-      splitCoefficient: BigDecimal
+      dividentAmount: BigDecimal
     )
 
     implicit val localDateDecoder: Decoder[LocalDate] = Decoder.decodeString.emapTry { str =>
@@ -43,23 +41,21 @@ object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
       Try(LocalDateTime.parse(str, dateTimeFormatter))
     }
 
-    implicit val timeSeriesDecoder: Decoder[TimeSeries] = Decoder.forProduct8(
+    implicit val timeSeriesDecoder: Decoder[TimeSeries] = Decoder.forProduct7(
       "1. open",
       "2. high",
       "3. low",
       "4. close",
       "5. adjusted close",
       "6. volume",
-      "7. dividend amount",
-      "8. split coefficient"
+      "7. dividend amount"
     )(TimeSeries.apply)
 
-    implicit val metaDataDecoder: Decoder[MetaData] = Decoder.forProduct5(
+    implicit val metaDataDecoder: Decoder[MetaData] = Decoder.forProduct4(
       "1. Information",
       "2. Symbol",
       "3. Last Refreshed",
-      "4. Output Size",
-      "5. Time Zone"
+      "4. Time Zone"
     )(MetaData.apply)
 
     implicit val timeSeriesKeyDecoder: KeyDecoder[LocalDate] = (key: String) => Option(LocalDate.parse(key))
