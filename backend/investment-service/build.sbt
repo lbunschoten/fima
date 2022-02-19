@@ -4,7 +4,7 @@ val scalaVersionStr = "3.1.1"
 val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
 val AkkaVersion = "2.6.18"
-val AkkaHttpVersion = "10.2.7"
+val AkkaHttpVersion = "10.2.8"
 
 lazy val root = project
   .in(file("."))
@@ -26,7 +26,7 @@ lazy val root = project
       "org.tpolecat" %% "doobie-postgres" % doobieVersion, // Postgres driver 42.2.19 + type mappings.
 
       // HTTP
-      "com.softwaremill.sttp.client3" %% "core" % "3.3.16",
+      "com.softwaremill.sttp.client3" %% "core" % "3.4.1",
 
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
@@ -34,8 +34,8 @@ lazy val root = project
       "io.circe" %% "circe-parser" % circeVersion,
 
       // Akka
-      "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
-      "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+      ("com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion).cross(CrossVersion.for3Use2_13),
+      ("com.typesafe.akka" %% "akka-stream" % AkkaVersion).cross(CrossVersion.for3Use2_13),
       ("com.typesafe.akka" %% "akka-http" % AkkaHttpVersion).cross(CrossVersion.for3Use2_13)
     ),
     assembly / assemblyMergeStrategy := {
