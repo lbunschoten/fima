@@ -6,7 +6,7 @@ import cats.implicits._
 import doobie.Transactor
 import doobie.implicits._
 import fima.services.investment.ApiError
-import fima.services.investment.market.alpha_vantage.DailyAdjustedTimeSeriesApiEndpoint.decoders
+import fima.services.investment.market.alpha_vantage.WeeklyAdjustedTimeSeriesApiEndpoint.decoders
 import fima.services.investment.domain.Stock.StockSymbol
 import fima.services.investment.repository.StockRepository
 
@@ -36,7 +36,7 @@ class MarketValueUpdater(
 
   def updateMarketValue(symbol: StockSymbol): Either[ApiError, IO[Int]] = {
     println(s"Updating market value for symbol: $symbol")
-    stockApi.getTimeseries(symbol).map { (timeseries: decoders.DailyAdjustedTimeSeries) =>
+    stockApi.getTimeseries(symbol).map { (timeseries: decoders.WeeklyAdjustedTimeSeries) =>
       val (_, latestTimeseries) = timeseries.timeseries.maxBy(_._1)
       stockRepository.updateMarketValue(symbol, latestTimeseries.adjustedClose).transact(transactor)
     }

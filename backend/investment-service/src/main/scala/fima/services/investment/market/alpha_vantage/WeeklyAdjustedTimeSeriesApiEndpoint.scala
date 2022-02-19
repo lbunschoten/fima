@@ -6,13 +6,13 @@ import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, LocalDateTime}
 import scala.util.Try
 
-object DailyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
+object WeeklyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
 
   override val functionName: String = "TIME_SERIES_DAILY_ADJUSTED"
 
   object decoders {
 
-    case class DailyAdjustedTimeSeries(metadata: MetaData, timeseries: Map[LocalDate, TimeSeries])
+    case class WeeklyAdjustedTimeSeries(metadata: MetaData, timeseries: Map[LocalDate, TimeSeries])
 
     case class MetaData(
       information: String,
@@ -66,9 +66,9 @@ object DailyAdjustedTimeSeriesApiEndpoint extends ApiEndpoint {
 
     implicit val timeSeriesMapDecoder: Decoder[Map[LocalDate, TimeSeries]] = Decoder.decodeMap[LocalDate, TimeSeries]
 
-    implicit val dailyAdjustedTimeSeriesDecoder: Decoder[DailyAdjustedTimeSeries] = Decoder.forProduct2(
+    implicit val dailyAdjustedTimeSeriesDecoder: Decoder[WeeklyAdjustedTimeSeries] = Decoder.forProduct2(
       "Meta Data",
       "Time Series (Daily)"
-    )(DailyAdjustedTimeSeries.apply)
+    )(WeeklyAdjustedTimeSeries.apply)
   }
 }
