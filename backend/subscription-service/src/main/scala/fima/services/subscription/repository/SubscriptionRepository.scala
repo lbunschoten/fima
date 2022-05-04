@@ -1,24 +1,20 @@
-package fima.services.subscription
+package fima.services.subscription.repository
 
 import cats.implicits.{catsSyntaxEq, toBifunctorOps}
-import doobie.implicits.toSqlInterpolator
-import doobie.postgres.implicits._
-import doobie.util.log.LogHandler
-import doobie.{ConnectionIO, Meta}
-import io.circe._
-import io.circe.parser._
-import io.circe.syntax._
+import doobie.free.connection.ConnectionIO
+import io.circe.*
+import io.circe.parser.*
+import io.circe.syntax.*
 import org.postgresql.util.PGobject
 
 import java.util.UUID
-
 
 sealed trait Recurrence {
   val id: Int
   val name: String
 }
 
-object Recurrence {
+object RecurrenceCompanion {
 
   val values: Seq[Recurrence] = Seq(Monthly, Yearly)
 
@@ -79,32 +75,8 @@ object SubscriptionSearchQuery {
 
 case class Subscription(id: UUID, name: String, query: SubscriptionSearchQuery, recurrence: Recurrence)
 
-class SubscriptionRepository {
-
-  private implicit val logHandler: LogHandler = LogHandler(println)
-  private implicit val RecurrenceMeta: Meta[Recurrence] = pgEnumStringOpt("recurrence", Recurrence.fromEnum, Recurrence.toEnum)
-  private implicit val subscriptionSearchQueryMeta: Meta[SubscriptionSearchQuery] =
-    Meta.Advanced
-      .other[PGobject]("json")
-      .timap[SubscriptionSearchQuery](SubscriptionSearchQuery.decode)(SubscriptionSearchQuery.encode)
-
-  def insert(subscription: Subscription): ConnectionIO[Int] = {
-    sql"insert into transaction.subscription (id, name, query, recurrence) values (${subscription.id}, ${subscription.name}, ${subscription.query}, ${subscription.recurrence})"
-      .update
-      .run
-  }
-
-  def findById(id: UUID): ConnectionIO[Option[Subscription]] = {
-    sql"SELECT id, name, query, recurrence from transaction.subscription WHERE id = $id"
-      .query[Subscription]
-      .option
-  }
-
-  def findAll(): ConnectionIO[List[Subscription]] = {
-    sql"SELECT id, name, query, recurrence from transaction.subscription"
-      .query[Subscription]
-      .to[List]
-  }
-
-
+trait SubscriptionRepository {
+  def insert(subscription: Subscription): ConnectionIO[Int]
+  def findById(id: UUID): ConnectionIO[Option[Subscription]]
+  def findAll(): ConnectionIO[List[Subscription]]
 }

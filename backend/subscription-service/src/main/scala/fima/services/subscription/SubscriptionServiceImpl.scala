@@ -3,11 +3,13 @@ package fima.services.subscription
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import doobie.Transactor
-import doobie.implicits._
+import doobie.implicits.*
 import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
-import fima.services.subscription.SubscriptionService._
+import fima.domain.transaction.TransactionDomain.Transaction
+import fima.services.subscription.SubscriptionService.*
 import fima.services.subscription.implicits.SubscriptionSearchQueryExt
-import fima.services.transaction.TransactionService._
+import fima.services.subscription.repository.{SubscriptionRepository, SubscriptionSearchQuery}
+import fima.services.transaction.TransactionService.*
 import io.grpc.Metadata
 
 import java.util.UUID

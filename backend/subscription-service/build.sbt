@@ -1,6 +1,6 @@
 import sbt.Keys.semanticdbEnabled
 
-val scalaVersionStr = "3.1.1"
+val scalaVersionStr = "3.1.2"
 val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
 
@@ -10,6 +10,7 @@ lazy val root = project
     name := "subscription-service",
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
+    scalacOptions += "-source:3.0-migration",
     libraryDependencies ++= Seq(
       // GRPC
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,

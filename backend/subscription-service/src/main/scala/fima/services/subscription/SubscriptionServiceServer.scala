@@ -1,11 +1,12 @@
 package fima.services.subscription
 
-import cats.effect._
-import doobie._
+import cats.effect.*
+import doobie.*
 import doobie.hikari.HikariTransactor
 import fima.services.subscription.SubscriptionService.SubscriptionServiceFs2Grpc
+import fima.services.subscription.repository.{SubscriptionRepository, PostgresSubscriptionRepository}
 import fima.services.transaction.TransactionService.TransactionServiceFs2Grpc
-import fs2.grpc.syntax.all._
+import fs2.grpc.syntax.all.*
 import io.grpc.ServerServiceDefinition
 import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 
@@ -25,7 +26,7 @@ object SubscriptionServiceServer extends IOApp.Simple {
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
   override def run: IO[Unit] = {
-    val subscriptionRepository = new SubscriptionRepository()
+    val subscriptionRepository = new PostgresSubscriptionRepository()
     val serviceDefinition = for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
       channel <- NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().resource[IO]
