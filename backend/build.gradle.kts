@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.5.31" apply false
-    kotlin("plugin.serialization") version "1.5.31" apply false
+    kotlin("jvm") version "1.6.20" apply false
+    kotlin("plugin.serialization") version "1.6.20" apply false
 }
 
 buildscript {

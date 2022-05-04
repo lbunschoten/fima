@@ -8,17 +8,17 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
-    implementation("io.netty:netty-codec-http2:4.1.55.Final")
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
-    implementation("io.grpc:grpc-netty:1.34.1")
-    implementation("io.grpc:grpc-protobuf:1.34.1")
-    implementation("com.opencsv:opencsv:5.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.20")
+    implementation("io.netty:netty-codec-http2:4.1.76.Final")
+    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("org.slf4j:slf4j-simple:1.7.36")
+    implementation("io.grpc:grpc-netty:1.46.0")
+    implementation("io.grpc:grpc-protobuf:1.46.0")
+    implementation("com.opencsv:opencsv:5.6")
     implementation(project(":domain"))
-    runtimeOnly("io.netty:netty-handler-proxy:4.1.55.Final")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.3.2")
-    testImplementation("io.mockk:mockk:1.10.3")
+    runtimeOnly("io.netty:netty-handler-proxy:4.1.76.Final")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.3")
+    testImplementation("io.mockk:mockk:1.12.3")
 }
 
 java {
@@ -32,4 +32,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.register("package") {
     dependsOn("shadowJar")
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "fima.services.transactionimport.MainKt"
+    }
 }
