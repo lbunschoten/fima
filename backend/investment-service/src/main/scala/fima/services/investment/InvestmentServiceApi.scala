@@ -11,7 +11,7 @@ import cats.implicits.*
 import doobie.Transactor
 import doobie.implicits.*
 import fima.services.investment.domain.{MarketIndex, Position, SectorType, Stock, Transaction}
-import fima.services.investment.domain.Stock.StockSymbol
+import fima.services.investment.domain.StockSymbol
 import fima.services.investment.repository.{StockRepository, TransactionRepository}
 import io.circe.generic.semiauto.*
 import CirceSupport._
@@ -20,6 +20,7 @@ import io.circe.{Codec, Decoder, Encoder}
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class InvestmentServiceApi(
   private val stockRepository: StockRepository,
@@ -77,7 +78,7 @@ class InvestmentServiceApi(
 
           Directives.onSuccess(stocks)(i => complete(i))
         } catch {
-          case e: Exception =>
+          case NonFatal(e) =>
             println(e)
             failWith(e)
         }

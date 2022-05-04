@@ -3,7 +3,7 @@ package fima.services.investment.market.alpha_vantage
 import fima.services.investment.ApiError
 import fima.services.investment.market.StockApi
 import fima.services.investment.market.alpha_vantage.WeeklyAdjustedTimeSeriesApiEndpoint.decoders.WeeklyAdjustedTimeSeries
-import fima.services.investment.domain.Stock.StockSymbol
+import fima.services.investment.domain.StockSymbol
 import io.circe.parser._
 import sttp.client3._
 

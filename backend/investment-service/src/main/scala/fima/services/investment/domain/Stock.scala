@@ -1,13 +1,8 @@
 package fima.services.investment.domain
 
 import fima.domain.investment.InvestmentDomain.{Stock => PStock}
-import fima.services.investment.domain.Stock.StockSymbol
 
 import java.time.Instant
-
-object Stock {
-  type StockSymbol = String
-}
 
 case class Stock(
   symbol: StockSymbol,
@@ -20,9 +15,8 @@ case class Stock(
 ) {
 
   def stockToProto: PStock = {
-    import implicits.toProto
-
-    PStock(symbol, name, index, toProto(sector), investmentType)
+    import ProtoConversions.toProto
+    PStock("", name, index, toProto(sector), investmentType)
   }
 
 }

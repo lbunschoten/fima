@@ -1,9 +1,9 @@
 import sbtassembly.AssemblyKeys.assembly
 
-val scalaVersionStr = "3.1.1"
+val scalaVersionStr = "3.1.2"
 val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
-val AkkaVersion = "2.6.18"
+val AkkaVersion = "2.6.19"
 val AkkaHttpVersion = "10.2.8"
 
 lazy val root = project
@@ -12,8 +12,9 @@ lazy val root = project
     name := "investment-service",
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
+    scalacOptions += "-source:3.1",
     excludeDependencies ++= Seq(
-      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13"),
+      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13")
     ),
     libraryDependencies ++= Seq(
       // GRPC
@@ -26,7 +27,7 @@ lazy val root = project
       "org.tpolecat" %% "doobie-postgres" % doobieVersion, // Postgres driver 42.2.19 + type mappings.
 
       // HTTP
-      "com.softwaremill.sttp.client3" %% "core" % "3.4.1",
+      "com.softwaremill.sttp.client3" %% "core" % "3.5.2",
 
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
@@ -34,8 +35,8 @@ lazy val root = project
       "io.circe" %% "circe-parser" % circeVersion,
 
       // Akka
-      ("com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion).cross(CrossVersion.for3Use2_13),
-      ("com.typesafe.akka" %% "akka-stream" % AkkaVersion).cross(CrossVersion.for3Use2_13),
+      "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+      "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       ("com.typesafe.akka" %% "akka-http" % AkkaHttpVersion).cross(CrossVersion.for3Use2_13)
     ),
     assembly / assemblyMergeStrategy := {

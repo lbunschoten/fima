@@ -3,7 +3,6 @@ package fima.services.transactionimport
 import fima.services.transaction.TransactionServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
 import io.grpc.ServerBuilder
-import org.slf4j.LoggerFactory
 
 
 fun main() {
@@ -20,12 +19,11 @@ fun main() {
 
     server.start()
 
-    val logger = LoggerFactory.getLogger("Main")
-    logger.info("Transaction import service started")
+    println("Transaction import service started")
 
     Runtime.getRuntime().addShutdownHook(Thread { println("Ups, JVM shutdown") })
     server.awaitTermination()
 
-    logger.info("Transaction import service stopped")
+    println("Transaction import service stopped")
 }
 

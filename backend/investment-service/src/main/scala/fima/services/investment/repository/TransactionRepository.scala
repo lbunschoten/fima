@@ -6,7 +6,7 @@ import doobie.postgres.implicits.JavaTimeInstantMeta
 import doobie.postgres.implicits.JavaTimeLocalDateMeta
 import doobie.postgres.implicits.UuidType
 import doobie.util.log.LogHandler
-import fima.services.investment.domain.Stock.StockSymbol
+import fima.services.investment.domain.StockSymbol
 import fima.services.investment.domain.Transaction
 
 class TransactionRepository {

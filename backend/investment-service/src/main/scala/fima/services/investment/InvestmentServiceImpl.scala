@@ -5,6 +5,7 @@ import doobie.Transactor
 import doobie.implicits._
 import fima.services.investment.InvestmentService._
 import fima.services.investment.repository.StockRepository
+import fima.services.investment.domain.StockSymbol
 import io.grpc.Metadata
 
 import scala.concurrent.ExecutionContext

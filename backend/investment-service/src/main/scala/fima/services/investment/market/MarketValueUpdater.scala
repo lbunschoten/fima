@@ -7,7 +7,7 @@ import doobie.Transactor
 import doobie.implicits._
 import fima.services.investment.ApiError
 import fima.services.investment.market.alpha_vantage.WeeklyAdjustedTimeSeriesApiEndpoint.decoders
-import fima.services.investment.domain.Stock.StockSymbol
+import fima.services.investment.domain.StockSymbol
 import fima.services.investment.repository.StockRepository
 
 class MarketValueUpdater(
