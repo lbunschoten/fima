@@ -6,7 +6,7 @@ import fima.services.transaction.*
 import org.slf4j.LoggerFactory
 import java.io.StringReader
 
-class TransactionImportServiceImpl(private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub) : TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineImplBase() {
+class TransactionImportServiceImpl(private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineImplBase) : TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineImplBase() {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

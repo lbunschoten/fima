@@ -24,8 +24,8 @@ open class TransactionApiConfig {
     @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_HOST:localhost}")
     private var transactionImportServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_PORT:9997}")
-    private var transactionImportServicePort: Int = 9997
+    @Value("\${TRANSACTION_IMPORT_SERVICE_SERVICE_PORT:9998}")
+    private var transactionImportServicePort: Int = 9998
 
     @Value("\${SUBSCRIPTION_SERVICE_SERVICE_HOST:localhost}")
     private var subscriptionServiceHost: String = "localhost"

@@ -15,6 +15,7 @@ dependencies {
     implementation("io.netty:netty-codec-http2:4.1.76.Final")
     implementation("io.grpc:grpc-netty:1.46.0")
     implementation("io.grpc:grpc-protobuf:1.46.0")
+    implementation("com.opencsv:opencsv:5.6")
     implementation("org.apache.kafka:kafka-clients:3.1.0")
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("org.slf4j:slf4j-simple:1.7.36")
