@@ -73,7 +73,7 @@ class TransactionController @Autowired constructor(
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
 
-        return transactions
+        val request: ImportTransactionsRequest = transactions
             .flatMap {
                 logger.info("Reached 1")
                 DataBufferUtils.join(it.content()).map { dataBuffer ->
@@ -85,14 +85,14 @@ class TransactionController @Autowired constructor(
                         }
                         logger.info("Reached 4")
 
-                        suspend {
-                            logger.info("Import transactions request sent")
-                            transactionService.importTransactions(request)
-                        }
+                        request
                     }
                 }
-            }.map {
-                ResponseEntity.ok("Upload successful")
             }.awaitSingle()
+
+        logger.info("Reached 5")
+        transactionService.importTransactions(request)
+
+        return ResponseEntity.ok("Upload successful")
     }
 }
