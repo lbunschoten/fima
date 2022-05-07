@@ -42,14 +42,14 @@ class TransactionServiceImpl(
                 logger.info("Importing ${transactions.size} transactions")
 
                 transactions.forEachIndexed { index, transaction ->
-                    if (index == 0) {
-                        openBankAccount(
-                            openBankAccountRequest {
-                                accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
-                                initialBalance = 5000F // FIXME: Make configurable
-                            }
-                        )
-                    }
+//                    if (index == 0) {
+//                        openBankAccount(
+//                            openBankAccountRequest {
+//                                accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
+//                                initialBalance = 5000F // FIXME: Make configurable
+//                            }
+//                        )
+//                    }
 
                     if (transaction.direction == "Af") {
                         withdraw(
