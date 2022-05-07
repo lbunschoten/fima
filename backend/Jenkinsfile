@@ -1,5 +1,5 @@
 podTemplate(
-        label: 'mypod',
+        label: 'build-slave',
         containers: [
                 containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
@@ -12,7 +12,7 @@ podTemplate(
                 hostPathVolume(mountPath: '/root/.gradle', hostPath: '/root/.gradle'),
         ]
 ) {
-    node('mypod') {
+    node('build-slave') {
         def services = ['api', 'transaction-service', 'subscription-service', 'investment-service']
         def buildImages = [:]
         def deployments = [:]
@@ -48,23 +48,29 @@ podTemplate(
         stage('Build') {
             parallel {
                 stage('Build gradle projects') {
-                    container('jdk') {
-                        withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                            sh './backend/gradlew build package -p backend --warning-mode all --no-daemon --parallel'
+                    steps {
+                        container('jdk') {
+                            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                                sh './backend/gradlew build package -p backend --warning-mode all --no-daemon --parallel'
+                            }
                         }
                     }
                 }
                 stage('Build subscription service') {
-                    container('sbt') {
-                        dir('./backend/subscription-service') {
-                            sh 'sbt ";assembly;scalafixAll --check"'
+                    steps {
+                        container('sbt') {
+                            dir('./backend/subscription-service') {
+                                sh 'sbt ";assembly;scalafixAll --check"'
+                            }
                         }
                     }
                 }
                 stage('Build investment service') {
-                    container('sbt') {
-                        dir('./backend/investment-service') {
-                            sh 'sbt ";assembly;scalafixAll --check"'
+                    steps {
+                        container('sbt') {
+                            dir('./backend/investment-service') {
+                                sh 'sbt ";assembly;scalafixAll --check"'
+                            }
                         }
                     }
                 }
