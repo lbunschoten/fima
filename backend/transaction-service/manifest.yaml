@@ -19,10 +19,8 @@ spec:
         - name: transaction-service
           image: "$DOCKER_IMAGE"
           ports:
-            - name: main-http
+            - name: http
               containerPort: 9997
-            - name: import-http
-              containerPort: 9998
           env:
             - name: DB_PASSWORD
               valueFrom:
@@ -44,11 +42,7 @@ spec:
     tier: backend
     name: transaction-service
   ports:
-    - name: main-http
+    - name: http
       protocol: TCP
       port: 9997
-      targetPort: main-http
-    - name: import-http
-      protocol: TCP
-      port: 9998
-      targetPort: import-http
+      targetPort: http

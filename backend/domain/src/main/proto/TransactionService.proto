@@ -8,6 +8,13 @@ option java_multiple_files = true;
 option java_package = "fima.services.transaction";
 option java_outer_classname = "TransactionServiceProtos";
 
+message ImportTransactionsRequest {
+  string transactions = 1;
+}
+
+message ImportTransactionsResponse {
+}
+
 message GetTransactionRequest {
   string id = 1;
 }
@@ -130,6 +137,9 @@ message GetTaggingRulesResponse {
 }
 
 service TransactionService {
+
+  rpc importTransactions(ImportTransactionsRequest) returns (ImportTransactionsResponse) {}
+
 
   rpc searchTransactions(SearchTransactionsRequest) returns (SearchTransactionsResponse) {}
 

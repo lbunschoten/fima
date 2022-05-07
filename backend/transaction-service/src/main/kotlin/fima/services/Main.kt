@@ -15,7 +15,6 @@ import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.listener.TransactionTaggingListener
-import fima.services.transactionimport.TransactionImportServiceImpl
 import io.grpc.ServerBuilder
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
@@ -43,32 +42,24 @@ fun main() {
         transactionTagsStore
     )
 
-    val transactionService = TransactionServiceImpl(
-        transactionsStore = transactionsStore,
-        transactionStatisticsStore = transactionStatisticsStore,
-        taggingRuleStore = taggingRuleStore,
-        commandHandler = CommandHandler(
-            eventStore = bankAccountEventStore,
-            eventProcessor = EventProcessor(),
-            eventListeners = setOf(
-                EventLoggingListener(),
-                TransactionListener(transactionsStore, RawDateToDateConverter()),
-                TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
-                TransactionTaggingListener(taggingService)
-            )
-        ),
-        taggingService = taggingService
-    )
-
-    val transactionServiceServer = ServerBuilder
+    val transactionService = ServerBuilder
         .forPort(9997)
-        .addService(transactionService)
-        .build()
-        .start()
-
-    val transactionImportServiceServer = ServerBuilder
-        .forPort(9998)
-        .addService(TransactionImportServiceImpl(transactionService))
+        .addService(TransactionServiceImpl(
+            transactionsStore = transactionsStore,
+            transactionStatisticsStore = transactionStatisticsStore,
+            taggingRuleStore = taggingRuleStore,
+            commandHandler = CommandHandler(
+                eventStore = bankAccountEventStore,
+                eventProcessor = EventProcessor(),
+                eventListeners = setOf(
+                    EventLoggingListener(),
+                    TransactionListener(transactionsStore, RawDateToDateConverter()),
+                    TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
+                    TransactionTaggingListener(taggingService)
+                )
+            ),
+            taggingService = taggingService
+        ))
         .build()
         .start()
 
@@ -82,8 +73,7 @@ fun main() {
         transactionStatisticsStore.close()
         taggingRuleStore.close()
     })
-    transactionServiceServer.awaitTermination()
-    transactionImportServiceServer.awaitTermination()
+    transactionService.awaitTermination()
 
     logger.info("Transaction services stopped")
 }

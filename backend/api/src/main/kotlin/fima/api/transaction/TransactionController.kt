@@ -2,8 +2,6 @@ package fima.api.transaction
 
 import fima.domain.transaction.monthInYear
 import fima.services.transaction.*
-import fima.services.transactionimport.TransactionImportServiceGrpcKt
-import fima.services.transactionimport.importTransactionsRequest
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +15,7 @@ import java.util.*
 
 @RestController
 class TransactionController @Autowired constructor(
-    private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub,
-    private val transactionImportService: TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub
+    private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -85,7 +82,7 @@ class TransactionController @Autowired constructor(
                         }
 
                         suspend {
-                            transactionImportService.importTransactions(request)
+                            transactionService.importTransactions(request)
                         }
                     }
                 }

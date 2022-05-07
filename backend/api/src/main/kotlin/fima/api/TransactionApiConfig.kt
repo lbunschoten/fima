@@ -3,7 +3,6 @@ package fima.api
 import fima.services.investment.InvestmentServiceGrpcKt
 import fima.services.subscription.SubscriptionServiceGrpcKt
 import fima.services.transaction.TransactionServiceGrpcKt
-import fima.services.transactionimport.TransactionImportServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -18,11 +17,8 @@ open class TransactionApiConfig {
     @Value("\${TRANSACTION_SERVICE_SERVICE_HOST:localhost}")
     private var transactionServiceHost: String = "localhost"
 
-    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT_MAIN_HTTP:9997}")
+    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT:9997}")
     private var transactionServicePort: Int = 9997
-
-    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT_IMPORT_HTTP:9998}")
-    private var transactionImportServicePort: Int = 9998
 
     @Value("\${SUBSCRIPTION_SERVICE_SERVICE_HOST:localhost}")
     private var subscriptionServiceHost: String = "localhost"
@@ -44,16 +40,6 @@ open class TransactionApiConfig {
             .usePlaintext()
             .build()
         return TransactionServiceGrpcKt.TransactionServiceCoroutineStub(channel)
-    }
-
-    @Bean
-    open fun getTransactionImportService(): TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub {
-        logger.info("Connecting to transaction-import-service at ${transactionServiceHost}:${transactionImportServicePort}")
-        val channel = ManagedChannelBuilder
-            .forAddress(transactionServiceHost, transactionImportServicePort)
-            .usePlaintext()
-            .build()
-        return TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub(channel)
     }
 
     @Bean
