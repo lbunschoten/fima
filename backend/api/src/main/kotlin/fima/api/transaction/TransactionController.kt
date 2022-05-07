@@ -82,6 +82,7 @@ class TransactionController @Autowired constructor(
                         }
 
                         suspend {
+                            logger.info("Import transactions request sent")
                             transactionService.importTransactions(request)
                         }
                     }
