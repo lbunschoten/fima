@@ -25,11 +25,13 @@ class BankAccountEventStore(db: Jdbi) : EventStore(), Closeable {
     }
 
     override fun writeEvents(aggregateId: String, events: List<Event>) {
-        events.forEach { event ->
-            handle.execute("""
-          INSERT INTO bank_account_events(aggregate_id, at, version, event)
-          VALUES (?, ?, ?, ?)
-        """, aggregateId, event.at, event.version.toLong(), serializeEvent(event))
+        handle.useTransaction<Exception> {
+            events.forEach { event ->
+                handle.execute("""
+                  INSERT INTO bank_account_events(aggregate_id, at, version, event)
+                  VALUES (?, ?, ?, ?)
+                """, aggregateId, event.at, event.version.toLong(), serializeEvent(event))
+            }
         }
     }
 
