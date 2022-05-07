@@ -46,7 +46,7 @@ podTemplate(
         }
 
         stage('Build') {
-            parralel {
+            pa
                 stage('Build gradle projects') {
                     container('jdk') {
                         withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
