@@ -27,58 +27,63 @@ class TransactionServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override suspend fun importTransactions(request: ImportTransactionsRequest): ImportTransactionsResponse {
-        StringReader(request.transactions).use { reader ->
-            val csvReader = CsvToBeanBuilder<TransactionRow>(reader)
-                .withSeparator(',')
-                .withQuoteChar('\"')
-                .withType(TransactionRow::class.java)
-                .withThrowExceptions(true)
-                .withSkipLines(1)
-                .build()
+        try {
+            StringReader(request.transactions).use { reader ->
+                val csvReader = CsvToBeanBuilder<TransactionRow>(reader)
+                    .withSeparator(',')
+                    .withQuoteChar('\"')
+                    .withType(TransactionRow::class.java)
+                    .withThrowExceptions(true)
+                    .withSkipLines(1)
+                    .build()
 
-            val transactions = csvReader.parse()
-            logger.info("Importing ${transactions.size} transactions")
+                val transactions = csvReader.parse()
+                logger.info("Importing ${transactions.size} transactions")
 
-            transactions.forEachIndexed { index, transaction ->
-                if (index == 0) {
-                    openBankAccount(
-                        openBankAccountRequest {
-                            accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
-                            initialBalance = 5000F // FIXME: Make configurable
-                        }
-                    )
+                transactions.forEachIndexed { index, transaction ->
+                    if (index == 0) {
+                        openBankAccount(
+                            openBankAccountRequest {
+                                accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
+                                initialBalance = 5000F // FIXME: Make configurable
+                            }
+                        )
+                    }
+
+                    if (transaction.direction == "Af") {
+                        withdraw(
+                            withdrawRequest {
+                                amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
+                                date = transaction.date
+                                details = transaction.details
+                                name = transaction.name
+                                fromAccount = transaction.firstAccount
+                                toAccount = transaction.secondAccount
+                                type = transaction.type
+                            }
+                        )
+                    } else {
+                        deposit(
+                            depositRequest {
+                                amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
+                                date = transaction.date
+                                details = transaction.details
+                                name = transaction.name
+                                fromAccount = transaction.secondAccount
+                                toAccount = transaction.firstAccount
+                                type = transaction.type
+                            }
+                        )
+                    }
+
                 }
-
-                if (transaction.direction == "Af") {
-                    withdraw(
-                        withdrawRequest {
-                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
-                            date = transaction.date
-                            details = transaction.details
-                            name = transaction.name
-                            fromAccount = transaction.firstAccount
-                            toAccount = transaction.secondAccount
-                            type = transaction.type
-                        }
-                    )
-                } else {
-                    deposit(
-                        depositRequest {
-                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
-                            date = transaction.date
-                            details = transaction.details
-                            name = transaction.name
-                            fromAccount = transaction.secondAccount
-                            toAccount = transaction.firstAccount
-                            type = transaction.type
-                        }
-                    )
-                }
-
             }
-        }
 
-        return importTransactionsResponse {}
+            return importTransactionsResponse {}
+        } catch (e: Exception) {
+            logger.error("Failed to import transactions: ${e.message}")
+            throw StatusException(Status.UNKNOWN.withCause(e))
+        }
     }
 
     override suspend fun searchTransactions(request: SearchTransactionsRequest): SearchTransactionsResponse {
