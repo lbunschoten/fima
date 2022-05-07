@@ -46,17 +46,27 @@ podTemplate(
         }
 
         stage('Build') {
-            container('jdk') {
-                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh './backend/gradlew build package -p backend --warning-mode all --no-daemon --parallel'
+            parralel {
+                stage('Build gradle projects') {
+                    container('jdk') {
+                        withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                            sh './backend/gradlew build package -p backend --warning-mode all --no-daemon --parallel'
+                        }
+                    }
                 }
-            }
-            container('sbt') {
-                dir('./backend/subscription-service') {
-                    sh 'sbt ";assembly;scalafixAll --check"'
+                stage('Build subscription service') {
+                    container('sbt') {
+                        dir('./backend/subscription-service') {
+                            sh 'sbt ";assembly;scalafixAll --check"'
+                        }
+                    }
                 }
-                dir('./backend/investment-service') {
-                    sh 'sbt ";assembly;scalafixAll --check"'
+                stage('Build investment service') {
+                    container('sbt') {
+                        dir('./backend/investment-service') {
+                            sh 'sbt ";assembly;scalafixAll --check"'
+                        }
+                    }
                 }
             }
         }
