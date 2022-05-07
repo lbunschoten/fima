@@ -75,11 +75,15 @@ class TransactionController @Autowired constructor(
 
         return transactions
             .flatMap {
+                logger.info("Reached 1")
                 DataBufferUtils.join(it.content()).map { dataBuffer ->
+                    logger.info("Reached 2")
                     dataBuffer.asInputStream().use { input ->
+                        logger.info("Reached 3")
                         val request = importTransactionsRequest {
                             this.transactions = String(input.readAllBytes(), Charset.forName("UTF-8"))
                         }
+                        logger.info("Reached 4")
 
                         suspend {
                             logger.info("Import transactions request sent")
