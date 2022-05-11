@@ -52,8 +52,8 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
             events.forEach { event ->
                 handle.execute("""
                   INSERT INTO bank_account_events(aggregate_id, at, version, snapshot_version, event)
-                  VALUES (?, ?, ?, ?)
-                """, aggregateId, event.at, event.version.toLong(), eventSerialization.serialize(event))
+                  VALUES (?, ?, ?, ?, ?)
+                """, aggregateId, event.at, event.version.toLong(), event.snapshotVersion.toLong(), eventSerialization.serialize(event))
             }
         }
     }
