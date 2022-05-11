@@ -37,7 +37,11 @@ fun main() {
     val commandHandler = CommandHandler(
         eventStore = eventStore,
         eventProcessor = eventProcessor,
-        eventListeners = setOf(EventLoggingListener(), TransactionCounter()))
+        eventListeners = setOf(EventLoggingListener(), TransactionCounter()),
+        transactionHandler = FakeTransactionHandler(),
+        jdbi = TODO()
+    )
+
     val aggregateId: String = UUID.randomUUID().toString()
 
     commandHandler.processCommand(aggregateId, create)

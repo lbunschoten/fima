@@ -1,6 +1,7 @@
 package fima.services.transaction.store
 
 import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
@@ -63,9 +64,7 @@ interface TransactionsStore {
     fun searchTransactions(filters: List<SearchFilters>): List<Transaction> = emptyList()
 }
 
-class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : TransactionsStore by transactionsStore {
-
-    private val handle = db.open()
+class TransactionsStoreImpl(private val db: Jdbi, transactionsStore: TransactionsStore) : TransactionsStore by transactionsStore {
 
     override fun searchTransactions(filters: List<TransactionsStore.SearchFilters>): List<Transaction> {
         if (filters.isEmpty()) return emptyList()
@@ -92,7 +91,10 @@ class TransactionsStoreImpl(db: Jdbi, transactionsStore: TransactionsStore) : Tr
                 ORDER BY t.date DESC
             """.trimIndent()
 
-        val q = handle.select(searchQuery)
-        return q.registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
+        return db.withHandleUnchecked { handle ->
+            handle
+                .select(searchQuery)
+                .registerRowMapper(TransactionRowMapper()).mapTo(Transaction::class.java).list()
+        }
     }
 }

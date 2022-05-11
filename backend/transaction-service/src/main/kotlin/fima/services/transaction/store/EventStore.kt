@@ -18,7 +18,17 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import java.util.UUID
 
-abstract class EventStore {
+interface EventStore {
+
+    fun aggregates(): List<String>
+
+    fun readEvents(aggregateId: String): List<Event>
+
+    fun writeEvents(aggregateId: String, events: List<Event>)
+
+}
+
+class EventSerialization {
 
     private val eventSerializers = SerializersModule {
         polymorphic(Event::class) {
@@ -29,19 +39,13 @@ abstract class EventStore {
         }
     }
 
-    val json = Json { serializersModule = eventSerializers; classDiscriminator = "t" }
+    private val json = Json { serializersModule = eventSerializers; classDiscriminator = "t" }
 
-    abstract fun aggregates(): List<String>
-
-    abstract fun readEvents(aggregateId: String): List<Event>
-
-    abstract fun writeEvents(aggregateId: String, events: List<Event>)
-
-    fun serializeEvent(event: Event): String {
+    fun serialize(event: Event): String {
         return json.encodeToString(Event.serializer(), event)
     }
 
-    fun deserializeEvents(serializedEvents: List<String>): List<Event> {
+    fun deserialize(serializedEvents: List<String>): List<Event> {
         return serializedEvents.map { e ->
             val event: Event = json.decodeFromString(e)
             event
