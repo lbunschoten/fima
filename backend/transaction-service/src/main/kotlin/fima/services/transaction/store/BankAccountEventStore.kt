@@ -5,7 +5,7 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.slf4j.LoggerFactory
 
-class BankAccountEventStore(private val db: Jdbi, private val eventSerialization: EventSerialization) : EventStore by db.onDemand(EventStore::class.java) {
+class BankAccountEventStore(private val db: Jdbi, private val eventSerialization: EventSerialization) : EventStore {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
