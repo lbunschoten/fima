@@ -18,14 +18,14 @@ class CommandHandler(private val transactionHandler: TransactionHandler,
 
     fun processCommand(aggregateId: String, command: Command): Set<String> {
         return try {
-            return transactionHandler.inTransaction {
+            transactionHandler.inTransaction {
                 logger.info("Process command: ${jdbi.withHandleUnchecked { it.isInTransaction }}")
 
-                val historicEvents = eventStore.readEvents(aggregateId)
+                val historicEvents = eventStore.readLatestEvents(aggregateId)
                 val inputAggregate = eventProcessor.process(historicEvents)
 
                 val newEvents: List<Event> = command.events(aggregateId).mapIndexed { idx, buildEvent ->
-                    buildEvent(1 + idx + inputAggregate.version)
+                    buildEvent(1 + idx + inputAggregate.version, inputAggregate.snapshotVersion)
                 }
                 val outputAggregate = newEvents.fold(inputAggregate) { agg, e -> e.apply(agg) }
 
@@ -34,6 +34,10 @@ class CommandHandler(private val transactionHandler: TransactionHandler,
                     eventStore.writeEvents(aggregateId, newEvents)
                     newEvents.forEach { event ->
                         eventListeners.forEach { listen -> listen(event) }
+                    }
+
+                    if (shouldCreateSnapshot(historicEvents + newEvents)) {
+                        eventStore.writeEvents(aggregateId, listOf(outputAggregate.snapshot()))
                     }
                 }
 
@@ -45,6 +49,7 @@ class CommandHandler(private val transactionHandler: TransactionHandler,
         }
     }
 
+    private fun shouldCreateSnapshot(eventsInCurrentSnapshot: List<Event>) = eventsInCurrentSnapshot.size >= 10
 }
 
 interface TransactionHandler {

@@ -1,10 +1,6 @@
 package fima.services.transaction.store
 
-import fima.services.transaction.write.event.BankAccountClosedEvent
-import fima.services.transaction.write.event.BankAccountOpenedEvent
-import fima.services.transaction.write.event.Event
-import fima.services.transaction.write.event.MoneyDepositedEvent
-import fima.services.transaction.write.event.MoneyWithdrawnEvent
+import fima.services.transaction.write.event.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -24,6 +20,8 @@ interface EventStore {
 
     fun readEvents(aggregateId: String): List<Event>
 
+    fun readLatestEvents(aggregateId: String): List<Event>
+
     fun writeEvents(aggregateId: String, events: List<Event>)
 
 }
@@ -36,6 +34,7 @@ class EventSerialization {
             subclass(MoneyDepositedEvent::class)
             subclass(MoneyWithdrawnEvent::class)
             subclass(BankAccountClosedEvent::class)
+            subclass(BankAccountSnapshotCreatedEvent::class)
         }
     }
 

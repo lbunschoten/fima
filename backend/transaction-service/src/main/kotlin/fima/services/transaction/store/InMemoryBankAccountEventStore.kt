@@ -15,6 +15,8 @@ class InMemoryBankAccountEventStore : EventStore {
         return eventSerialization.deserialize(serializedEvents)
     }
 
+    override fun readLatestEvents(aggregateId: String): List<Event> = readEvents(aggregateId)
+
     override fun writeEvents(aggregateId: String, events: List<Event>) {
         val serializedEvents = events.map { eventSerialization.serialize(it) }
         storage[aggregateId] = storage[aggregateId].orEmpty() + serializedEvents

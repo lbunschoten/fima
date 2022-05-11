@@ -29,12 +29,29 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
         return eventSerialization.deserialize(serializedEvents)
     }
 
+    override fun readLatestEvents(aggregateId: String): List<Event> {
+        val serializedEvents = db.withHandleUnchecked { handle ->
+            logger.info("Read latest events: ${handle.isInTransaction }}")
+            handle
+                .select("""
+                    SELECT event 
+                    FROM bank_account_events 
+                    WHERE aggregate_id = ?
+                    AND (SELECT MAX(snapshot_version) FROM bank_account_events WHERE aggregate_id = ?) = snapshot_version
+                    ORDER BY version ASC
+                """.trimIndent(), aggregateId, aggregateId)
+                .mapTo(String::class.java)
+                .list()
+        }
+        return eventSerialization.deserialize(serializedEvents)
+    }
+
     override fun writeEvents(aggregateId: String, events: List<Event>) {
         db.withHandleUnchecked { handle ->
             logger.info("Write events: ${handle.isInTransaction }")
             events.forEach { event ->
                 handle.execute("""
-                  INSERT INTO bank_account_events(aggregate_id, at, version, event)
+                  INSERT INTO bank_account_events(aggregate_id, at, version, snapshot_version, event)
                   VALUES (?, ?, ?, ?)
                 """, aggregateId, event.at, event.version.toLong(), eventSerialization.serialize(event))
             }

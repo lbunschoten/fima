@@ -9,6 +9,7 @@ import java.util.UUID
 @Serializable
 @SerialName("MoneyWithdrawnEvent")
 data class MoneyWithdrawnEvent(override val version: Int,
+                               override val snapshotVersion: Int,
                                @Serializable(with = UUIDSerializer::class) override val id: UUID,
                                override val amountInCents: Long,
                                override val date: Int,
@@ -21,6 +22,7 @@ data class MoneyWithdrawnEvent(override val version: Int,
     override fun apply(aggregate: BankAccount): BankAccount {
         return aggregate
             .withVersion(version)
+            .withSnapshotVersion(snapshotVersion)
             .withBalance(aggregate.balanceInCents - amountInCents)
     }
 
