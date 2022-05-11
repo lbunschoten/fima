@@ -15,6 +15,7 @@ import io.grpc.Status
 import io.grpc.StatusException
 import org.slf4j.LoggerFactory
 import java.io.StringReader
+import java.time.LocalDate
 
 class TransactionServiceImpl(
     private val transactionsStore: TransactionsStore,
@@ -44,39 +45,34 @@ class TransactionServiceImpl(
                 transactions.forEachIndexed { index, transaction ->
                     if (index == 0) {
                         openBankAccount(
-                            openBankAccountRequest {
-                                accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount
-                                initialBalance = 5000F // FIXME: Make configurable
-                            }
+                            accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount,
+                            initialBalance = 5000F // FIXME: Make configurable
                         )
                     }
 
-                    if (transaction.direction == "Af") {
+                    val validationErrors = if (transaction.direction == "Af") {
                         withdraw(
-                            withdrawRequest {
-                                amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
-                                date = transaction.date
-                                details = transaction.details
-                                name = transaction.name
-                                fromAccount = transaction.firstAccount
-                                toAccount = transaction.secondAccount
-                                type = transaction.type
-                            }
+                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong(),
+                            date = transaction.date,
+                            details = transaction.details,
+                            name = transaction.name,
+                            fromAccount = transaction.firstAccount,
+                            toAccount = transaction.secondAccount,
+                            type = transaction.type
                         )
                     } else {
                         deposit(
-                            depositRequest {
-                                amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong()
-                                date = transaction.date
-                                details = transaction.details
-                                name = transaction.name
-                                fromAccount = transaction.secondAccount
-                                toAccount = transaction.firstAccount
-                                type = transaction.type
-                            }
+                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong(),
+                            date = transaction.date,
+                            details = transaction.details,
+                            name = transaction.name,
+                            fromAccount = transaction.secondAccount,
+                            toAccount = transaction.firstAccount,
+                            type = transaction.type
                         )
                     }
 
+                    validationErrors.forEach { logger.warn(it) }
                 }
             }
 
@@ -146,52 +142,26 @@ class TransactionServiceImpl(
         }
     }
 
-    override suspend fun openBankAccount(request: OpenBankAccountRequest): OpenBankAccountResponse {
-        logger.info("Received request for opening bank account ${request.accountNumber}")
-        val errorMessages = commandHandler.processCommand(request.accountNumber, OpenBankAccountCommand(request.accountNumber, (request.initialBalance * 100).toLong()))
-
-        return openBankAccountResponse {
-            this.errorMessages.addAll(errorMessages)
-        }
+    private fun openBankAccount(accountNumber: String, initialBalance: Float): Set<String> {
+        logger.info("Received request for opening bank account $accountNumber")
+        return commandHandler.processCommand(accountNumber, OpenBankAccountCommand(accountNumber, (initialBalance * 100).toLong()))
     }
 
-    override suspend fun withdraw(request: WithdrawRequest): WithdrawResponse {
-        logger.info("Received request for withdrawal from ${request.fromAccount}")
-        val errorMessages = commandHandler.processCommand(
-            request.fromAccount,
-            WithdrawMoneyCommand(
-                request.amountInCents,
-                request.date,
-                request.name,
-                request.details,
-                request.toAccount,
-                request.type
-            )
+    private fun withdraw(fromAccount: String, amountInCents: Long, date: Int, name: String, details: String, toAccount: String, type: String): Set<String> {
+        logger.info("Received request for withdrawal from $fromAccount")
+        return commandHandler.processCommand(
+            fromAccount,
+            WithdrawMoneyCommand(amountInCents, date, name, details, toAccount, type)
         )
-
-        return withdrawResponse {
-            this.errorMessages.addAll(errorMessages)
-        }
     }
 
-    override suspend fun deposit(request: DepositRequest): DepositResponse {
-        logger.info("Received request for deposit to ${request.toAccount}")
+    private fun deposit(toAccount: String, amountInCents: Long, date: Int, name: String, details: String, fromAccount: String, type: String): Set<String> {
+        logger.info("Received request for deposit to $toAccount")
 
-        val errorMessages = commandHandler.processCommand(
-            request.toAccount,
-            DepositMoneyCommand(
-                request.amountInCents,
-                request.date,
-                request.name,
-                request.details,
-                request.fromAccount,
-                request.type
-            )
+        return commandHandler.processCommand(
+            toAccount,
+            DepositMoneyCommand(amountInCents, date, name, details, fromAccount, type)
         )
-
-        return depositResponse {
-            this.errorMessages.addAll(errorMessages)
-        }
     }
 
     override suspend fun getTaggingRules(request: GetTaggingRulesRequest): GetTaggingRulesResponse {

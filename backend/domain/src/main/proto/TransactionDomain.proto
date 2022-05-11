@@ -35,16 +35,6 @@ message Transaction {
   map<string, string> tags = 9;
 }
 
-message RawTransaction {
-  int32 date = 1;
-  string name = 2;
-  string from_account = 3;
-  string to_account = 4;
-  string type = 5;
-  float amount = 6;
-  string details = 7;
-}
-
 message TaggingRule {
   string id = 1;
   string regex = 2;
