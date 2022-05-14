@@ -8,10 +8,10 @@ import java.time.Instant
 abstract class Event : EventVersion {
 
     abstract val version: Int
+    abstract val snapshotVersion: Int
 
     @Suppress("unused")
     val at: Long = Instant.now().toEpochMilli()
-
 
     abstract fun apply(aggregate: BankAccount): BankAccount
 }

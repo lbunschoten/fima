@@ -1,14 +1,11 @@
-package fima.services.transaction
+package fima.services
 
+import fima.services.transaction.TransactionServiceImpl
 import fima.services.transaction.conversion.RawDateToDateConverter
-import fima.services.transaction.store.BankAccountEventStore
-import fima.services.transaction.store.TaggingRulesStoreImpl
-import fima.services.transaction.store.TransactionStatisticsStoreImpl
-import fima.services.transaction.store.TransactionTagsStore
-import fima.services.transaction.store.TransactionsStore
-import fima.services.transaction.store.TransactionsStoreImpl
+import fima.services.transaction.store.*
 import fima.services.transaction.write.CommandHandler
 import fima.services.transaction.write.EventProcessor
+import fima.services.transaction.write.JdbiTransactionHandler
 import fima.services.transaction.write.TaggingService
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
@@ -29,7 +26,7 @@ fun main() {
         .installPlugin(KotlinPlugin())
         .installPlugin(KotlinSqlObjectPlugin())
 
-    val bankAccountEventStore = BankAccountEventStore(db)
+    val bankAccountEventStore = BankAccountEventStore(db, EventSerialization())
     val transactionsStore = TransactionsStoreImpl(db, db.onDemand(TransactionsStore::class.java))
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
     val transactionTagsStore = TransactionTagsStore(db)
@@ -41,13 +38,15 @@ fun main() {
         transactionTagsStore
     )
 
-    val transactionServiceServer = ServerBuilder
+    val transactionService = ServerBuilder
         .forPort(9997)
         .addService(TransactionServiceImpl(
             transactionsStore = transactionsStore,
             transactionStatisticsStore = transactionStatisticsStore,
             taggingRuleStore = taggingRuleStore,
             commandHandler = CommandHandler(
+                transactionHandler = JdbiTransactionHandler(db),
+                jdbi = db,
                 eventStore = bankAccountEventStore,
                 eventProcessor = EventProcessor(),
                 eventListeners = setOf(
@@ -60,20 +59,12 @@ fun main() {
             taggingService = taggingService
         ))
         .build()
-
-    transactionServiceServer.start()
+        .start()
 
     val logger = LoggerFactory.getLogger("Main")
     logger.info("Transaction-service started")
 
-    Runtime.getRuntime().addShutdownHook(Thread {
-        logger.info("JVM is shutting down")
-        bankAccountEventStore.close()
-        transactionTagsStore.close()
-        transactionStatisticsStore.close()
-        taggingRuleStore.close()
-    })
-    transactionServiceServer.awaitTermination()
+    transactionService.awaitTermination()
 
     logger.info("Transaction services stopped")
 }

@@ -10,5 +10,6 @@ RUN apt-get update && \
 COPY ./build/libs/transaction-service-all.jar fima.jar
 
 EXPOSE 9997
+EXPOSE 9998
 
-ENTRYPOINT ["java", "-cp", "fima.jar", "fima.services.transaction.MainKt"]
+ENTRYPOINT ["java", "-cp", "fima.jar", "fima.services.MainKt"]

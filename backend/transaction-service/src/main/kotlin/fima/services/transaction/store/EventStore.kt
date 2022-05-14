@@ -1,10 +1,6 @@
 package fima.services.transaction.store
 
-import fima.services.transaction.write.event.BankAccountClosedEvent
-import fima.services.transaction.write.event.BankAccountOpenedEvent
-import fima.services.transaction.write.event.Event
-import fima.services.transaction.write.event.MoneyDepositedEvent
-import fima.services.transaction.write.event.MoneyWithdrawnEvent
+import fima.services.transaction.write.event.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -18,7 +14,19 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import java.util.UUID
 
-abstract class EventStore {
+interface EventStore {
+
+    fun aggregates(): List<String>
+
+    fun readEvents(aggregateId: String): List<Event>
+
+    fun readLatestEvents(aggregateId: String): List<Event>
+
+    fun writeEvents(aggregateId: String, events: List<Event>)
+
+}
+
+class EventSerialization {
 
     private val eventSerializers = SerializersModule {
         polymorphic(Event::class) {
@@ -26,22 +34,17 @@ abstract class EventStore {
             subclass(MoneyDepositedEvent::class)
             subclass(MoneyWithdrawnEvent::class)
             subclass(BankAccountClosedEvent::class)
+            subclass(BankAccountSnapshotCreatedEvent::class)
         }
     }
 
-    val json = Json { serializersModule = eventSerializers; classDiscriminator = "t" }
+    private val json = Json { serializersModule = eventSerializers; classDiscriminator = "t" }
 
-    abstract fun aggregates(): List<String>
-
-    abstract fun readEvents(aggregateId: String): List<Event>
-
-    abstract fun writeEvents(aggregateId: String, events: List<Event>)
-
-    fun serializeEvent(event: Event): String {
+    fun serialize(event: Event): String {
         return json.encodeToString(Event.serializer(), event)
     }
 
-    fun deserializeEvents(serializedEvents: List<String>): List<Event> {
+    fun deserialize(serializedEvents: List<String>): List<Event> {
         return serializedEvents.map { e ->
             val event: Event = json.decodeFromString(e)
             event

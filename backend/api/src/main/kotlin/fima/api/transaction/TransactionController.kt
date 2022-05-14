@@ -2,8 +2,6 @@ package fima.api.transaction
 
 import fima.domain.transaction.monthInYear
 import fima.services.transaction.*
-import fima.services.transactionimport.TransactionImportServiceGrpcKt
-import fima.services.transactionimport.importTransactionsRequest
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +15,7 @@ import java.util.*
 
 @RestController
 class TransactionController @Autowired constructor(
-    private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub,
-    private val transactionImportService: TransactionImportServiceGrpcKt.TransactionImportServiceCoroutineStub
+    private val transactionService: TransactionServiceGrpcKt.TransactionServiceCoroutineStub
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -76,21 +73,26 @@ class TransactionController @Autowired constructor(
     suspend fun importTransactions(@RequestPart("transactions", required = true) transactions: Mono<FilePart>): ResponseEntity<String> {
         logger.info("Received import request")
 
-        return transactions
+        val request: ImportTransactionsRequest = transactions
             .flatMap {
+                logger.info("Reached 1")
                 DataBufferUtils.join(it.content()).map { dataBuffer ->
+                    logger.info("Reached 2")
                     dataBuffer.asInputStream().use { input ->
+                        logger.info("Reached 3")
                         val request = importTransactionsRequest {
                             this.transactions = String(input.readAllBytes(), Charset.forName("UTF-8"))
                         }
+                        logger.info("Reached 4")
 
-                        suspend {
-                            transactionImportService.importTransactions(request)
-                        }
+                        request
                     }
                 }
-            }.map {
-                ResponseEntity.ok("Upload successful")
             }.awaitSingle()
+
+        logger.info("Reached 5")
+        transactionService.importTransactions(request)
+
+        return ResponseEntity.ok("Upload successful")
     }
 }

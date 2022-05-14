@@ -37,7 +37,11 @@ fun main() {
     val commandHandler = CommandHandler(
         eventStore = eventStore,
         eventProcessor = eventProcessor,
-        eventListeners = setOf(EventLoggingListener(), TransactionCounter()))
+        eventListeners = setOf(EventLoggingListener(), TransactionCounter()),
+        transactionHandler = FakeTransactionHandler(),
+        jdbi = TODO()
+    )
+
     val aggregateId: String = UUID.randomUUID().toString()
 
     commandHandler.processCommand(aggregateId, create)
@@ -45,7 +49,7 @@ fun main() {
     commandHandler.processCommand(aggregateId, addTransaction2)
     commandHandler.processCommand(aggregateId, close)
 
-    val newBankAccount: BankAccount = UniniatilizedAccount
+    val newBankAccount: BankAccount = UniniatilizedAccount(aggregateId)
     println(eventStore.readEvents(aggregateId).fold(newBankAccount) { agg, e ->
         eventProcessor.process(agg, listOf(e)).also {
             EventLoggingListener().invoke(e)

@@ -1,6 +1,7 @@
 package fima.services.transaction.store
 
 import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import java.io.Closeable
@@ -9,9 +10,7 @@ import java.util.Optional
 class TransactionStatisticsStoreImpl(
     private val db: Jdbi,
     private val initialBalanceInCents: Long
-) : TransactionStatisticsStore by db.onDemand(TransactionStatisticsStore::class.java), Closeable {
-
-    private val handle = db.open()
+) : TransactionStatisticsStore by db.onDemand(TransactionStatisticsStore::class.java) {
 
     fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
         val statistics = getStatistics(month, year).orElse(null)
@@ -35,26 +34,28 @@ class TransactionStatisticsStoreImpl(
     }
 
     private fun insertStatistic(sum: Long, balance: Long, month: Int, year: Int) {
-        handle.execute("""
-      INSERT INTO monthly_transaction_statistics (month, year, num_transactions, sum, balance)
-      VALUES (?, ?, 1, ?, ?)
-    """, month, year, sum, balance)
+        db.withHandleUnchecked { handle ->
+            handle.execute("""
+              INSERT INTO monthly_transaction_statistics (month, year, num_transactions, sum, balance)
+              VALUES (?, ?, 1, ?, ?)
+            """, month, year, sum, balance)
+        }
     }
 
     private fun updateStatistic(numTransactions: Int, sum: Long, balance: Long, month: Int, year: Int) {
-        handle.execute("""
-        UPDATE monthly_transaction_statistics
-        SET 
-          num_transactions = ?,
-          sum = ?,
-          balance = ?
-        WHERE month = ? AND year = ?
-        """,
-            numTransactions, sum, balance, month, year
-        )
+        db.withHandleUnchecked {handle ->
+            handle.execute("""
+                UPDATE monthly_transaction_statistics
+                SET 
+                  num_transactions = ?,
+                  sum = ?,
+                  balance = ?
+                WHERE month = ? AND year = ?
+                """,
+                    numTransactions, sum, balance, month, year
+                )
+        }
     }
-
-    override fun close() = handle.close()
 }
 
 interface TransactionStatisticsStore {
