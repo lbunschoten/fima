@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("BankAccountSnapshotCreatedEvent")
-data class BankAccountSnapshotCreatedEvent(override val version: Int, override val snapshotVersion: Int, val balanceInCents: Long) : Event(), EventVersion1 {
+data class BankAccountSnapshotCreatedEvent(override val version: Int, override val snapshotVersion: Int, val balanceInCents: Long, val isOpen: Boolean) : Event(), EventVersion1 {
 
     override fun apply(aggregate: BankAccount): BankAccount {
         return if (aggregate.isOpen) OpenBankAccount(version, snapshotVersion, aggregate.accountNumber, balanceInCents)

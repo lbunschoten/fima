@@ -11,16 +11,14 @@ interface BankAccount : Aggregate {
     fun withVersion(version: Int): BankAccount
     fun withSnapshotVersion(snapshotVersion: Int): BankAccount
     fun withBalance(balanceInCents: Long): BankAccount
-    override fun snapshot(): Event = BankAccountSnapshotCreatedEvent(version + 1, snapshotVersion + 1, balanceInCents)
+    override fun snapshot(): Event = BankAccountSnapshotCreatedEvent(version + 1, snapshotVersion + 1, balanceInCents, isOpen)
 }
 
-object UniniatilizedAccount : BankAccount {
+data class UniniatilizedAccount(override val accountNumber: String) : BankAccount {
     override val version: Int = 0
     override val snapshotVersion: Int = 0
     override val balanceInCents: Long = 0
     override val isOpen: Boolean = false
-    override val accountNumber: String
-        get() = throw IllegalStateException("The account has not been assigned an account number yet")
 
     override fun withVersion(version: Int): BankAccount = this
     override fun withSnapshotVersion(snapshotVersion: Int): BankAccount = this

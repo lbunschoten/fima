@@ -22,7 +22,7 @@ class CommandHandler(private val transactionHandler: TransactionHandler,
                 logger.info("Process command: ${jdbi.withHandleUnchecked { it.isInTransaction }}")
 
                 val historicEvents = eventStore.readLatestEvents(aggregateId)
-                val inputAggregate = eventProcessor.process(historicEvents)
+                val inputAggregate = eventProcessor.process(aggregateId, historicEvents)
 
                 val newEvents: List<Event> = command.events(aggregateId).mapIndexed { idx, buildEvent ->
                     buildEvent(1 + idx + inputAggregate.version, inputAggregate.snapshotVersion)
