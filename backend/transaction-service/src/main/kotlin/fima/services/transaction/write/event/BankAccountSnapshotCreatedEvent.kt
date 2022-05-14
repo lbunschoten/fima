@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 data class BankAccountSnapshotCreatedEvent(override val version: Int, override val snapshotVersion: Int, val balanceInCents: Long, val isOpen: Boolean) : Event(), EventVersion1 {
 
     override fun apply(aggregate: BankAccount): BankAccount {
-        return if (aggregate.isOpen) OpenBankAccount(version, snapshotVersion, aggregate.accountNumber, balanceInCents)
+        return if (isOpen) OpenBankAccount(version, snapshotVersion, aggregate.accountNumber, balanceInCents)
         else ClosedBankAccount(version, snapshotVersion, aggregate.accountNumber)
     }
 
