@@ -66,3 +66,14 @@ spec:
       services:
         - name: transaction-service
           port: 80
+      middlewares:
+        - name: strip-transaction-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-transaction-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /transaction
