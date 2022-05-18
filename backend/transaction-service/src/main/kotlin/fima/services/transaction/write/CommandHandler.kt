@@ -5,22 +5,15 @@ import fima.services.transaction.write.command.Command
 import fima.services.transaction.write.event.Event
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
-import org.jdbi.v3.core.kotlin.withHandleUnchecked
-import org.slf4j.LoggerFactory
 
 class CommandHandler(private val transactionHandler: TransactionHandler,
-                     private val jdbi: Jdbi, // TOD() remove
                      private val eventStore: EventStore,
                      private val eventProcessor: EventProcessor,
                      private val eventListeners: Set<(Event) -> Unit>) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     fun processCommand(aggregateId: String, command: Command): Set<String> {
         return try {
             transactionHandler.inTransaction {
-                logger.info("Process command: ${jdbi.withHandleUnchecked { it.isInTransaction }}")
-
                 val historicEvents = eventStore.readLatestEvents(aggregateId)
                 val inputAggregate = eventProcessor.process(aggregateId, historicEvents)
 
@@ -60,8 +53,4 @@ class JdbiTransactionHandler(private val jdbi: Jdbi) : TransactionHandler{
     override fun <T> inTransaction(f: () -> T): T {
         return jdbi.inTransactionUnchecked { f() }
     }
-}
-
-class FakeTransactionHandler : TransactionHandler {
-    override fun <T> inTransaction(f: () -> T): T = f()
 }

@@ -29,8 +29,6 @@ spec:
                 secretKeyRef:
                   name: fima-postgres-db-pass
                   key: password
-            - name: KAFKA_HOST
-              value: 10.108.62.237
       imagePullSecrets:
         - name: regcred
 ---

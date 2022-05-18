@@ -48,7 +48,6 @@ fun main() {
 
     val commandHandler = CommandHandler(
         transactionHandler = JdbiTransactionHandler(db),
-        jdbi = db,
         eventStore = bankAccountEventStore,
         eventProcessor = EventProcessor(),
         eventListeners = setOf(
