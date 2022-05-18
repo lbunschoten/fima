@@ -20,7 +20,7 @@ spec:
           image: "$DOCKER_IMAGE"
           ports:
             - name: http
-              containerPort: 9997
+              containerPort: 9998
           env:
             - name: DB_PASSWORD
               valueFrom:
@@ -42,5 +42,30 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 9997
+      port: 80
       targetPort: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: subscription-api-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.fima.test`) && PathPrefix(`/subscription`)
+      kind: Rule
+      services:
+        - name: subscription-service
+          port: 80
+      middlewares:
+        - name: strip-subscription-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-subscription-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /subscription
