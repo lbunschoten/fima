@@ -6,10 +6,7 @@ import fima.services.http.plugins.configureSerialization
 import fima.services.transaction.TransactionServiceImpl
 import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.store.*
-import fima.services.transaction.write.CommandHandler
-import fima.services.transaction.write.EventProcessor
-import fima.services.transaction.write.JdbiTransactionHandler
-import fima.services.transaction.write.TaggingService
+import fima.services.transaction.write.*
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
@@ -23,9 +20,14 @@ import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.slf4j.LoggerFactory
 
-fun Application.module(transactionsStore: TransactionsStore, transactionStatisticsStore: TransactionStatisticsStore) {
+fun Application.module(
+    transactionsStore: TransactionsStore,
+    transactionStatisticsStore: TransactionStatisticsStore,
+    transactionImportService: TransactionImportService,
+    taggingService: TaggingService
+) {
     configureHttp()
-    configureRouting(transactionsStore, transactionStatisticsStore)
+    configureRouting(transactionsStore, transactionStatisticsStore, transactionImportService, taggingService)
     configureSerialization()
 }
 
@@ -42,37 +44,29 @@ fun main() {
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
+    val taggingService = TaggingService(bankAccountEventStore, taggingRuleStore, transactionTagsStore)
+
+    val commandHandler = CommandHandler(
+        transactionHandler = JdbiTransactionHandler(db),
+        jdbi = db,
+        eventStore = bankAccountEventStore,
+        eventProcessor = EventProcessor(),
+        eventListeners = setOf(
+            EventLoggingListener(),
+            TransactionListener(transactionsStore, RawDateToDateConverter()),
+            TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
+            TransactionTaggingListener(taggingService)
+        )
+    )
+    val transactionImportService = TransactionImportServiceImpl(commandHandler)
 
     val httpServer = embeddedServer(Netty, port = 9998) {
-        module(transactionsStore, transactionStatisticsStore)
+        module(transactionsStore, transactionStatisticsStore, transactionImportService, taggingService)
     }.start()
-
-    val taggingService = TaggingService(
-        bankAccountEventStore,
-        taggingRuleStore,
-        transactionTagsStore
-    )
 
     val transactionService = ServerBuilder
         .forPort(9997)
-        .addService(TransactionServiceImpl(
-            transactionsStore = transactionsStore,
-            transactionStatisticsStore = transactionStatisticsStore,
-            taggingRuleStore = taggingRuleStore,
-            commandHandler = CommandHandler(
-                transactionHandler = JdbiTransactionHandler(db),
-                jdbi = db,
-                eventStore = bankAccountEventStore,
-                eventProcessor = EventProcessor(),
-                eventListeners = setOf(
-                    EventLoggingListener(),
-                    TransactionListener(transactionsStore, RawDateToDateConverter()),
-                    TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
-                    TransactionTaggingListener(taggingService)
-                )
-            ),
-            taggingService = taggingService
-        ))
+        .addService(TransactionServiceImpl(transactionsStore))
         .build()
         .start()
 

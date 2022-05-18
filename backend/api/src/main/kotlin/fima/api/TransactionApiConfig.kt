@@ -2,7 +2,6 @@ package fima.api
 
 import fima.services.investment.InvestmentServiceGrpcKt
 import fima.services.subscription.SubscriptionServiceGrpcKt
-import fima.services.transaction.TransactionServiceGrpcKt
 import io.grpc.ManagedChannelBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -13,12 +12,6 @@ import org.springframework.context.annotation.Configuration
 open class TransactionApiConfig {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    @Value("\${TRANSACTION_SERVICE_SERVICE_HOST:localhost}")
-    private var transactionServiceHost: String = "localhost"
-
-    @Value("\${TRANSACTION_SERVICE_SERVICE_PORT:9997}")
-    private var transactionServicePort: Int = 9997
 
     @Value("\${SUBSCRIPTION_SERVICE_SERVICE_HOST:localhost}")
     private var subscriptionServiceHost: String = "localhost"
@@ -31,16 +24,6 @@ open class TransactionApiConfig {
 
     @Value("\${INVESTMENT_SERVICE_SERVICE_PORT:9997}")
     private var investmentServicePort: Int = 9997
-
-    @Bean
-    open fun getTransactionService(): TransactionServiceGrpcKt.TransactionServiceCoroutineStub {
-        logger.info("Connecting to transaction-service at ${transactionServiceHost}:${transactionServicePort}")
-        val channel = ManagedChannelBuilder
-            .forAddress(transactionServiceHost, transactionServicePort)
-            .usePlaintext()
-            .build()
-        return TransactionServiceGrpcKt.TransactionServiceCoroutineStub(channel)
-    }
 
     @Bean
     open fun getSubscriptionService(): SubscriptionServiceGrpcKt.SubscriptionServiceCoroutineStub {
