@@ -50,7 +50,7 @@ spec:
       targetPort: grpc
     - name: http
       protocol: TCP
-      port: 9998
+      port: 80
       targetPort: http
 ---
 apiVersion: traefik.containo.us/v1alpha1
