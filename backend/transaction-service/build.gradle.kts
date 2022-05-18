@@ -29,6 +29,7 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages-jvm:2.0.1")
     implementation("io.ktor:ktor-server-default-headers-jvm:2.0.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.1")
+    implementation("io.ktor:ktor-server-cors:2.0.1")
     implementation(project(":domain"))
     runtimeOnly("io.netty:netty-handler-proxy:4.1.76.Final")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.3")

@@ -1,6 +1,7 @@
 package fima.services
 
 import configureRouting
+import fima.services.http.plugins.configureHttp
 import fima.services.http.plugins.configureSerialization
 import fima.services.transaction.TransactionServiceImpl
 import fima.services.transaction.conversion.RawDateToDateConverter
@@ -23,12 +24,12 @@ import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.slf4j.LoggerFactory
 
 fun Application.module(transactionsStore: TransactionsStore, transactionStatisticsStore: TransactionStatisticsStore) {
+    configureHttp()
     configureRouting(transactionsStore, transactionStatisticsStore)
     configureSerialization()
 }
 
 fun main() {
-
     val dbHost: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST") ?: "localhost"
     val dbPort: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
