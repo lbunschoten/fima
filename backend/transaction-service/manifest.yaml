@@ -19,8 +19,10 @@ spec:
         - name: transaction-service
           image: "$DOCKER_IMAGE"
           ports:
-            - name: http
+            - name: grpc
               containerPort: 9997
+            - name: http
+              containerPort: 9998
           env:
             - name: DB_PASSWORD
               valueFrom:
@@ -42,7 +44,25 @@ spec:
     tier: backend
     name: transaction-service
   ports:
-    - name: http
+    - name: grpc
       protocol: TCP
       port: 9997
+      targetPort: grpc
+    - name: http
+      protocol: TCP
+      port: 9998
       targetPort: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: transaction-api-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.fima.test`) && PathPrefix(`/transaction`)
+      kind: Rule
+      services:
+        - name: transaction-service
+          port: 80

@@ -1,5 +1,7 @@
 package fima.services
 
+import configureRouting
+import fima.services.http.plugins.configureSerialization
 import fima.services.transaction.TransactionServiceImpl
 import fima.services.transaction.conversion.RawDateToDateConverter
 import fima.services.transaction.store.*
@@ -12,13 +14,21 @@ import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.listener.TransactionTaggingListener
 import io.grpc.ServerBuilder
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.slf4j.LoggerFactory
 
+fun Application.module(transactionsStore: TransactionsStore, transactionStatisticsStore: TransactionStatisticsStore) {
+    configureRouting(transactionsStore, transactionStatisticsStore)
+    configureSerialization()
+}
 
 fun main() {
+
     val dbHost: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST") ?: "localhost"
     val dbPort: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
@@ -31,6 +41,10 @@ fun main() {
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
+
+    val httpServer = embeddedServer(Netty, port = 9998) {
+        module(transactionsStore, transactionStatisticsStore)
+    }.start()
 
     val taggingService = TaggingService(
         bankAccountEventStore,
@@ -64,8 +78,16 @@ fun main() {
     val logger = LoggerFactory.getLogger("Main")
     logger.info("Transaction-service started")
 
-    transactionService.awaitTermination()
+    Runtime.getRuntime().addShutdownHook(Thread {
+        logger.info("Transaction shutting down")
 
-    logger.info("Transaction services stopped")
+        transactionService.shutdown()
+        transactionService.awaitTermination()
+        httpServer.stop()
+
+        logger.info("Transaction services stopped")
+    })
+
+    transactionService.awaitTermination()
 }
 
