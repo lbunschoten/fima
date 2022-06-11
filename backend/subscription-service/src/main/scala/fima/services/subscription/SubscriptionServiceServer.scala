@@ -6,7 +6,6 @@ import akka.http.scaladsl.Http
 import cats.effect.*
 import doobie.*
 import doobie.hikari.HikariTransactor
-import fima.services.subscription.SubscriptionService.SubscriptionServiceFs2Grpc
 import fima.services.subscription.repository.{PostgresSubscriptionRepository, SubscriptionRepository}
 import fima.services.transaction.TransactionService.TransactionServiceFs2Grpc
 import fs2.grpc.syntax.all.*

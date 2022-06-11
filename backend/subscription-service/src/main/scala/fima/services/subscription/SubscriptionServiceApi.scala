@@ -12,9 +12,7 @@ import doobie.Transactor
 import doobie.implicits.*
 import io.circe.generic.semiauto.*
 import CirceSupport.*
-import fima.domain.subscription.SubscriptionDomain.{Recurrence, Subscription}
 import fima.domain.transaction.TransactionDomain.Transaction
-import fima.services.subscription.SubscriptionService.{GetSubscriptionResponse, GetSubscriptionsResponse}
 import fima.services.subscription.repository.{SubscriptionRepository, SubscriptionSearchQuery}
 import fima.services.transaction.TransactionService.{QueryStringFilter, SearchFilter, SearchTransactionsRequest, TransactionServiceFs2Grpc, TransactionTagFilter}
 import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionService
@@ -45,7 +43,7 @@ class SubscriptionServiceApi(
   implicit val subscriptionDtoEncoder: Encoder[SubscriptionDto] = deriveEncoder
   implicit val transactionDtoEncoder: Encoder[TransactionDto] = deriveEncoder
   implicit val getSubscriptionResponseDtoEncoder: Encoder[GetSubscriptionResponseDto] = deriveEncoder
-  val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
   val routes: Route =
     concat(
