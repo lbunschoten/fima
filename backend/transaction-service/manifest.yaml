@@ -19,16 +19,16 @@ spec:
         - name: transaction-service
           image: "$DOCKER_IMAGE"
           ports:
-            - name: http
+            - name: grpc
               containerPort: 9997
+            - name: http
+              containerPort: 9998
           env:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: fima-postgres-db-pass
                   key: password
-            - name: KAFKA_HOST
-              value: 10.108.62.237
       imagePullSecrets:
         - name: regcred
 ---
@@ -42,7 +42,36 @@ spec:
     tier: backend
     name: transaction-service
   ports:
-    - name: http
+    - name: grpc
       protocol: TCP
       port: 9997
+      targetPort: grpc
+    - name: http
+      protocol: TCP
+      port: 80
       targetPort: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: transaction-api-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.fima.test`) && PathPrefix(`/transaction`)
+      kind: Rule
+      services:
+        - name: transaction-service
+          port: 80
+      middlewares:
+        - name: strip-transaction-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-transaction-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /transaction

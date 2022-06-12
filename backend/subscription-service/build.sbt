@@ -3,6 +3,8 @@ import sbt.Keys.semanticdbEnabled
 val scalaVersionStr = "3.1.2"
 val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.1"
+val AkkaVersion = "2.6.19"
+val AkkaHttpVersion = "10.2.8"
 
 lazy val root = project
   .in(file("."))
@@ -11,6 +13,9 @@ lazy val root = project
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
     scalacOptions += "-source:3.0-migration",
+    excludeDependencies ++= Seq(
+      ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13")
+    ),
     libraryDependencies ++= Seq(
       // GRPC
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
@@ -24,7 +29,12 @@ lazy val root = project
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
-      "io.circe" %% "circe-parser" % circeVersion
+      "io.circe" %% "circe-parser" % circeVersion,
+
+      // Akka
+      ("com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion).cross(CrossVersion.for3Use2_13),
+      ("com.typesafe.akka" %% "akka-stream" % AkkaVersion).cross(CrossVersion.for3Use2_13),
+      ("com.typesafe.akka" %% "akka-http" % AkkaHttpVersion).cross(CrossVersion.for3Use2_13)
     ),
 
     assembly / assemblyMergeStrategy := {

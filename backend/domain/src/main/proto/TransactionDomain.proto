@@ -34,22 +34,3 @@ message Transaction {
   float amount = 8;
   map<string, string> tags = 9;
 }
-
-message TaggingRule {
-  string id = 1;
-  string regex = 2;
-  repeated string tags = 3;
-}
-
-message MonthInYear {
-  int32 month = 2;
-  int32 year = 3;
-}
-
-message MonthlyTransactionStatistics {
-  int32 month = 1;
-  int32 year = 2;
-  int32 transaction = 3;
-  float sum = 4;
-  float balance = 5;
-}

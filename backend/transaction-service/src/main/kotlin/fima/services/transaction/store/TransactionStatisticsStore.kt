@@ -4,7 +4,6 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
-import java.io.Closeable
 import java.util.Optional
 
 class TransactionStatisticsStoreImpl(

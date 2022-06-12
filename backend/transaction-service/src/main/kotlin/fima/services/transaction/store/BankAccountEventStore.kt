@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory
 
 class BankAccountEventStore(private val db: Jdbi, private val eventSerialization: EventSerialization) : EventStore {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     override fun aggregates(): List<String> {
         return db.withHandleUnchecked { handle ->
             handle
@@ -20,7 +18,6 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
 
     override fun readEvents(aggregateId: String): List<Event> {
         val serializedEvents = db.withHandleUnchecked { handle ->
-            logger.info("Read events: ${handle.isInTransaction }}")
             handle
                 .select("SELECT event FROM bank_account_events WHERE aggregate_id = ?", aggregateId)
                 .mapTo(String::class.java)
@@ -31,7 +28,6 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
 
     override fun readLatestEvents(aggregateId: String): List<Event> {
         val serializedEvents = db.withHandleUnchecked { handle ->
-            logger.info("Read latest events: ${handle.isInTransaction }}")
             handle
                 .select("""
                     SELECT event 
@@ -48,7 +44,6 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
 
     override fun writeEvents(aggregateId: String, events: List<Event>) {
         db.withHandleUnchecked { handle ->
-            logger.info("Write events: ${handle.isInTransaction }")
             events.forEach { event ->
                 handle.execute("""
                   INSERT INTO bank_account_events(aggregate_id, at, version, snapshot_version, event)

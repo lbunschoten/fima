@@ -1,23 +1,26 @@
 package fima.services.subscription
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
 import cats.effect.*
 import doobie.*
 import doobie.hikari.HikariTransactor
-import fima.services.subscription.SubscriptionService.SubscriptionServiceFs2Grpc
-import fima.services.subscription.repository.{SubscriptionRepository, PostgresSubscriptionRepository}
+import fima.services.subscription.repository.{PostgresSubscriptionRepository, SubscriptionRepository}
 import fima.services.transaction.TransactionService.TransactionServiceFs2Grpc
 import fs2.grpc.syntax.all.*
-import io.grpc.ServerServiceDefinition
+import io.grpc.{Metadata, ServerServiceDefinition}
 import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 
 import java.util.concurrent.Executors
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.language.existentials
+import scala.util.{Failure, Success}
 
 
 object SubscriptionServiceServer extends IOApp.Simple {
 
-  private val port = 9997
+  private val port = 9998
   private val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
   private val dbPort: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
   private val dbPassword: String = Option(System.getenv("DB_PASSWORD")).getOrElse("root123")
@@ -26,24 +29,27 @@ object SubscriptionServiceServer extends IOApp.Simple {
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
 
   override def run: IO[Unit] = {
+    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "api-system")
+
     val subscriptionRepository = new PostgresSubscriptionRepository()
-    val serviceDefinition = for {
+    val resources = for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
       channel <- NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().resource[IO]
       transactionService <- TransactionServiceFs2Grpc.stubResource(channel)(Async[IO])
-      subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, transactionService, transactor)(ec, runtime)
-      serviceDefinition <- SubscriptionServiceFs2Grpc.bindServiceResource(subscriptionService)
-    } yield serviceDefinition
+    } yield Resources(transactionService, transactor)
 
-    serviceDefinition.use(service => {
-      NettyServerBuilder
-        .forPort(port)
-        .addService(service)
-        .resource[IO]
-        .evalMap(server => IO(server.start()))
-        .evalTap(server => IO.println(s"Server started, listening on ${server.getPort}"))
-        .useForever
-        .onCancel(IO.println("Server is shutting down!"))
+    resources.use(r => {
+      val api = new SubscriptionServiceApi(subscriptionRepository, r.transactionServiceFs2Grpc, r.transactor)(ec, runtime)
+      val apiServer: Future[Http.ServerBinding] = Http()
+        .newServerAt("0.0.0.0", port)
+        .bind(api.routes)
+
+      apiServer.onComplete {
+        case Success(v) => println(s"HTTP Server started at ${v.localAddress}")
+        case Failure(e) => println(s"Failed to start HTTP server: ${e.getMessage}")
+      }
+
+      IO.never[Unit]
     })
   }
 
@@ -60,5 +66,5 @@ object SubscriptionServiceServer extends IOApp.Simple {
     } yield transactor
   }
 
-  case class Resources(serviceDefinition: ServerServiceDefinition)
+  case class Resources(transactionServiceFs2Grpc: TransactionServiceFs2Grpc[IO, Metadata], transactor: Transactor[IO])
 }

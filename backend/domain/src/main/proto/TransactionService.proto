@@ -8,21 +8,6 @@ option java_multiple_files = true;
 option java_package = "fima.services.transaction";
 option java_outer_classname = "TransactionServiceProtos";
 
-message ImportTransactionsRequest {
-  string transactions = 1;
-}
-
-message ImportTransactionsResponse {
-}
-
-message GetTransactionRequest {
-  string id = 1;
-}
-
-message GetTransactionResponse {
-  domain.Transaction transaction = 1;
-}
-
 message QueryStringFilter {
   string queryString = 1;
 }
@@ -45,71 +30,8 @@ message SearchTransactionsResponse {
   repeated domain.Transaction transactions = 1;
 }
 
-message GetRecentTransactionsRequest {
-  int32 limit = 1;
-  int32 offset = 2;
-}
-
-message GetRecentTransactionResponse {
-  repeated domain.Transaction transactions = 1;
-}
-
-message DeleteTransactionRequest {
-  string id = 1;
-}
-
-message DeleteTransactionResponse {
-}
-
-message TransactionsStatisticsRequest {
-  domain.MonthInYear startDate = 1;
-  domain.MonthInYear endDate = 2;
-}
-
-message TransactionStatisticsResponse {
-  repeated domain.MonthlyTransactionStatistics monthlyStatistics = 1;
-}
-
-message StoreTaggingRuleRequest {
-  repeated domain.TaggingRule taggingRules = 1;
-}
-
-message StoreTaggingRuleResponse {
-  repeated string errorMessages = 1;
-}
-
-message GetTaggingRulesRequest {
-}
-
-message TagTransactionsRequest {
-}
-
-message TagTransactionsResponse {
-}
-
-message GetTaggingRulesResponse {
-  repeated domain.TaggingRule taggingRules = 1;
-}
-
 service TransactionService {
 
-  rpc importTransactions(ImportTransactionsRequest) returns (ImportTransactionsResponse) {}
-
-
   rpc searchTransactions(SearchTransactionsRequest) returns (SearchTransactionsResponse) {}
-
-  rpc getTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
-
-  rpc getRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionResponse) {}
-
-  rpc getMonthlyStatistics(TransactionsStatisticsRequest) returns (TransactionStatisticsResponse) {}
-
-
-  rpc getTaggingRules(GetTaggingRulesRequest) returns (GetTaggingRulesResponse) {}
-
-  rpc storeTaggingRule(StoreTaggingRuleRequest) returns (StoreTaggingRuleResponse) {}
-
-
-  rpc tagTransactions(TagTransactionsRequest) returns (TagTransactionsResponse) {}
 
 }
