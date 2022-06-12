@@ -49,7 +49,7 @@ object SubscriptionServiceServer extends IOApp.Simple {
         case Failure(e) => println(s"Failed to start HTTP server: ${e.getMessage}")
       }
 
-      IO.fromFuture(IO.pure(apiServer.map(_ => ())))
+      IO.never[Unit]
     })
   }
 
