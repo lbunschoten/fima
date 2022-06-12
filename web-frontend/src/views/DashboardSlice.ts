@@ -75,7 +75,7 @@ export const fetchTransactions = (): ThunkAction<void, RootState, unknown, AnyAc
 }
 
 export const fetchSubscriptions = (): ThunkAction<void, RootState, unknown, AnyAction> => async dispatch => {
-    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/subscriptions`)
+    const asyncResp = await fetch(`${process.env.REACT_APP_API_HOST}/subscription/subscriptions`)
     const subscriptions: SubscriptionData[] = await asyncResp.json()
     dispatch(setSubscriptions(subscriptions))
 }
