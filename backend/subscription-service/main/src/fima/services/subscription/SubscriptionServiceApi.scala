@@ -28,6 +28,7 @@ import scala.util.control.NonFatal
 import fima.services.subscription.implicits.{asSearchRequest, toIO}
 
 import java.time.format.DateTimeFormatter
+import scala.concurrent.duration.DurationInt
 
 
 class SubscriptionServiceApi(
@@ -60,7 +61,7 @@ class SubscriptionServiceApi(
             subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
             searchTransactionsResponse <- subscription.map { s =>
               println(s)
-              val a = transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions).toIO
+              val a: IO[Future[Seq[Transaction]]] = IO(transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions)).timeoutTo(2.seconds, IO(Seq.empty))
               a.map(println)
               a
             }.getOrElse(IO(Seq.empty))
