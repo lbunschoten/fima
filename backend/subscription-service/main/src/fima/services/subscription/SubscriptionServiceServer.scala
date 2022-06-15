@@ -7,10 +7,10 @@ import cats.effect.*
 import doobie.*
 import doobie.hikari.HikariTransactor
 import fima.services.subscription.repository.{PostgresSubscriptionRepository, SubscriptionRepository}
-import fima.services.transaction.TransactionService.TransactionServiceFs2Grpc
-import fs2.grpc.syntax.all.*
-import io.grpc.{Metadata, ServerServiceDefinition}
-import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
+import fima.services.transaction.TransactionService.TransactionServiceGrpc
+import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceStub
+import io.grpc.netty.NettyChannelBuilder
+import io.grpc.{Channel, Metadata, ServerServiceDefinition}
 
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -34,8 +34,8 @@ object SubscriptionServiceServer extends IOApp.Simple {
     val subscriptionRepository = new PostgresSubscriptionRepository()
     val resources = for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
-      channel <- NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().resource[IO]
-      transactionService <- TransactionServiceFs2Grpc.stubResource(channel)(Async[IO])
+      channel <- Resource.pure(NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build())
+      transactionService <- Resource.pure(TransactionServiceGrpc.stub(channel))
     } yield Resources(transactionService, transactor)
 
     resources.use(r => {
@@ -66,5 +66,5 @@ object SubscriptionServiceServer extends IOApp.Simple {
     } yield transactor
   }
 
-  case class Resources(transactionServiceFs2Grpc: TransactionServiceFs2Grpc[IO, Metadata], transactor: Transactor[IO])
+  case class Resources(transactionServiceFs2Grpc: TransactionServiceStub, transactor: Transactor[IO])
 }

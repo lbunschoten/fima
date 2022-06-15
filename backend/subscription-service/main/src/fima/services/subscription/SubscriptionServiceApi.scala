@@ -12,10 +12,11 @@ import doobie.Transactor
 import doobie.implicits.*
 import io.circe.generic.semiauto.*
 import CirceSupport.*
+import com.google.protobuf.GeneratedMessage
 import fima.domain.transaction.TransactionDomain.Transaction
-import fima.services.subscription.repository.{SubscriptionRepository, SubscriptionSearchQuery}
-import fima.services.transaction.TransactionService.{QueryStringFilter, SearchFilter, SearchTransactionsRequest, TransactionServiceFs2Grpc, TransactionTagFilter}
-import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionService
+import fima.services.subscription.repository.{Subscription, SubscriptionRepository, SubscriptionSearchQuery}
+import fima.services.transaction.TransactionService.{QueryStringFilter, SearchFilter, SearchTransactionsRequest, SearchTransactionsResponse, TransactionTagFilter}
+import fima.services.transaction.TransactionService.TransactionServiceGrpc.{TransactionService, TransactionServiceStub}
 import io.circe.syntax.*
 import io.circe.{Codec, Decoder, Encoder}
 import io.grpc.Metadata
@@ -24,14 +25,14 @@ import java.time.{Instant, LocalDate}
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import fima.services.subscription.implicits.SubscriptionSearchQueryExt
+import fima.services.subscription.implicits.{asSearchRequest, toIO}
 
 import java.time.format.DateTimeFormatter
 
 
 class SubscriptionServiceApi(
   private val subscriptionRepository: SubscriptionRepository,
-  private val transactionService: TransactionServiceFs2Grpc[IO, Metadata],
+  private val transactionService: TransactionServiceStub,
   transactor: Transactor[IO]
 )(
   private implicit val ec: ExecutionContext,
@@ -40,10 +41,10 @@ class SubscriptionServiceApi(
 
   import CirceSupport._
 
-  implicit val subscriptionDtoEncoder: Encoder[SubscriptionDto] = deriveEncoder
-  implicit val transactionDtoEncoder: Encoder[TransactionDto] = deriveEncoder
-  implicit val getSubscriptionResponseDtoEncoder: Encoder[GetSubscriptionResponseDto] = deriveEncoder
-  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+  private implicit val subscriptionDtoEncoder: Encoder[SubscriptionDto] = deriveEncoder
+  private implicit val transactionDtoEncoder: Encoder[TransactionDto] = deriveEncoder
+  private implicit val getSubscriptionResponseDtoEncoder: Encoder[GetSubscriptionResponseDto] = deriveEncoder
+  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
   val routes: Route =
     concat(
@@ -56,11 +57,10 @@ class SubscriptionServiceApi(
       get {
         try {
           val response = for {
-            subscription <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
+            subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
             searchTransactionsResponse <- subscription.map { s =>
-              transactionService.searchTransactions(s.query.asSearchRequest, new Metadata()).map {
-                _.transactions
-              }
+                val a = transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions).toIO
+                a
             }.getOrElse(IO(Seq.empty))
           } yield GetSubscriptionResponseDto(
             subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
@@ -100,11 +100,7 @@ object CirceSupport {
   implicit final def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A] = {
     Unmarshaller.stringUnmarshaller
       .forContentTypes(jsonContentTypes: _*)
-      .flatMap { ctx =>
-        mat =>
-          json =>
-            io.circe.parser.decode(json).fold(Future.failed, Future.successful)
-      }
+      .flatMap { _ => _ => json => io.circe.parser.decode(json).fold(Future.failed, Future.successful) }
   }
 
   implicit final def marshaller[A: Encoder]: ToEntityMarshaller[A] = {
@@ -132,9 +128,8 @@ case class GetSubscriptionResponseDto(
   transactions: Seq[TransactionDto]
 )
 
-
 object implicits {
-  implicit class SubscriptionSearchQueryExt(val subscriptionSearchQuery: SubscriptionSearchQuery) {
+  extension (subscriptionSearchQuery: SubscriptionSearchQuery) {
     def asSearchRequest: SearchTransactionsRequest = {
       SearchTransactionsRequest()
         .withFilters(
@@ -146,5 +141,9 @@ object implicits {
           }
         )
     }
+  }
+
+  extension [T] (f: Future[T]) {
+    def toIO: IO[T] = IO.fromFuture(IO { f })
   }
 }
