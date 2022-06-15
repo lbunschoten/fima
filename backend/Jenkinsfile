@@ -65,7 +65,7 @@ podTemplate(
             }
 
             builds["Build mill service"] = {
-                container('nill') {
+                container('mill') {
                     dir('./backend/subscription-service') {
                         sh './mill main.assembly'
                     }
