@@ -59,8 +59,10 @@ class SubscriptionServiceApi(
           val response = for {
             subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
             searchTransactionsResponse <- subscription.map { s =>
-                val a = transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions).toIO
-                a
+              println(s)
+              val a = transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions).toIO
+              println(a)
+              a
             }.getOrElse(IO(Seq.empty))
           } yield GetSubscriptionResponseDto(
             subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
@@ -73,6 +75,9 @@ class SubscriptionServiceApi(
           Directives.onSuccess(response.unsafeToFuture())(i => complete(i))
         } catch {
           case NonFatal(e) =>
+            println(e)
+            failWith(e)
+          case e: Throwable =>
             println(e)
             failWith(e)
         }
