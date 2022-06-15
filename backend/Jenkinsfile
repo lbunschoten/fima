@@ -54,11 +54,15 @@ podTemplate(
                     }
                 }
             }
+
             builds["Build sbt service"] = {
                 container('sbt') {
                     dir('./backend/subscription-service') {
                         sh 'sbt ";assembly;scalafixAll --check"'
                     }
+                }
+            }
+
             builds["Build mill service"] = {
                 container('sbt') {
                     dir('./backend/investment-service') {
