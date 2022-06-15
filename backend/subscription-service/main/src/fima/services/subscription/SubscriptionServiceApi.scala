@@ -60,9 +60,8 @@ class SubscriptionServiceApi(
           val response = for {
             subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
             searchTransactionsResponse <- subscription.map { s =>
-              println(s)
               val a: IO[Seq[Transaction]] = IO.fromFuture(IO(transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions))).timeoutTo(2.seconds, IO(Seq.empty))
-              a.map(println)
+              a.start
               a
             }.getOrElse(IO(Seq.empty))
           } yield {
