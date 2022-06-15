@@ -61,16 +61,19 @@ class SubscriptionServiceApi(
             searchTransactionsResponse <- subscription.map { s =>
               println(s)
               val a = transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions).toIO
-              println(a)
+              a.map(println)
               a
             }.getOrElse(IO(Seq.empty))
-          } yield GetSubscriptionResponseDto(
-            subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
-            transactions = searchTransactionsResponse.map { (t: Transaction) =>
-              val date = t.date.map { date => LocalDate.of(date.year, date.month, date.day).format(dateFormatter) }.getOrElse("")
-              TransactionDto(UUID.fromString(t.id), date, t.`type`.name, t.name, t.toAccount, t.fromAccount, t.amount, t.tags)
-            }
-          )
+          } yield {
+            println("SUCCESS")
+            GetSubscriptionResponseDto(
+              subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
+              transactions = searchTransactionsResponse.map { (t: Transaction) =>
+                val date = t.date.map { date => LocalDate.of(date.year, date.month, date.day).format(dateFormatter) }.getOrElse("")
+                TransactionDto(UUID.fromString(t.id), date, t.`type`.name, t.name, t.toAccount, t.fromAccount, t.amount, t.tags)
+              }
+            )
+          }
 
           Directives.onSuccess(response.unsafeToFuture())(i => complete(i))
         } catch {
