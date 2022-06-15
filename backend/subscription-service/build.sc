@@ -2,6 +2,7 @@ import mill._
 import contrib.scalapblib._
 import mill.define.Sources
 import $ivy.`com.lihaoyi::mill-contrib-scalapblib:$MILL_VERSION`
+import mill.modules.Assembly
 import mill.modules.Assembly.Rule
 import scalalib._
 
