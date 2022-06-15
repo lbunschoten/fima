@@ -54,38 +54,38 @@ class SubscriptionServiceApi(
     )
 
   private def getSubscriptionById(id: String): Route = {
-    corsHandler(
-      get {
-        try {
-          val response = for {
-            subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
-            searchTransactionsResponse <- subscription.map { s =>
-              val a: IO[Seq[Transaction]] = IO.fromFuture(IO.pure(transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions))).timeoutTo(2.seconds, IO(Seq.empty))
-              a.map(println)
-              a
-            }.getOrElse(IO(Seq.empty))
-          } yield {
-            println("SUCCESS")
-            GetSubscriptionResponseDto(
-              subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
-              transactions = searchTransactionsResponse.map { (t: Transaction) =>
-                val date = t.date.map { date => LocalDate.of(date.year, date.month, date.day).format(dateFormatter) }.getOrElse("")
-                TransactionDto(UUID.fromString(t.id), date, t.`type`.name, t.name, t.toAccount, t.fromAccount, t.amount, t.tags)
-              }
-            )
-          }
+    try {
+      corsHandler(
+        get {
+            val response = for {
+              subscription: Option[Subscription] <- subscriptionRepository.findById(UUID.fromString(id)).transact(transactor)
+              searchTransactionsResponse <- subscription.map { s =>
+                val a: IO[Seq[Transaction]] = IO.fromFuture(IO.pure(transactionService.searchTransactions(s.query.asSearchRequest).map(_.transactions))).timeoutTo(2.seconds, IO(Seq.empty))
+                a.map(println)
+                a
+              }.getOrElse(IO(Seq.empty))
+            } yield {
+              println("SUCCESS")
+              GetSubscriptionResponseDto(
+                subscription = subscription.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) },
+                transactions = searchTransactionsResponse.map { (t: Transaction) =>
+                  val date = t.date.map { date => LocalDate.of(date.year, date.month, date.day).format(dateFormatter) }.getOrElse("")
+                  TransactionDto(UUID.fromString(t.id), date, t.`type`.name, t.name, t.toAccount, t.fromAccount, t.amount, t.tags)
+                }
+              )
+            }
 
-          Directives.onSuccess(response.unsafeToFuture())(i => complete(i))
-        } catch {
-          case NonFatal(e) =>
-            println(e)
-            failWith(e)
-          case e: Throwable =>
-            println(e)
-            failWith(e)
+            Directives.onSuccess(response.unsafeToFuture())(i => complete(i))
         }
-      }
-    )
+      )
+    } catch {
+      case NonFatal(e) =>
+        println(e)
+        failWith(e)
+      case e: Throwable =>
+        println(e)
+        failWith(e)
+    }
   }
 
   private def getSubscriptions: Route =
