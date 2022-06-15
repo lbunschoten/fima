@@ -57,7 +57,7 @@ podTemplate(
 
             builds["Build sbt service"] = {
                 container('sbt') {
-                    dir('./backend/subscription-service') {
+                    dir('./backend/investment-service') {
                         sh 'sbt ";assembly;scalafixAll --check"'
                     }
                 }
@@ -65,7 +65,7 @@ podTemplate(
 
             builds["Build mill service"] = {
                 container('sbt') {
-                    dir('./backend/investment-service') {
+                    dir('./backend/subscription-service') {
                         sh './mill main.assbemly'
                     }
                 }
