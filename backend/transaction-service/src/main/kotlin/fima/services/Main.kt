@@ -11,7 +11,8 @@ import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.listener.TransactionTaggingListener
-import io.grpc.ServerBuilder
+import io.grpc.*
+import io.grpc.util.TransmitStatusRuntimeExceptionInterceptor
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -32,6 +33,7 @@ fun Application.module(
 }
 
 fun main() {
+    val logger = LoggerFactory.getLogger("Main")
     val dbHost: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST") ?: "localhost"
     val dbPort: String = System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT") ?: "3306"
     val dbPassword: String = System.getenv("DB_PASSWORD") ?: "root123"
@@ -65,11 +67,11 @@ fun main() {
 
     val transactionService = ServerBuilder
         .forPort(9997)
+        .intercept(TransmitStatusRuntimeExceptionInterceptor.instance())
         .addService(TransactionServiceImpl(transactionsStore))
         .build()
         .start()
 
-    val logger = LoggerFactory.getLogger("Main")
     logger.info("Transaction-service started")
 
     Runtime.getRuntime().addShutdownHook(Thread {
