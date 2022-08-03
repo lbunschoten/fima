@@ -10,9 +10,9 @@ import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.http4s.ztapir.*
 import sttp.tapir.server.interceptor.cors.{CORSConfig, CORSInterceptor}
 import sttp.tapir.ztapir.*
+import zio.*
 import zio.interop.catz.*
 import zio.interop.catz.implicits.*
-import zio.*
 
 import java.util.UUID
 
@@ -42,11 +42,11 @@ class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, tr
 
   private def getSubscriptionById: ZServerEndpoint[Any, Any] = getSubscriptionByIdEndpoint.zServerLogic { subscriptionId: UUID =>
     for {
-      subscriptionOpt <- subscriptionRepository.findById(subscriptionId).mapError(_.getMessage)
-      subscription <- ZIO.fromOption(subscriptionOpt).mapError(_.toString)
+      subscriptionOpt <- subscriptionRepository.findById(subscriptionId).mapError(e => s"Failed to retrieve subscription: ${e.getMessage}")
+      subscription <- ZIO.fromOption(subscriptionOpt).orElseFail(s"Could not find subscription $subscriptionId")
       searchTransactionsResponse <- transactionService
         .searchTransactions(subscription.query.toProto)
-        .mapError(_.asException().getMessage)
+        .mapError(e => s"Failed to retrieve transactions for subscription $subscriptionId: ${e.asException().getMessage}")
     } yield {
       GetSubscriptionResponseDto(
         subscription = Option(SubscriptionDto(subscription.id.toString, subscription.name, subscription.recurrence.name.toUpperCase())),
@@ -67,7 +67,7 @@ class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, tr
     subscriptionRepository
       .findAll()
       .mapBoth(
-        _.getMessage,
+        e => s"Could not retrieve subscriptions: ${e.getMessage}",
         s => s.map { s => SubscriptionDto(s.id.toString, s.name, s.recurrence.name.toUpperCase()) }
       )
   }
