@@ -1,70 +1,80 @@
 package fima.services.subscription
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
-import cats.effect.*
-import doobie.*
 import doobie.hikari.HikariTransactor
-import fima.services.subscription.repository.{PostgresSubscriptionRepository, SubscriptionRepository}
-import fima.services.transaction.TransactionService.TransactionServiceGrpc
-import fima.services.transaction.TransactionService.TransactionServiceGrpc.TransactionServiceStub
+import fima.services.subscription.repository.PostgresSubscriptionRepository
+import fima.services.transaction.TransactionService.ZioTransactionService
 import io.grpc.netty.NettyChannelBuilder
-import io.grpc.{Channel, Metadata, ServerServiceDefinition}
+import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.server.Router
+import scalapb.zio_grpc.ZManagedChannel
+import sttp.tapir.server.http4s.Http4sServerOptions
+import sttp.tapir.server.interceptor.cors.CORSInterceptor
+import zio.*
+import zio.interop.catz.*
+import zio.interop.catz.implicits.*
 
-import java.util.concurrent.Executors
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import java.lang
 import scala.language.existentials
-import scala.util.{Failure, Success}
 
 
-object SubscriptionServiceServer extends IOApp.Simple {
+object SubscriptionServiceServer extends ZIOAppDefault {
 
   private val port = 9998
-  private val dbHost: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
-  private val dbPort: String = Option(System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
-  private val dbPassword: String = Option(System.getenv("DB_PASSWORD")).getOrElse("root123")
-  private val transactionServiceHost = System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")
-  private val transactionServicePort = System.getenv("TRANSACTION_SERVICE_SERVICE_PORT").toInt
-  private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(32))
+  private val dbHost: String = Option(lang.System.getenv("FIMA_POSTGRES_DB_SERVICE_HOST")).getOrElse("localhost")
+  private val dbPort: String = Option(lang.System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
+  private val dbPassword: String = Option(lang.System.getenv("DB_PASSWORD")).getOrElse("root123")
+  private val transactionServiceHost = Option(lang.System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")).getOrElse("localhost")
+  private val transactionServicePort = Option(lang.System.getenv("TRANSACTION_SERVICE_SERVICE_PORT")).getOrElse("9097").toInt
 
-  override def run: IO[Unit] = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "api-system")
-
-    val subscriptionRepository = new PostgresSubscriptionRepository()
-    val resources = for {
+  override def run: ZIO[Scope, Any, Any] = {
+    for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
-      channel <- Resource.pure(NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().build())
-      transactionService <- Resource.pure(TransactionServiceGrpc.stub(channel))
-    } yield Resources(transactionService, transactor)
-
-    resources.use(r => {
-      val api = new SubscriptionServiceApi(subscriptionRepository, r.transactionServiceFs2Grpc, r.transactor)(ec, runtime)
-      val apiServer: Future[Http.ServerBinding] = Http()
-        .newServerAt("0.0.0.0", port)
-        .bind(api.routes)
-
-      apiServer.onComplete {
-        case Success(v) => println(s"HTTP Server started at ${v.localAddress}")
-        case Failure(e) => println(s"Failed to start HTTP server: ${e.getMessage}")
-      }
-
-      IO.never[Unit]
-    })
+      app <- buildApp(transactor)
+    } yield app
   }
 
-  private def startDbTransactor(dbHost: String, dbPort: String, dbPassword: String): Resource[IO, HikariTransactor[IO]] = {
+  private def buildApp(transactor: ULayer[HikariTransactor[Task]]): ZIO[Scope, Any, Unit] = {
+    val channel = ZManagedChannel(NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext())
+
+    ZLayer
+      .make[SubscriptionApi](
+        SubscriptionApi.live,
+        ZioTransactionService.TransactionServiceClient.live[Any, Any](channel),
+        transactor,
+        PostgresSubscriptionRepository.live,
+      )
+      .build
+      .map(_.get[SubscriptionApi])
+      .flatMap(runHttp)
+  }
+
+  private def runHttp(subscriptionApi: SubscriptionApi): Task[Unit] = {
+    val httpApp = Router(
+      "" -> subscriptionApi.routes
+    ).orNotFound
+
+    BlazeServerBuilder
+      .apply
+      .withoutBanner
+      .bindHttp(port, "0.0.0.0")
+      .withHttpApp(httpApp)
+      .serve
+      .compile[Task, Task, cats.effect.ExitCode]
+      .drain
+  }
+
+  private def startDbTransactor(dbHost: String, dbPort: String, dbPassword: String): RIO[Scope, ULayer[HikariTransactor[Task]]] = {
+    val connectExecutionContext = ZIO.descriptor.map(_.executor.asExecutionContext)
+
     for {
-      connectExecutionContext <- ExecutionContexts.fixedThreadPool[IO](32)
-      transactor <- HikariTransactor.newHikariTransactor[IO](
+      ec <- connectExecutionContext
+      transactor <- HikariTransactor.newHikariTransactor[Task](
         driverClassName = "org.postgresql.Driver",
         url = s"jdbc:postgresql://$dbHost:$dbPort/fima?createDatabaseIfNotExist=true&currentSchema=transaction",
         user = "root",
         pass = dbPassword,
-        connectEC = connectExecutionContext
-      )
-    } yield transactor
+        connectEC = ec
+      ).toScopedZIO
+    } yield ZLayer.succeed(transactor)
   }
-
-  case class Resources(transactionServiceFs2Grpc: TransactionServiceStub, transactor: Transactor[IO])
 }

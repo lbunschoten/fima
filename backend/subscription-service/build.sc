@@ -6,19 +6,31 @@ import mill.modules.Assembly
 import mill.modules.Assembly.Rule
 import scalalib._
 
+import java.nio.file.Paths
+
 object main extends ScalaModule {
   val doobieVersion = "1.0.0-RC2"
   val circeVersion = "0.14.1"
-  val akkaVersion = "2.6.19"
-  val akkaHttpVersion = "10.2.8"
+  val zioGrpcVersion = "0.6.0-test4"
 
-  def scalaVersion = "3.1.2"
-  override def scalacOptions = Seq("-source:3.0-migration")
+  def scalaVersion = "2.13.8"
+
+  override def scalacOptions = Seq("-Xsource:3")
+
   override def mainClass = Some("fima.services.subscription.SubscriptionServiceServer")
+
   override def ivyDeps = Agg(
     // GRPC
-    ivy"com.thesamet.scalapb::scalapb-runtime-grpc:${domain.scalaPBVersion}",
+    ivy"com.thesamet.scalapb:scalapb-runtime-grpc_2.13:0.11.10",
     ivy"io.grpc:grpc-netty:1.47.0",
+
+    // ZIO GRPC
+    ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.13:$zioGrpcVersion",
+    ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-codegen_2.13:$zioGrpcVersion",
+
+    // ZIO
+    ivy"dev.zio::zio:2.0.0",
+    ivy"dev.zio::zio-interop-cats::3.3.0",
 
     // DB
     ivy"org.tpolecat::doobie-core:$doobieVersion",
@@ -30,10 +42,19 @@ object main extends ScalaModule {
     ivy"io.circe::circe-generic:$circeVersion",
     ivy"io.circe::circe-parser:$circeVersion",
 
-    // Akka
-    ivy"com.typesafe.akka:akka-actor-typed_2.13:$akkaVersion",
-    ivy"com.typesafe.akka:akka-stream_2.13:$akkaVersion",
-    ivy"com.typesafe.akka:akka-http_2.13:$akkaHttpVersion"
+    // STTP
+    ivy"org.http4s::http4s-blaze-server:0.23.12",
+    ivy"org.http4s::http4s-dsl:0.23.12",
+    ivy"org.http4s::http4s-blaze-client:0.23.12",
+    ivy"org.http4s::http4s-circe:0.23.13",
+
+    // Tapir
+    ivy"com.softwaremill.sttp.tapir::tapir-core:1.0.1",
+    ivy"com.softwaremill.sttp.tapir::tapir-sttp-client:1.0.1",
+    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server:1.0.1",
+    ivy"com.softwaremill.sttp.tapir::tapir-zio:1.0.1",
+    ivy"com.softwaremill.sttp.tapir::tapir-json-circe:1.0.1",
+    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server-zio:1.0.1"
   )
 
   override def moduleDeps = Seq(domain)
@@ -42,18 +63,27 @@ object main extends ScalaModule {
     Rule.ExcludePattern("akka.protobuf.*")
   )
 
-  override def generatedSources = Seq(
-    PathRef(os.pwd / "out" / "domain" / "compileScalaPB.dest")
-  )
 }
 
 object domain extends ScalaPBModule {
-  def scalaVersion = "3.1.2"
+  def scalaVersion = "2.13.8"
+
   def scalaPBVersion = "0.11.10"
 
   override def scalaPBGrpc = true
 
   override def scalaPBSources: Sources = T.sources {
-    os.pwd / os.up / "domain" / "src"  / "main" / "proto"
+    os.pwd / os.up / "domain" / "src" / "main" / "proto"
   }
+
+  override def ivyDeps = super.ivyDeps() ++ Agg(
+    ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.13:${main.zioGrpcVersion}",
+    ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-codegen_2.13:${main.zioGrpcVersion}"
+  )
+
+  override def scalaPBAdditionalArgs = T {
+    val zioOut = (T.workspace / "out" / "domain" / "compileScalaPB.dest").toIO.getCanonicalPath
+    Seq(s"--plugin-artifact=com.thesamet.scalapb.zio-grpc:protoc-gen-zio:${main.zioGrpcVersion}:default,classifier=unix,ext=sh,type=jar", s"--zio_out=$zioOut")
+  }
+
 }
