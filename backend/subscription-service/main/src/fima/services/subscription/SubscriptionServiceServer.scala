@@ -24,7 +24,7 @@ object SubscriptionServiceServer extends ZIOAppDefault {
   private val dbPort: String = Option(lang.System.getenv("FIMA_POSTGRES_DB_SERVICE_PORT")).getOrElse("3306")
   private val dbPassword: String = Option(lang.System.getenv("DB_PASSWORD")).getOrElse("root123")
   private val transactionServiceHost = Option(lang.System.getenv("TRANSACTION_SERVICE_SERVICE_HOST")).getOrElse("localhost")
-  private val transactionServicePort = Option(lang.System.getenv("TRANSACTION_SERVICE_SERVICE_PORT")).getOrElse("9097").toInt
+  private val transactionServicePort = Option(lang.System.getenv("TRANSACTION_SERVICE_SERVICE_PORT")).getOrElse("9997").toInt
 
   override def run: ZIO[Scope, Any, Any] = {
     for {
@@ -39,8 +39,8 @@ object SubscriptionServiceServer extends ZIOAppDefault {
     ZLayer
       .make[SubscriptionApi](
         SubscriptionApi.live,
-        ZioTransactionService.TransactionServiceClient.live[Any, Any](channel),
-        transactor,
+        ZioTransactionService.TransactionServiceClient.live[Any, Any](channel).tap(_ => ZIO.logInfo("Started transaction service client")),
+        transactor.tap(_ => ZIO.logInfo("Started DB transactor")),
         PostgresSubscriptionRepository.live,
       )
       .build
