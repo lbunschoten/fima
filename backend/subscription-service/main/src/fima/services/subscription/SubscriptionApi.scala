@@ -46,7 +46,7 @@ class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, tr
       subscription <- ZIO.fromOption(subscriptionOpt).orElseFail(s"Could not find subscription $subscriptionId")
       searchTransactionsResponse <- transactionService
         .searchTransactions(subscription.query.toProto)
-        .mapError(e => s"Failed to retrieve transactions for subscription $subscriptionId: ${e.asException().getMessage}")
+        .mapError(e => s"Failed to retrieve transactions for subscription $subscriptionId: ${e.toString}")
     } yield {
       GetSubscriptionResponseDto(
         subscription = Option(SubscriptionDto(subscription.id.toString, subscription.name, subscription.recurrence.name.toUpperCase())),
