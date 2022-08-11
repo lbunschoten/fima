@@ -22,7 +22,6 @@ object main extends ScalaModule {
   override def ivyDeps = Agg(
     // GRPC
     ivy"com.thesamet.scalapb:scalapb-runtime-grpc_2.13:0.11.10",
-    ivy"io.grpc:grpc-netty:1.47.0",
 
     // ZIO GRPC
     ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.13:$zioGrpcVersion",
