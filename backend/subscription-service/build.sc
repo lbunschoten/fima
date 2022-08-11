@@ -6,8 +6,6 @@ import mill.modules.Assembly
 import mill.modules.Assembly.Rule
 import scalalib._
 
-import java.nio.file.Paths
-
 object main extends ScalaModule {
   val doobieVersion = "1.0.0-RC2"
   val circeVersion = "0.14.1"

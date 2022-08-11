@@ -3,13 +3,11 @@ package fima.services.subscription
 import doobie.hikari.HikariTransactor
 import fima.services.subscription.repository.PostgresSubscriptionRepository
 import fima.services.transaction.TransactionService.ZioTransactionService
-import io.grpc.netty.NettyChannelBuilder
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.grpc.{CallOptions, Channel, ClientCall, ClientInterceptor, MethodDescriptor}
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.Router
 import scalapb.zio_grpc.ZManagedChannel
-import sttp.tapir.server.http4s.Http4sServerOptions
-import sttp.tapir.server.interceptor.cors.CORSInterceptor
 import zio.*
 import zio.interop.catz.*
 import zio.interop.catz.implicits.*
