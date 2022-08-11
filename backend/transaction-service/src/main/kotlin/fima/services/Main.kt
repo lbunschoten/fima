@@ -12,7 +12,6 @@ import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.listener.TransactionTaggingListener
 import io.grpc.*
-import io.grpc.util.TransmitStatusRuntimeExceptionInterceptor
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -67,7 +66,13 @@ fun main() {
 
     val transactionService = ServerBuilder
         .forPort(9997)
-        .intercept(TransmitStatusRuntimeExceptionInterceptor.instance())
+        .intercept(object: ServerInterceptor {
+            override fun <ReqT : Any?, RespT : Any?> interceptCall(call: ServerCall<ReqT, RespT>, headers: Metadata, next: ServerCallHandler<ReqT, RespT>): ServerCall.Listener<ReqT> {
+                println(call.toString())
+                println(headers.toString())
+                return next.startCall(call, headers)
+            }
+        })
         .addService(TransactionServiceImpl(transactionsStore))
         .build()
         .start()
