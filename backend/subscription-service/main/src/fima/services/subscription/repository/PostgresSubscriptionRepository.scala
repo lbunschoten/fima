@@ -1,40 +1,42 @@
 package fima.services.subscription.repository
 
-import cats.implicits.{catsSyntaxEq, toBifunctorOps}
 import doobie.*
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 import doobie.util.log.LogHandler
+import doobie.util.transactor.Transactor
+import fima.services.subscription.domain.{Recurrence, Subscription, SubscriptionSearchQuery}
 import org.postgresql.util.PGobject
+import zio.*
+import zio.interop.catz.*
 
 import java.util.UUID
 
-class PostgresSubscriptionRepository extends SubscriptionRepository {
+object PostgresSubscriptionRepository {
 
+  lazy val live: ZLayer[Transactor[Task], Nothing, PostgresSubscriptionRepository] =
+    ZLayer.fromFunction { t: Transactor[Task] => new PostgresSubscriptionRepository(t) }
+}
+
+class PostgresSubscriptionRepository(transactor: Transactor[Task]) {
   private implicit val logHandler: LogHandler = LogHandler(println)
-  private implicit val RecurrenceMeta: Meta[Recurrence] = pgEnumStringOpt("recurrence", RecurrenceCompanion.fromEnum, RecurrenceCompanion.toEnum)
+  private implicit val recurrenceMeta: Meta[Recurrence] = pgEnumStringOpt("recurrence", Recurrence.fromEnum, Recurrence.toEnum)
   private implicit val subscriptionSearchQueryMeta: Meta[SubscriptionSearchQuery] =
     Meta.Advanced
       .other[PGobject]("json")
       .timap[SubscriptionSearchQuery](SubscriptionSearchQuery.decode)(SubscriptionSearchQuery.encode)
 
-  def insert(subscription: Subscription): ConnectionIO[Int] = {
-    sql"insert into transaction.subscription (id, name, query, recurrence) values (${subscription.id}, ${subscription.name}, ${subscription.query}, ${subscription.recurrence})"
-      .update
-      .run
-  }
-
-  def findById(id: UUID): ConnectionIO[Option[Subscription]] = {
+  def findById(id: UUID): Task[Option[Subscription]] = {
     sql"SELECT id, name, query, recurrence from transaction.subscription WHERE id = $id"
       .query[Subscription]
       .option
+      .transact(transactor)
   }
 
-  def findAll(): ConnectionIO[List[Subscription]] = {
+  def findAll(): Task[List[Subscription]] = {
     sql"SELECT id, name, query, recurrence from transaction.subscription"
       .query[Subscription]
       .to[List]
+      .transact(transactor)
   }
-
-
 }

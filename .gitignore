@@ -19,3 +19,4 @@ sbt.json
 .metals/
 .vscode/
 metals.sbt
+out/
