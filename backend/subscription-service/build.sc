@@ -8,8 +8,10 @@ import scalalib._
 
 object main extends ScalaModule {
   val doobieVersion = "1.0.0-RC2"
-  val circeVersion = "0.14.1"
+  val circeVersion = "0.14.2"
+  val scalaPbVersion = "0.11.11"
   val zioGrpcVersion = "0.6.0-test4"
+  val tapirVersion = "1.0.4"
 
   def scalaVersion = "2.13.8"
 
@@ -19,7 +21,7 @@ object main extends ScalaModule {
 
   override def ivyDeps = Agg(
     // GRPC
-    ivy"com.thesamet.scalapb:scalapb-runtime-grpc_2.13:0.11.10",
+    ivy"com.thesamet.scalapb:scalapb-runtime-grpc_2.13:$scalaPbVersion",
     ivy"io.grpc:grpc-netty:1.48.1",
 
     // ZIO GRPC
@@ -42,17 +44,17 @@ object main extends ScalaModule {
 
     // STTP
     ivy"org.http4s::http4s-blaze-server:0.23.12",
-    ivy"org.http4s::http4s-dsl:0.23.12",
+    ivy"org.http4s::http4s-dsl:0.23.14",
     ivy"org.http4s::http4s-blaze-client:0.23.12",
-    ivy"org.http4s::http4s-circe:0.23.13",
+    ivy"org.http4s::http4s-circe:0.23.14",
 
     // Tapir
-    ivy"com.softwaremill.sttp.tapir::tapir-core:1.0.1",
-    ivy"com.softwaremill.sttp.tapir::tapir-sttp-client:1.0.1",
-    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server:1.0.1",
-    ivy"com.softwaremill.sttp.tapir::tapir-zio:1.0.1",
-    ivy"com.softwaremill.sttp.tapir::tapir-json-circe:1.0.1",
-    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server-zio:1.0.1"
+    ivy"com.softwaremill.sttp.tapir::tapir-core:$tapirVersion",
+    ivy"com.softwaremill.sttp.tapir::tapir-sttp-client:$tapirVersion",
+    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server:$tapirVersion",
+    ivy"com.softwaremill.sttp.tapir::tapir-zio:$tapirVersion",
+    ivy"com.softwaremill.sttp.tapir::tapir-json-circe:$tapirVersion",
+    ivy"com.softwaremill.sttp.tapir::tapir-http4s-server-zio:$tapirVersion"
   )
 
   override def moduleDeps = Seq(domain)
@@ -67,7 +69,7 @@ object main extends ScalaModule {
 object domain extends ScalaPBModule {
   def scalaVersion = "2.13.8"
 
-  def scalaPBVersion = "0.11.10"
+  def scalaPBVersion = main.scalaPbVersion
 
   override def scalaPBGrpc = true
 
