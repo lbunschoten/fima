@@ -7,8 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 import java.util.Optional
 
 class TransactionStatisticsStoreImpl(
-    private val db: Jdbi,
-    private val initialBalanceInCents: Long
+    private val db: Jdbi
 ) : TransactionStatisticsStore by db.onDemand(TransactionStatisticsStore::class.java) {
 
     fun insertTransaction(month: Int, year: Int, amountInCents: Long) {
@@ -22,10 +21,10 @@ class TransactionStatisticsStoreImpl(
                 year = year
             )
         } ?: run {
-            val previousMonthStatistics = getPreviousMonthStatistics(month, year)
+            val lastAvailableStatistics = getLastAvailableStatistics(month, year)
             insertStatistic(
                 sum = amountInCents,
-                balance = previousMonthStatistics?.balance ?: (initialBalanceInCents + amountInCents),
+                balance = (lastAvailableStatistics.orElse(null)?.balance ?: 0) + amountInCents,
                 month = month,
                 year = year
             )
@@ -78,9 +77,14 @@ interface TransactionStatisticsStore {
     @RegisterRowMapper(MonthlyTransactionStatisticsRowMapper::class)
     fun getMonthlyStatistics(startMonth: Int, startYear: Int, endMonth: Int, endYear: Int): List<MonthlyTransactionStatistics>
 
-    fun getPreviousMonthStatistics(month: Int, year: Int): MonthlyTransactionStatistics? {
-        return if (month == 1) getStatistics(12, year - 1).orElse(null)
-        else getStatistics(month - 1, year).orElse(null)
-    }
+    @SqlQuery("""
+        SELECT *
+        FROM monthly_transaction_statistics
+        WHERE CONCAT(year,TO_CHAR(month, 'fm00')) < CONCAT(:year, :month)
+        ORDER BY CONCAT(year,TO_CHAR(month, 'fm00')) DESC
+        LIMIT 1
+    """)
+    @RegisterRowMapper(MonthlyTransactionStatisticsRowMapper::class)
+    fun getLastAvailableStatistics(month: Int, year: Int): Optional<MonthlyTransactionStatistics>
 
 }

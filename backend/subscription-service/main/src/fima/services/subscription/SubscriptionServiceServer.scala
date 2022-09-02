@@ -4,7 +4,6 @@ import doobie.hikari.HikariTransactor
 import fima.services.subscription.repository.PostgresSubscriptionRepository
 import fima.services.transaction.TransactionService.ZioTransactionService
 import io.grpc.netty.NettyChannelBuilder
-import io.grpc.{CallOptions, Channel, ClientCall, ClientInterceptor, MethodDescriptor}
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.Router
 import scalapb.zio_grpc.ZManagedChannel
@@ -33,13 +32,7 @@ object SubscriptionServiceServer extends ZIOAppDefault {
   }
 
   private def buildApp(transactor: ULayer[HikariTransactor[Task]]): ZIO[Scope, Any, Unit] = {
-    val channel = ZManagedChannel(NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext().intercept(new ClientInterceptor {
-      override def interceptCall[ReqT, RespT](method: MethodDescriptor[ReqT, RespT], callOptions: CallOptions, next: Channel): ClientCall[ReqT, RespT] = {
-        println(method.toString)
-        println(callOptions.toString)
-        next.newCall(method, callOptions)
-      }
-    }))
+    val channel = ZManagedChannel(NettyChannelBuilder.forAddress(transactionServiceHost, transactionServicePort).usePlaintext())
 
     ZLayer
       .make[SubscriptionApi](

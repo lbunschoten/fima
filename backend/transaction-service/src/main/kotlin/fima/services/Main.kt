@@ -43,7 +43,7 @@ fun main() {
 
     val bankAccountEventStore = BankAccountEventStore(db, EventSerialization())
     val transactionsStore = TransactionsStoreImpl(db, db.onDemand(TransactionsStore::class.java))
-    val transactionStatisticsStore = TransactionStatisticsStoreImpl(db, initialBalanceInCents = 0L)
+    val transactionStatisticsStore = TransactionStatisticsStoreImpl(db)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
     val taggingService = TaggingService(bankAccountEventStore, taggingRuleStore, transactionTagsStore)

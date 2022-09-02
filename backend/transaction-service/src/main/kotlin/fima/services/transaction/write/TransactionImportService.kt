@@ -9,6 +9,7 @@ import io.grpc.Status
 import io.grpc.StatusException
 import org.slf4j.LoggerFactory
 import java.io.StringReader
+import java.math.BigDecimal
 
 interface TransactionImportService {
     suspend fun import(rawTransactions: String)
@@ -22,6 +23,7 @@ class TransactionImportServiceImpl(
 
     override suspend fun import(rawTransactions: String) {
         logger.info("Received request for importing transactions")
+        val knownBankAccounts = mutableListOf<String>()
         try {
             StringReader(rawTransactions).use { reader ->
                 val csvReader = CsvToBeanBuilder<TransactionRow>(reader)
@@ -35,17 +37,16 @@ class TransactionImportServiceImpl(
                 val transactions = csvReader.parse()
                 logger.info("Importing ${transactions.size} transactions")
 
-                transactions.forEachIndexed { index, transaction ->
-                    if (index == 0) {
-                        openBankAccount(
-                            accountNumber = if (transaction.direction == "Af") transaction.firstAccount else transaction.secondAccount,
-                            initialBalance = 5000F // FIXME: Make configurable
-                        )
+                transactions.forEach { transaction ->
+                    if (!knownBankAccounts.contains(transaction.firstAccount)) {
+                        openBankAccount(transaction.firstAccount)
+                        knownBankAccounts.add(transaction.firstAccount)
                     }
 
+                    val amountInCents = (transaction.amount.replace(',', '.').toBigDecimal() * BigDecimal("100")).toLong()
                     val validationErrors = if (transaction.direction == "Af") {
                         withdraw(
-                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong(),
+                            amountInCents = amountInCents,
                             date = transaction.date,
                             details = transaction.details,
                             name = transaction.name,
@@ -55,7 +56,7 @@ class TransactionImportServiceImpl(
                         )
                     } else {
                         deposit(
-                            amountInCents = (transaction.amount.replace(',', '.').toFloat() * 100).toLong(),
+                            amountInCents = amountInCents,
                             date = transaction.date,
                             details = transaction.details,
                             name = transaction.name,
@@ -74,9 +75,9 @@ class TransactionImportServiceImpl(
         }
     }
 
-    private fun openBankAccount(accountNumber: String, initialBalance: Float): Set<String> {
+    private fun openBankAccount(accountNumber: String): Set<String> {
         logger.info("Received request for opening bank account $accountNumber")
-        return commandHandler.processCommand(accountNumber, OpenBankAccountCommand(accountNumber, (initialBalance * 100).toLong()))
+        return commandHandler.processCommand(accountNumber, OpenBankAccountCommand(accountNumber))
     }
 
     private fun withdraw(fromAccount: String, amountInCents: Long, date: Int, name: String, details: String, toAccount: String, type: String): Set<String> {

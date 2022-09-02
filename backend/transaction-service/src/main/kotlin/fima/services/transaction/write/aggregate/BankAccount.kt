@@ -38,9 +38,7 @@ data class OpenBankAccount(override val version: Int, override val snapshotVersi
     }
 
     override fun validate(): Set<String> {
-        return mapOf<() -> Boolean, String>(
-            ::hasNegativeBalance to "Account has a negative balance"
-        ).filterKeys { f -> f() }.values.toSet()
+        return emptySet()
     }
 
     private fun hasNegativeBalance(): Boolean {

@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("BankAccountOpenedEvent")
-data class BankAccountOpenedEvent(override val version: Int, override val snapshotVersion: Int, val accountNumber: String, val initialBalanceInCents: Long) : Event(), EventVersion1 {
+data class BankAccountOpenedEvent(override val version: Int, override val snapshotVersion: Int, val accountNumber: String) : Event(), EventVersion1 {
 
     override fun apply(aggregate: BankAccount): BankAccount {
-        return OpenBankAccount(version, snapshotVersion, accountNumber, initialBalanceInCents)
+        return OpenBankAccount(version, snapshotVersion, accountNumber, balanceInCents = 0)
     }
 
 }
