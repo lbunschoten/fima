@@ -17,6 +17,7 @@ enum SectorType(val name: String, val value: String) extends StringSerializable 
   case InformationTechnology extends SectorType("Information Technology", "it")
   case CommunicationServices extends SectorType("Communication Services", "communication")
   case RealEstate extends SectorType("Real Estate", "real_estate")
+  case Diverse extends SectorType("Diverse", "diverse")
 }
 
 object SectorType extends EnumSerialization[SectorType] {

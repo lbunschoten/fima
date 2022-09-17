@@ -5,7 +5,7 @@
  * @param {...object} objects - Objects to merge
  * @returns {object} New object with merged key/values
  */
-import {ChartOptions} from "chart.js";
+import {ChartOptions, TooltipItem} from "chart.js";
 
 function mergeDeep(...objects: any[]) {
     const isObject = (obj: any) => obj && typeof obj === 'object';
@@ -76,6 +76,15 @@ let chart_with_currency_legend = {
             ticks: {
                 callback: function (value: number) {
                     return new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0}).format(value / 100);
+                }
+            }
+        }
+    },
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label(tooltipItem: TooltipItem<"line">) {
+                    return tooltipItem.dataset.label + ": " + new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0}).format(tooltipItem.parsed.y / 100);
                 }
             }
         }

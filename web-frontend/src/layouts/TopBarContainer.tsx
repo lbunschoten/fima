@@ -57,8 +57,8 @@ const TopBarContainer = (props: AdminNavbarProps) => {
                                 <span className="navbar-toggler-bar bar3" />
                             </button>
                         </div>
-                        <NavbarBrand href="#pablo" onClick={e => e.preventDefault()}>
-                            {props.brandText}
+                        <NavbarBrand href="#" onClick={e => e.preventDefault()}>
+                            Finance manager - {props.brandText}
                         </NavbarBrand>
                     </div>
                     <button

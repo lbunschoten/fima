@@ -10,6 +10,7 @@ enum MarketIndex(override val value: String) extends StringSerializable {
   case NYSE extends MarketIndex("NYSE")
   case NASDAQ extends MarketIndex("NASDAQ")
   case AMS extends MarketIndex("AMS")
+  case DEX extends MarketIndex("DEX")
 }
 
 object MarketIndex extends EnumSerialization[MarketIndex] {

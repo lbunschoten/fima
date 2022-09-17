@@ -31,9 +31,7 @@ class InvestmentServiceApi(
   private implicit val iORuntime: IORuntime
 ) extends CORSHandler {
 
-  //  import io.circe.generic.extras.semiauto.deriveEncoder§
   import CirceSupport._
-  //  implicit val config: Configuration = Configuration.default.withSnakeCaseMemberNames
   implicit val modeCodec: Codec[MarketIndex] = deriveCodec[MarketIndex]
   implicit val stockEncoder: Encoder[Stock] = deriveEncoder
   implicit val positionEncoder: Encoder[Position] = deriveEncoder

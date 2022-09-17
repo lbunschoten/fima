@@ -28,7 +28,7 @@ const initialState: DashboardState = {
         options: transactionsChart.defaultChartOptions
     },
     sumChart: {
-        label: "Sum of all transactions",
+        label: "Sum of transactions",
         results: [],
         options: transactionsChart.currencyChartOptions
     },
