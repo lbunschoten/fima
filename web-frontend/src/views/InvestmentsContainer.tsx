@@ -15,7 +15,7 @@ const InvestmentsContainer = () => {
     const allPositions = useAppSelector((state) => state.investments.positions)
     const positionsBySector: Dictionary<Position[]> = useAppSelector((state) => _.chain(state.investments.positions).groupBy("stock.sector").value())
     const totalPositionValue = useAppSelector((state) => {
-        return _.sum(state.investments.positions.map(p => p.shares * p.stock.market_value))
+        return _.sum(state.investments.positions.map(p => p.shares * p.stock.marketValue))
     })
 
     useEffect(() => {
@@ -91,16 +91,16 @@ const InvestmentsContainer = () => {
                                                             <p className="title">{p.shares}</p>
                                                         </td>
                                                         <td>
-                                                            <p className="title">{Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 2}).format(p.stock.market_value)}</p>
+                                                            <p className="title">{Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 2}).format(p.stock.marketValue)}</p>
                                                         </td>
                                                         <td>
-                                                            <p className="title">{Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 2}).format(p.stock.market_value * p.shares)}</p>
+                                                            <p className="title">{Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR', maximumFractionDigits: 2}).format(p.stock.marketValue * p.shares)}</p>
                                                         </td>
                                                         <td className="td-actions text-right">
                                                             <Link to={`/admin/subscription/${p.stock.symbol}`}>
                                                                 <Button
                                                                     color="link"
-                                                                    id={`tooltip-${p.stock.symbol}`}
+                                                                    id={`tooltip-${p.stock.symbol.replace(".", "_")}`}
                                                                     title=""
                                                                     type="button"
                                                                 >
@@ -109,7 +109,7 @@ const InvestmentsContainer = () => {
                                                             </Link>
                                                             <UncontrolledTooltip
                                                                 delay={0}
-                                                                target={`tooltip-${p.stock.symbol}`}
+                                                                target={`tooltip-${p.stock.symbol.replace(".", "_")}`}
                                                                 placement="right"
                                                             >
                                                                 View transactions
@@ -144,7 +144,7 @@ const InvestmentsContainer = () => {
                                                 <tr key={sector}>
                                                     <td>{sectors[sector]?.name ?? sector + "Unknown sector"}</td>
                                                     <td>{positions?.length ?? 0 } </td>
-                                                    <td>{((_.sum(positions?.map(p => p.shares * p.stock.market_value)) ?? 0) / (totalPositionValue ?? 0) * 100).toFixed(2)} %</td>
+                                                    <td>{((_.sum(positions?.map(p => p.shares * p.stock.marketValue)) ?? 0) / (totalPositionValue ?? 0) * 100).toFixed(2)} %</td>
                                                 </tr>
                                             )
                                         }

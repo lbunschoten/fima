@@ -6,6 +6,6 @@ interface Aggregate {
     val version: Int
     val snapshotVersion: Int
 
-    fun validate(): Set<String>
+    fun validate(): Set<String> = emptySet()
     fun snapshot(): Event
 }

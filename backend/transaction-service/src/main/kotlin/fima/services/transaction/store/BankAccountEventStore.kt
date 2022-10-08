@@ -3,7 +3,6 @@ package fima.services.transaction.store
 import fima.services.transaction.write.event.Event
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
-import org.slf4j.LoggerFactory
 
 class BankAccountEventStore(private val db: Jdbi, private val eventSerialization: EventSerialization) : EventStore {
 
@@ -20,6 +19,22 @@ class BankAccountEventStore(private val db: Jdbi, private val eventSerialization
         val serializedEvents = db.withHandleUnchecked { handle ->
             handle
                 .select("SELECT event FROM bank_account_events WHERE aggregate_id = ?", aggregateId)
+                .mapTo(String::class.java)
+                .list()
+        }
+        return eventSerialization.deserialize(serializedEvents)
+    }
+
+    override fun readEvents(limit: Int, offset: Int): List<Event> {
+        val serializedEvents = db.withHandleUnchecked { handle ->
+            handle
+                .select("""
+                    SELECT event
+                    FROM transaction.bank_account_events
+                    WHERE (event::json->'date')::text IS NOT NULL
+                    ORDER BY (event::json->'date')::text,  aggregate_id, (event::json->'version')::text
+                    LIMIT ? OFFSET ?
+                """.trimIndent(), limit, offset)
                 .mapTo(String::class.java)
                 .list()
         }

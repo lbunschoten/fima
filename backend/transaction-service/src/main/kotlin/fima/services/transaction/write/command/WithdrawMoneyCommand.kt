@@ -2,10 +2,11 @@ package fima.services.transaction.write.command
 
 import fima.services.transaction.write.event.Event
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
+import java.time.LocalDate
 import java.util.UUID
 
 data class WithdrawMoneyCommand(val amountInCents: Long,
-                                val date: Int,
+                                val date: LocalDate,
                                 val name: String,
                                 val details: String,
                                 val toAccountNumber: String,

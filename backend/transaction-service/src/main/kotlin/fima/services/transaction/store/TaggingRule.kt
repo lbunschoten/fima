@@ -11,7 +11,7 @@ data class TaggingRule(
     val tags: List<String>
 )
 
-class TaggingRuleMapper : RowMapper<TaggingRule> {
+class TaggingRuleRowMapper : RowMapper<TaggingRule> {
     override fun map(rs: ResultSet, ctx: StatementContext): TaggingRule {
         return TaggingRule(
             id = UUID.fromString(rs.getString("id")),

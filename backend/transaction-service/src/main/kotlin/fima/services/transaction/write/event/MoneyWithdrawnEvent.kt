@@ -1,9 +1,11 @@
 package fima.services.transaction.write.event
 
+import fima.services.transaction.store.DateSerializer
 import fima.services.transaction.store.UUIDSerializer
 import fima.services.transaction.write.aggregate.BankAccount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDate
 import java.util.UUID
 
 @Serializable
@@ -12,7 +14,7 @@ data class MoneyWithdrawnEvent(override val version: Int,
                                override val snapshotVersion: Int,
                                @Serializable(with = UUIDSerializer::class) override val id: UUID,
                                override val amountInCents: Long,
-                               override val date: Int,
+                               @Serializable(with = DateSerializer::class) override val date: LocalDate,
                                override val name: String,
                                override val details: String,
                                override val fromAccountNumber: String,
@@ -25,5 +27,7 @@ data class MoneyWithdrawnEvent(override val version: Int,
             .withSnapshotVersion(snapshotVersion)
             .withBalance(aggregate.balanceInCents - amountInCents)
     }
+
+    override val amountInCentsDiff: Long = -amountInCents
 
 }

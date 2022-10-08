@@ -10,7 +10,7 @@ class EventProcessor {
         return process(UniniatilizedAccount(aggregateId), events)
     }
 
-    fun process(aggregate: BankAccount, events: List<Event>): BankAccount {
+    private fun process(aggregate: BankAccount, events: List<Event>): BankAccount {
         return events.fold(aggregate) { agg, e ->
             e.apply(agg)
         }

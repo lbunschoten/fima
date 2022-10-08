@@ -7,7 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 interface TaggingRuleStore {
 
     @SqlQuery("SELECT * FROM transaction_tagging_rule")
-    @RegisterRowMapper(TaggingRuleMapper::class)
+    @RegisterRowMapper(TaggingRuleRowMapper::class)
     fun getTaggingRules(): List<TaggingRule>
 }
 

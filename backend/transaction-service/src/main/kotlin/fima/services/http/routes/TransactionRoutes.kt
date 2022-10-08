@@ -1,9 +1,9 @@
 package fima.services.http.routes
 
-import fima.services.transaction.store.TransactionStatisticsStore
 import fima.services.transaction.store.TransactionsStore
 import fima.services.transaction.store.UUIDSerializer
 import fima.services.transaction.write.TransactionImportService
+import fima.services.transaction.write.TransactionStatisticsService
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -36,16 +36,21 @@ data class TransactionDto(
     val tags: Map<String, String>
 )
 
-fun Route.transactionRoutes(transactionsStore: TransactionsStore, transactionStatisticsStore: TransactionStatisticsStore, transactionImportService: TransactionImportService) {
+fun Route.transactionRoutes(transactionsStore: TransactionsStore, transactionStatisticsService: TransactionStatisticsService, transactionImportService: TransactionImportService) {
     get("/transaction/statistics") {
         call.respond(
             status = HttpStatusCode.OK,
-            message = transactionStatisticsStore
-                .getMonthlyStatistics(1, 2020, 12, 2020)
+            message = transactionStatisticsService
+                .getMonthlyStatistics()
                 .map {
                     MonthlyTransactionStatisticsDto(it.month, it.year, it.numTransactions, it.sum.toFloat(), it.balance.toFloat())
                 }
         )
+    }
+
+    get("/transaction/statistics/reset") {
+        transactionStatisticsService.resetStatistics()
+        call.respond(HttpStatusCode.OK)
     }
 
     get("/transaction/recent") {

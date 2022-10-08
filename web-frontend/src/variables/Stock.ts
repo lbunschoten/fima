@@ -4,6 +4,6 @@ export type Stock = {
     index: string,
     sector: string,
     investmentType: string,
-    market_value: number,
+    marketValue: number,
     updateAt: string
 }

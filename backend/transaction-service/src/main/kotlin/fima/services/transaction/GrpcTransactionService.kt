@@ -1,12 +1,13 @@
 package fima.services.transaction
 
 import fima.services.transaction.store.TransactionsStore
+import fima.services.transaction.write.TransactionService
 import io.grpc.Status
 import io.grpc.StatusException
 import org.slf4j.LoggerFactory
 
-class TransactionServiceImpl(
-    private val transactionsStore: TransactionsStore
+class GrpcTransactionService(
+    private val transactionService: TransactionService
 ) : TransactionServiceGrpcKt.TransactionServiceCoroutineImplBase() {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -14,7 +15,7 @@ class TransactionServiceImpl(
     override suspend fun searchTransactions(request: SearchTransactionsRequest): SearchTransactionsResponse {
         try {
             logger.info("Received search request for transactions: $request")
-            val transactions = transactionsStore.searchTransactions(
+            val transactions = transactionService.searchTransactions(
                 request.filtersList.map { f ->
                     TransactionsStore.SearchFilters(
                         queryFilter = f?.query?.queryString?.takeIf { it.isNotBlank() },

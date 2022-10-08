@@ -2,6 +2,7 @@ package fima.services.transaction.write
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvToBeanBuilder
+import fima.services.transaction.store.EventStore
 import fima.services.transaction.write.command.DepositMoneyCommand
 import fima.services.transaction.write.command.OpenBankAccountCommand
 import fima.services.transaction.write.command.WithdrawMoneyCommand
@@ -10,24 +11,27 @@ import io.grpc.StatusException
 import org.slf4j.LoggerFactory
 import java.io.StringReader
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 interface TransactionImportService {
     suspend fun import(rawTransactions: String)
 }
 
 class TransactionImportServiceImpl(
-    private val commandHandler: CommandHandler
+    private val commandHandler: CommandHandler,
+    private val eventStore: EventStore
 ) : TransactionImportService {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override suspend fun import(rawTransactions: String) {
         logger.info("Received request for importing transactions")
-        val knownBankAccounts = mutableListOf<String>()
+        val knownBankAccounts = eventStore.aggregates().toMutableList()
         try {
             StringReader(rawTransactions).use { reader ->
                 val csvReader = CsvToBeanBuilder<TransactionRow>(reader)
-                    .withSeparator(',')
+                    .withSeparator(';')
                     .withQuoteChar('\"')
                     .withType(TransactionRow::class.java)
                     .withThrowExceptions(true)
@@ -47,7 +51,7 @@ class TransactionImportServiceImpl(
                     val validationErrors = if (transaction.direction == "Af") {
                         withdraw(
                             amountInCents = amountInCents,
-                            date = transaction.date,
+                            date = parseDate(transaction.date),
                             details = transaction.details,
                             name = transaction.name,
                             fromAccount = transaction.firstAccount,
@@ -57,7 +61,7 @@ class TransactionImportServiceImpl(
                     } else {
                         deposit(
                             amountInCents = amountInCents,
-                            date = transaction.date,
+                            date = parseDate(transaction.date),
                             details = transaction.details,
                             name = transaction.name,
                             fromAccount = transaction.secondAccount,
@@ -80,7 +84,7 @@ class TransactionImportServiceImpl(
         return commandHandler.processCommand(accountNumber, OpenBankAccountCommand(accountNumber))
     }
 
-    private fun withdraw(fromAccount: String, amountInCents: Long, date: Int, name: String, details: String, toAccount: String, type: String): Set<String> {
+    private fun withdraw(fromAccount: String, amountInCents: Long, date: LocalDate, name: String, details: String, toAccount: String, type: String): Set<String> {
         logger.info("Received request for withdrawal from $fromAccount")
         return commandHandler.processCommand(
             fromAccount,
@@ -88,17 +92,21 @@ class TransactionImportServiceImpl(
         )
     }
 
-    private fun deposit(toAccount: String, amountInCents: Long, date: Int, name: String, details: String, fromAccount: String, type: String): Set<String> {
+    private fun deposit(toAccount: String, amountInCents: Long, date: LocalDate, name: String, details: String, fromAccount: String, type: String): Set<String> {
         logger.info("Received request for deposit to $toAccount")
         return commandHandler.processCommand(
             toAccount,
             DepositMoneyCommand(amountInCents, date, name, details, fromAccount, type)
         )
     }
+
+    private fun parseDate(date: String): LocalDate {
+        return LocalDate.parse(date.replace("-", ""), DateTimeFormatter.BASIC_ISO_DATE)
+    }
 }
 
 data class TransactionRow(
-    @CsvBindByPosition(position = 0) val date: Int = 0,
+    @CsvBindByPosition(position = 0) val date: String = "",
     @CsvBindByPosition(position = 1) val name: String = "",
     @CsvBindByPosition(position = 2) val firstAccount: String = "",
     @CsvBindByPosition(position = 3) val secondAccount: String = "",

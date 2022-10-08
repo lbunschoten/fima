@@ -5,7 +5,7 @@ import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
-import java.time.ZonedDateTime
+import java.time.LocalDate
 
 interface TransactionsStore {
 
@@ -59,7 +59,7 @@ interface TransactionsStore {
         INSERT INTO transactions(id, date, name, from_account, to_account, type, amount)
         VALUES (:id, :date, :name, :fromAccount, :toAccount, :type, :amountInCents)
     """)
-    fun insertTransaction(id: String, date: ZonedDateTime, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)
+    fun insertTransaction(id: String, date: LocalDate, name: String, fromAccount: String, toAccount: String, type: String, amountInCents: Long)
 
     fun searchTransactions(filters: List<SearchFilters>): List<Transaction> = emptyList()
 }

@@ -3,15 +3,14 @@ package fima.services
 import configureRouting
 import fima.services.http.plugins.configureHttp
 import fima.services.http.plugins.configureSerialization
-import fima.services.transaction.TransactionServiceImpl
-import fima.services.transaction.conversion.RawDateToDateConverter
+import fima.services.transaction.GrpcTransactionService
 import fima.services.transaction.store.*
 import fima.services.transaction.write.*
 import fima.services.transaction.write.listener.EventLoggingListener
 import fima.services.transaction.write.listener.TransactionListener
 import fima.services.transaction.write.listener.TransactionStatisticsListener
 import fima.services.transaction.write.listener.TransactionTaggingListener
-import io.grpc.*
+import io.grpc.ServerBuilder
 import io.grpc.util.TransmitStatusRuntimeExceptionInterceptor
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -23,12 +22,12 @@ import org.slf4j.LoggerFactory
 
 fun Application.module(
     transactionsStore: TransactionsStore,
-    transactionStatisticsStore: TransactionStatisticsStore,
+    transactionStatisticsService: TransactionStatisticsService,
     transactionImportService: TransactionImportService,
     taggingService: TaggingService
 ) {
     configureHttp()
-    configureRouting(transactionsStore, transactionStatisticsStore, transactionImportService, taggingService)
+    configureRouting(transactionsStore, transactionImportService, transactionStatisticsService, taggingService)
     configureSerialization()
 }
 
@@ -46,7 +45,9 @@ fun main() {
     val transactionStatisticsStore = TransactionStatisticsStoreImpl(db)
     val transactionTagsStore = TransactionTagsStore(db)
     val taggingRuleStore = TaggingRulesStoreImpl(db)
+    val transactionStatisticsService = TransactionStatisticsService(bankAccountEventStore, transactionStatisticsStore)
     val taggingService = TaggingService(bankAccountEventStore, taggingRuleStore, transactionTagsStore)
+    val transactionService = TransactionService(transactionsStore)
 
     val commandHandler = CommandHandler(
         transactionHandler = JdbiTransactionHandler(db),
@@ -54,21 +55,21 @@ fun main() {
         eventProcessor = EventProcessor(),
         eventListeners = setOf(
             EventLoggingListener(),
-            TransactionListener(transactionsStore, RawDateToDateConverter()),
-            TransactionStatisticsListener(transactionStatisticsStore, RawDateToDateConverter()),
+            TransactionListener(transactionService),
+            TransactionStatisticsListener(transactionStatisticsService),
             TransactionTaggingListener(taggingService)
         )
     )
-    val transactionImportService = TransactionImportServiceImpl(commandHandler)
+    val transactionImportService = TransactionImportServiceImpl(commandHandler, bankAccountEventStore)
 
     val httpServer = embeddedServer(Netty, port = 9998) {
-        module(transactionsStore, transactionStatisticsStore, transactionImportService, taggingService)
+        module(transactionsStore, transactionStatisticsService, transactionImportService, taggingService)
     }.start()
 
-    val transactionService = ServerBuilder
+    val grpcService = ServerBuilder
         .forPort(9997)
         .intercept(TransmitStatusRuntimeExceptionInterceptor.instance())
-        .addService(TransactionServiceImpl(transactionsStore))
+        .addService(GrpcTransactionService(transactionService))
         .build()
         .start()
 
@@ -77,13 +78,13 @@ fun main() {
     Runtime.getRuntime().addShutdownHook(Thread {
         logger.info("Transaction shutting down")
 
-        transactionService.shutdown()
-        transactionService.awaitTermination()
+        grpcService.shutdown()
+        grpcService.awaitTermination()
         httpServer.stop()
 
         logger.info("Transaction services stopped")
     })
 
-    transactionService.awaitTermination()
+    grpcService.awaitTermination()
 }
 

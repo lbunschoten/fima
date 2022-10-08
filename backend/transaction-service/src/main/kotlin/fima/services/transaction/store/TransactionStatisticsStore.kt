@@ -54,6 +54,14 @@ class TransactionStatisticsStoreImpl(
                 )
         }
     }
+
+    fun deleteAllStatistics() {
+        db.withHandleUnchecked { handle ->
+            handle
+                .createUpdate("""DELETE FROM monthly_transaction_statistics""")
+                .execute()
+        }
+    }
 }
 
 interface TransactionStatisticsStore {

@@ -1,7 +1,6 @@
 package fima.services.transaction.store
 
 import fima.services.transaction.write.event.Event
-import kotlinx.serialization.decodeFromString
 
 class InMemoryBankAccountEventStore : EventStore {
 
@@ -13,6 +12,10 @@ class InMemoryBankAccountEventStore : EventStore {
     override fun readEvents(aggregateId: String): List<Event> {
         val serializedEvents = storage.getOrDefault(aggregateId, emptyList())
         return eventSerialization.deserialize(serializedEvents)
+    }
+
+    override fun readEvents(limit: Int, offset: Int): List<Event> {
+        return eventSerialization.deserialize(storage.values.flatten())
     }
 
     override fun readLatestEvents(aggregateId: String): List<Event> = readEvents(aggregateId)
