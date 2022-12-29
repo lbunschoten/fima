@@ -1,9 +1,11 @@
-podTemplate(label: 'mypod', containers: [
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.16.0', command: 'cat', ttyEnabled: true)
-  ],
-  volumes: []
-  ) {
-    node('mypod') {
+podTemplate(
+    label: 'build-slave',
+    containers: [
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.23.6', command: 'cat', ttyEnabled: true)
+    ],
+    volumes: []
+) {
+    node('build-slave') {
         stage('Clone repository') {
             container('git') {
                 checkout scm
