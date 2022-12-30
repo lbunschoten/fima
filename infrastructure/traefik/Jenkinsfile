@@ -15,7 +15,7 @@ podTemplate(
         stage('Deploy') {
             container('kubectl') {
                 dir("infrastructure/${env.JOB_NAME}") {
-                    sh "kubectl apply -f manifest.yaml --namespace=default"
+                    sh "kubectl apply -f '*.yaml' --namespace=default"
                 }
             }
         }
