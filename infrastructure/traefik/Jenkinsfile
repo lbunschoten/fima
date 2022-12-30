@@ -1,19 +1,21 @@
-podTemplate(label: 'mypod', containers: [
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.16.0', command: 'cat', ttyEnabled: true)
-  ],
-  volumes: []
-  ) {
-    node('mypod') {
+podTemplate(
+    containers: [
+            containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.23.6', command: 'cat', ttyEnabled: true)
+    ],
+    volumes: []
+) {
+    node(POD_LABEL) {
         stage('Clone repository') {
-            container('git') {
-                checkout scm
-            }
+            checkout scm
         }
 
         stage('Deploy') {
             container('kubectl') {
                 dir("infrastructure/${env.JOB_NAME}") {
-                    sh "kubectl apply -f manifest.yaml --namespace=default"
+                    sh "kubectl apply -f 'manifest.yaml' --namespace=default"
+                    sh "kubectl apply -f 'traefik-crd.yaml' --namespace=default"
+                    sh "kubectl apply -f 'traefik-rbac.yaml' --namespace=default"
+                    sh "kubectl apply -f 'traefik-routes.yaml' --namespace=default"
                 }
             }
         }
