@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {HashRouter, Redirect, Route, Switch} from "react-router-dom";
-import {AnyAction, configureStore, getDefaultMiddleware, ThunkDispatch} from '@reduxjs/toolkit'
+import {AnyAction, configureStore, ThunkDispatch} from '@reduxjs/toolkit'
 
 import LayoutContainer from "./layouts/LayoutContainer";
 
