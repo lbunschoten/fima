@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {HashRouter, Redirect, Route, Switch} from "react-router-dom";
-import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit'
+import {AnyAction, configureStore, getDefaultMiddleware, ThunkDispatch} from '@reduxjs/toolkit'
 
 import LayoutContainer from "./layouts/LayoutContainer";
 
@@ -23,18 +23,17 @@ const store = configureStore({
         layout: layoutSlice.reducer,
         investments: investmentsSlice.reducer
     },
-    middleware: getDefaultMiddleware({
-        serializableCheck: false,
-    }),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware()
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
+export type TypedAppDispatch = ThunkDispatch<RootState, any, AnyAction>;
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
-export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppDispatch = () => useDispatch<TypedAppDispatch>()
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 ReactDOM.render(

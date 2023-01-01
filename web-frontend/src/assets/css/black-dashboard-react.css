@@ -9534,20 +9534,6 @@ img {
   .navbar-minimize-fixed button i {
     font-size: 20px; }
 
-.notification {
-  background: #fd5d93;
-  color: #ffffff;
-  border-radius: 0.875rem;
-  height: 6px;
-  width: 6px;
-  position: absolute;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 800;
-  top: 10px;
-  right: 10px;
-  border: 1px solid #fd5d93; }
-
 .navbar-nav li {
   padding: 0 10px; }
   .navbar-nav li a {
@@ -11414,10 +11400,6 @@ textarea.form-control {
 .input-group-prepend .tim-icons,
 .input-group-append .tim-icons {
   font-size: 1rem; }
-
-.react-notification-alert-container {
-  z-index: 1051;
-  position: fixed; }
 
 .card {
   background: #27293d;
