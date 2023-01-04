@@ -36,7 +36,7 @@ object InvestmentServiceServer extends IOApp.Simple {
     val transactionRepository = new TransactionRepository()
     val resources = for {
       transactor <- startDbTransactor(dbHost, dbPort, dbPassword)
-      investmentService = new InvestmentServiceImpl(stockRepository, transactor)(ec)
+      investmentService = new InvestmentServiceImpl(stockRepository, transactor)
       service <- InvestmentServiceFs2Grpc.bindServiceResource(investmentService)
     } yield Resources(service, transactor)
 

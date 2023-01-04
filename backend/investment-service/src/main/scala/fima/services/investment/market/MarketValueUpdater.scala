@@ -34,7 +34,7 @@ class MarketValueUpdater(
       }.unsafeRunAndForget()
   }
 
-  def updateMarketValue(symbol: StockSymbol): Either[ApiError, IO[Int]] = {
+  private def updateMarketValue(symbol: StockSymbol): Either[ApiError, IO[Int]] = {
     println(s"Updating market value for symbol: $symbol")
     stockApi.getTimeseries(symbol).map { (timeseries: decoders.WeeklyAdjustedTimeSeries) =>
       val (_, latestTimeseries) = timeseries.timeseries.maxBy(_._1)

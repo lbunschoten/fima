@@ -19,10 +19,6 @@ trait CORSHandler {
     preflightRequestHandler ~ r
   }
 
-  // Helper method to add CORS headers to HttpResponse 
-  // preventing duplication of CORS headers across code
-  def addCORSHeaders(response: HttpResponse): HttpResponse = response.withHeaders(corsResponseHeaders)
-
   // This directive adds access control headers to normal responses
   private def withAccessControlHeaders: Directive0 = {
     respondWithHeaders(corsResponseHeaders)

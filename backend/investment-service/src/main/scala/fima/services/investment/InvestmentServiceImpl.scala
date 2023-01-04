@@ -8,11 +8,8 @@ import fima.services.investment.repository.StockRepository
 import fima.services.investment.domain.StockSymbol
 import io.grpc.Metadata
 
-import scala.concurrent.ExecutionContext
-
 class InvestmentServiceImpl(stockRepository: StockRepository,
-                            transactor: Transactor[IO])
-                           (private implicit val ec: ExecutionContext) extends InvestmentServiceFs2Grpc[IO, Metadata] {
+                            transactor: Transactor[IO]) extends InvestmentServiceFs2Grpc[IO, Metadata] {
 
   override def getStock(request: GetStockRequest, metadata: Metadata): IO[GetStockResponse] = {
     stockRepository

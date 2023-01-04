@@ -1,10 +1,10 @@
 import sbtassembly.AssemblyKeys.assembly
 
-val scalaVersionStr = "3.1.2"
+val scalaVersionStr = "3.2.1"
 val doobieVersion = "1.0.0-RC2"
-val circeVersion = "0.14.1"
-val AkkaVersion = "2.6.19"
-val AkkaHttpVersion = "10.2.8"
+val circeVersion = "0.14.3"
+val AkkaVersion = "2.7.0"
+val AkkaHttpVersion = "10.4.0"
 
 lazy val root = project
   .in(file("."))
@@ -27,7 +27,7 @@ lazy val root = project
       "org.tpolecat" %% "doobie-postgres" % doobieVersion, // Postgres driver 42.2.19 + type mappings.
 
       // HTTP
-      "com.softwaremill.sttp.client3" %% "core" % "3.5.2",
+      "com.softwaremill.sttp.client3" %% "core" % "3.8.6",
 
       // JSON
       "io.circe" %% "circe-core" % circeVersion,

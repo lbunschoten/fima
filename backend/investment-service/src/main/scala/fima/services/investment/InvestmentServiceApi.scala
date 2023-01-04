@@ -141,16 +141,6 @@ class InvestmentServiceApi(
 
   case class InvestmentMethodDto(name: String, `type`: domain.InvestmentMethod)
 
-  case class StockDto(
-    symbol: StockSymbol,
-    name: String,
-    index: MarketDto,
-    sector: SectorDto,
-    investmentType: InvestmentMethodDto,
-    marketValue: BigDecimal,
-    updatedAt: Instant
-  )
-
 }
 
 object CirceSupport {
@@ -160,7 +150,7 @@ object CirceSupport {
   implicit final def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A] = {
     Unmarshaller.stringUnmarshaller
       .forContentTypes(jsonContentTypes: _*)
-      .flatMap { ctx => mat => json =>
+      .flatMap { _ => _ => json =>
         io.circe.parser.decode(json).fold(Future.failed, Future.successful)
       }
   }
