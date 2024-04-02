@@ -1,5 +1,6 @@
 import mill._
-import mill.contrib.scalapblib.ScalaPBModule
+import $ivy.`com.lihaoyi::mill-contrib-scalapblib:`
+import contrib.scalapblib.ScalaPBModule
 import mill.scalalib.Assembly.Rule
 import mill.scalalib.{Assembly, Dep, DepSyntax, ScalaModule}
 

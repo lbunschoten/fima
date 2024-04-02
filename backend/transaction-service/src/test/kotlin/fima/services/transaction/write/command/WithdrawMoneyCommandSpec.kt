@@ -1,5 +1,6 @@
 package fima.services.transaction.write.command
 
+import fima.services.transaction.write.event.MoneyDepositedEvent
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -37,7 +38,8 @@ class WithdrawMoneyCommandSpec : StringSpec() {
                         toAccountNumber = toAccountNumber,
                         type = type
                     ),
-                    MoneyWithdrawnEvent::id
+                    MoneyWithdrawnEvent::id,
+                    MoneyWithdrawnEvent::at,
                 )
         }
 

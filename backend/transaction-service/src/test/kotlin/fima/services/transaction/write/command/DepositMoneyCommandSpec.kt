@@ -37,7 +37,8 @@ class DepositMoneyCommandSpec : StringSpec() {
                         toAccountNumber = toAccountNumber,
                         type
                     ),
-                    MoneyDepositedEvent::id
+                    MoneyDepositedEvent::id,
+                    MoneyDepositedEvent::at,
                 )
         }
 
