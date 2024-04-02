@@ -1,8 +1,8 @@
 import sbtassembly.AssemblyKeys.assembly
 
-val scalaVersionStr = "3.2.1"
-val doobieVersion = "1.0.0-RC2"
-val circeVersion = "0.14.3"
+val scalaVersionStr = "3.3.3"
+val doobieVersion = "1.0.0-RC5"
+val circeVersion = "0.14.6"
 val AkkaVersion = "2.7.0"
 val AkkaHttpVersion = "10.4.0"
 
@@ -12,7 +12,7 @@ lazy val root = project
     name := "investment-service",
     version := "0.1.0",
     scalaVersion := scalaVersionStr,
-    scalacOptions += "-source:3.1",
+    scalacOptions += "-source:3.3",
     excludeDependencies ++= Seq(
       ExclusionRule("com.typesafe.akka", s"akka-protobuf-v3_2.13")
     ),
@@ -27,7 +27,7 @@ lazy val root = project
       "org.tpolecat" %% "doobie-postgres" % doobieVersion, // Postgres driver 42.2.19 + type mappings.
 
       // HTTP
-      "com.softwaremill.sttp.client3" %% "core" % "3.8.6",
+      "com.softwaremill.sttp.client3" %% "core" % "3.9.4",
 
       // JSON
       "io.circe" %% "circe-core" % circeVersion,

@@ -2,7 +2,7 @@ package fima.services.transaction.write.command
 
 import fima.services.transaction.write.event.MoneyWithdrawnEvent
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.equality.shouldBeEqualToComparingFieldsExcept
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import java.time.LocalDate
 import java.util.*
 
@@ -24,7 +24,7 @@ class WithdrawMoneyCommandSpec : StringSpec() {
         "it should generate a MoneyWithdrawnEvent" {
             command
                 .events(fromAccountNumber)[0].invoke(version, snapshotVersion)
-                .shouldBeEqualToComparingFieldsExcept(
+                .shouldBeEqualToIgnoringFields(
                     MoneyWithdrawnEvent(
                         version = version,
                         snapshotVersion = snapshotVersion,

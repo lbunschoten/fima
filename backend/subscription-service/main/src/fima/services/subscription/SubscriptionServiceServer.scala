@@ -4,6 +4,7 @@ import doobie.hikari.HikariTransactor
 import fima.services.subscription.repository.PostgresSubscriptionRepository
 import fima.services.transaction.TransactionService.ZioTransactionService
 import io.grpc.netty.NettyChannelBuilder
+import org.http4s.HttpApp
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.Router
 import scalapb.zio_grpc.ZManagedChannel
@@ -37,7 +38,7 @@ object SubscriptionServiceServer extends ZIOAppDefault {
     ZLayer
       .make[SubscriptionApi](
         SubscriptionApi.live,
-        ZioTransactionService.TransactionServiceClient.live[Any, Any](channel).tap(_ => ZIO.logInfo("Started transaction service client")),
+        ZioTransactionService.TransactionServiceClient.live(channel).tap(_ => ZIO.logInfo("Started transaction service client")),
         transactor.tap(_ => ZIO.logInfo("Started DB transactor")),
         PostgresSubscriptionRepository.live,
       )
@@ -47,12 +48,12 @@ object SubscriptionServiceServer extends ZIOAppDefault {
   }
 
   private def runHttp(subscriptionApi: SubscriptionApi): Task[Unit] = {
-    val httpApp = Router(
+    val httpApp: HttpApp[Task] = Router(
       "" -> subscriptionApi.routes
     ).orNotFound
 
     BlazeServerBuilder
-      .apply
+      .apply[Task]
       .withoutBanner
       .bindHttp(port, "0.0.0.0")
       .withHttpApp(httpApp)

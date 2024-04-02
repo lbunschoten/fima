@@ -2,7 +2,7 @@ package fima.services.transaction.write.command
 
 import fima.services.transaction.write.event.MoneyDepositedEvent
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.equality.shouldBeEqualToComparingFieldsExcept
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import java.time.LocalDate
 import java.util.*
 
@@ -24,7 +24,7 @@ class DepositMoneyCommandSpec : StringSpec() {
         "it should generate a MoneyDepositedEvent" {
             command
                 .events(toAccountNumber)[0].invoke(version, snapshotVersion)
-                .shouldBeEqualToComparingFieldsExcept(
+                .shouldBeEqualToIgnoringFields(
                     MoneyDepositedEvent(
                         version = version,
                         snapshotVersion = snapshotVersion,

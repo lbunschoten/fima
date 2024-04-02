@@ -1,35 +1,32 @@
 import mill._
-import contrib.scalapblib._
-import mill.define.Sources
-import $ivy.`com.lihaoyi::mill-contrib-scalapblib:$MILL_VERSION`
-import mill.modules.Assembly
-import mill.modules.Assembly.Rule
-import scalalib._
+import mill.contrib.scalapblib.ScalaPBModule
+import mill.scalalib.Assembly.Rule
+import mill.scalalib.{Assembly, Dep, DepSyntax, ScalaModule}
 
 object main extends ScalaModule {
-  val doobieVersion = "1.0.0-RC2"
-  val circeVersion = "0.14.2"
-  val scalaPbVersion = "0.11.11"
-  val zioGrpcVersion = "0.6.0-test4"
-  val tapirVersion = "1.0.4"
+  val doobieVersion = "1.0.0-RC5"
+  val circeVersion = "0.14.6"
+  val scalaPbVersion = "0.11.15"
+  val zioGrpcVersion = "0.6.1"
+  val tapirVersion = "1.10.0"
 
-  def scalaVersion = "2.13.8"
+  def scalaVersion = "2.13.13"
 
-  override def scalacOptions = Seq("-Xsource:3")
+  override def scalacOptions: Target[Seq[String]] = Seq("-Xsource:3")
 
-  override def mainClass = Some("fima.services.subscription.SubscriptionServiceServer")
+  override def mainClass: Target[Option[String]] = Some("fima.services.subscription.SubscriptionServiceServer")
 
   override def ivyDeps = Agg(
     // GRPC
     ivy"com.thesamet.scalapb:scalapb-runtime-grpc_2.13:$scalaPbVersion",
-    ivy"io.grpc:grpc-netty:1.48.1",
+    ivy"io.grpc:grpc-netty:1.62.2",
 
     // ZIO GRPC
     ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.13:$zioGrpcVersion",
     ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-codegen_2.13:$zioGrpcVersion",
 
     // ZIO
-    ivy"dev.zio::zio:2.0.0",
+    ivy"dev.zio::zio:2.0.21",
     ivy"dev.zio::zio-interop-cats::3.3.0",
 
     // DB
@@ -43,10 +40,10 @@ object main extends ScalaModule {
     ivy"io.circe::circe-parser:$circeVersion",
 
     // STTP
-    ivy"org.http4s::http4s-blaze-server:0.23.12",
-    ivy"org.http4s::http4s-dsl:0.23.14",
-    ivy"org.http4s::http4s-blaze-client:0.23.12",
-    ivy"org.http4s::http4s-circe:0.23.14",
+    ivy"org.http4s::http4s-blaze-server:0.23.16",
+    ivy"org.http4s::http4s-dsl:0.23.26",
+    ivy"org.http4s::http4s-blaze-client:0.23.16",
+    ivy"org.http4s::http4s-circe:0.23.26",
 
     // Tapir
     ivy"com.softwaremill.sttp.tapir::tapir-core:$tapirVersion",
@@ -57,9 +54,9 @@ object main extends ScalaModule {
     ivy"com.softwaremill.sttp.tapir::tapir-http4s-server-zio:$tapirVersion"
   )
 
-  override def moduleDeps = Seq(domain)
+  override def moduleDeps: Seq[ScalaModule] = Seq(domain)
 
-  override def assemblyRules = Assembly.defaultRules ++ Seq(
+  override def assemblyRules: Seq[Rule] = Assembly.defaultRules ++ Seq(
     Rule.ExcludePattern("akka.protobuf.*"),
     Rule.AppendPattern("META-INF/*")
   )
@@ -67,17 +64,17 @@ object main extends ScalaModule {
 }
 
 object domain extends ScalaPBModule {
-  def scalaVersion = "2.13.8"
+  def scalaVersion = "2.13.13"
 
-  def scalaPBVersion = main.scalaPbVersion
+  def scalaPBVersion: T[String] = main.scalaPbVersion
 
   override def scalaPBGrpc = true
 
-  override def scalaPBSources: Sources = T.sources {
+  override def scalaPBSources: T[Seq[PathRef]] = T.sources {
     os.pwd / os.up / "domain" / "src" / "main" / "proto"
   }
 
-  override def ivyDeps = super.ivyDeps() ++ Agg(
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
     ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.13:${main.zioGrpcVersion}",
     ivy"com.thesamet.scalapb.zio-grpc:zio-grpc-codegen_2.13:${main.zioGrpcVersion}"
   )

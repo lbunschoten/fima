@@ -3,6 +3,7 @@ package fima.services.subscription
 import fima.services.subscription.SubscriptionDtos.*
 import fima.services.subscription.repository.PostgresSubscriptionRepository
 import fima.services.transaction.TransactionService.ZioTransactionService.TransactionServiceClient
+import org.http4s.HttpRoutes
 import sttp.tapir.PublicEndpoint
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
@@ -18,11 +19,11 @@ import java.util.UUID
 
 object SubscriptionApi {
 
-  lazy val live: ZLayer[PostgresSubscriptionRepository & TransactionServiceClient.Service, Any, SubscriptionApi] = {
+  lazy val live: ZLayer[PostgresSubscriptionRepository & TransactionServiceClient, Any, SubscriptionApi] = {
     ZLayer {
       for {
         subscriptionRepository <- ZIO.service[PostgresSubscriptionRepository]
-        transactionService <- ZIO.service[TransactionServiceClient.Service]
+        transactionService <- ZIO.service[TransactionServiceClient]
       } yield {
         new SubscriptionApi(subscriptionRepository, transactionService)
       }
@@ -30,7 +31,7 @@ object SubscriptionApi {
   }
 }
 
-class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, transactionService: TransactionServiceClient.Service) {
+class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, transactionService: TransactionServiceClient) {
 
   private val getSubscriptionByIdEndpoint: PublicEndpoint[UUID, String, GetSubscriptionResponseDto, Any] = {
     endpoint
@@ -40,7 +41,7 @@ class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, tr
       .errorOut(plainBody[String])
   }
 
-  private def getSubscriptionById: ZServerEndpoint[Any, Any] = getSubscriptionByIdEndpoint.zServerLogic { subscriptionId: UUID =>
+  private def getSubscriptionById: ZServerEndpoint[Any, Any] = getSubscriptionByIdEndpoint.zServerLogic { (subscriptionId: UUID) =>
     for {
       subscriptionOpt <- subscriptionRepository.findById(subscriptionId).mapError(e => s"Failed to retrieve subscription: ${e.getMessage}")
       subscription <- ZIO.fromOption(subscriptionOpt).orElseFail(s"Could not find subscription $subscriptionId")
@@ -78,7 +79,7 @@ class SubscriptionApi(subscriptionRepository: PostgresSubscriptionRepository, tr
     .corsInterceptor(corsInterceptor)
     .options
 
-  val routes = ZHttp4sServerInterpreter(serverOptions).from(List(
+  val routes: HttpRoutes[Task] = ZHttp4sServerInterpreter(serverOptions).from(List(
     getSubscriptionById,
     getSubscriptions
   )).toRoutes
